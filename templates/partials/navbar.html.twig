@@ -21,7 +21,7 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li>
-							<a class="dropdown-item" href="{{ path('tablette.list') }}">
+							<a class="dropdown-item {{ app.current_route starts with 'tablette.' ? 'active' : null }}" href="{{ path('tablette.list') }}">
 								{{ ux_icon(constant('App\\Entity\\Tablette::ICON')) }}
 								Tablettes
 							</a>

@@ -19,7 +19,7 @@ final class TabletteController extends AbstractController
     {
         return $this->render('tablette/list.html.twig', [
             'title' => sprintf('%s tablettes', __FUNCTION__),
-            'tablettes' => $tabletteRepository->findAll(),
+            'tablettes' => $tabletteRepository->findBy(['lvl' => 0]),
         ]);
     }
 

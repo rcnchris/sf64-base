@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Tablette;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\{AbstractType, FormBuilderInterface};
+use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TabletteType extends AbstractType
@@ -13,13 +14,12 @@ class TabletteType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('slug')
             ->add('icon')
-            ->add('color')
+            ->add('color', ColorType::class)
             ->add('description')
             ->add('parent', EntityType::class, [
                 'class' => Tablette::class,
-                'choice_label' => 'id',
+                'required' => false,
             ])
         ;
     }

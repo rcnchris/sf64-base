@@ -7,12 +7,18 @@
 {% endblock %}
 
 {% block body %}
-    <h1>Edit Tablette</h1>
+	<h1>{{ title }}</h1>
 
-    {{ include('tablette/_form.html.twig', {'button_label': 'Save'}) }}
+	{{ include('tablette/_form.html.twig', {'button_label': 'Save'}) }}
 
-    <a href="{{ path('tablette.list') }}">back to list</a>
-{% if tablette.id %}
-    {{ include('tablette/_delete_form.html.twig') }}
-{% endif %}
+	<a href="{{ path('tablette.list') }}">
+		{{ 'back to list'|trans|capitalize }}
+	</a>
+
+	{% if tablette.id %}
+		{{ include('tablette/_delete_form.html.twig') }}
+		{% include "tablette/_table.html.twig" with {tablettes: tablette.children} %}
+	{% endif %}
+
+
 {% endblock %}
