@@ -1,4 +1,7 @@
 {
+    "name": "rcnchris/sf64-base",
+    "description": "Projet Symfony 6.4.* de base",
+    "version": "1.0.0",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
@@ -22,7 +25,8 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "process-timeout": 0
     },
     "autoload": {
         "psr-4": {
@@ -53,7 +57,11 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "sfy": "php bin/console",
+        "sf-about": "@sfy about",
+        "commit": "git add --all && git commit -m",
+        "git-log": "git log --oneline"
     },
     "conflict": {
         "symfony/symfony": "*"
