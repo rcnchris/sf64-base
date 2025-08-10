@@ -21,7 +21,10 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li>
-							<a class="dropdown-item" href="#">Action</a>
+							<a class="dropdown-item" href="{{ path('tablette.list') }}">
+								{{ ux_icon(constant('App\\Entity\\Tablette::ICON')) }}
+								Tablettes
+							</a>
 						</li>
 						<li>
 							<a class="dropdown-item" href="#">Another action</a>

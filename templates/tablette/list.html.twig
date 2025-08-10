@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|trans|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+    <h1>{{ title }}</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Slug</th>
+                <th>Icon</th>
+                <th>Color</th>
+                <th>Description</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for tablette in tablettes %}
+            <tr>
+                <td>{{ tablette.name }}</td>
+                <td>{{ tablette.slug }}</td>
+                <td>{{ tablette.icon }}</td>
+                <td>{{ tablette.color }}</td>
+                <td>{{ tablette.description }}</td>
+                <td>
+                    <a href="{{ path('tablette.edit', {id: tablette.id, slug: tablette.slug}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="12">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('tablette.new') }}">Create new</a>
+{% endblock %}

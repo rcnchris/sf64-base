@@ -8,4 +8,5 @@ ux_icons:
         class: 'mb-1'
     aliases:
         gear: bi:gear
+        hierarchy: bi:diagram-3
         home: bi:house
