@@ -14,6 +14,7 @@
         "doctrine/doctrine-bundle": "^2.15",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
+        "league/commonmark": "^2.7",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.2",
         "symfony/apache-pack": "*",
@@ -42,10 +43,17 @@
         "symfony/string": "6.4.*",
         "symfony/translation": "6.4.*",
         "symfony/twig-bundle": "6.4.*",
+        "symfony/ux-icons": "^2.29",
         "symfony/validator": "6.4.*",
         "symfony/web-link": "6.4.*",
         "symfony/yaml": "6.4.*",
+        "twig/cssinliner-extra": "^3.21",
         "twig/extra-bundle": "^2.12|^3.0",
+        "twig/html-extra": "^3.21",
+        "twig/inky-extra": "^3.21",
+        "twig/intl-extra": "^3.21",
+        "twig/markdown-extra": "^3.21",
+        "twig/string-extra": "^3.21",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {
@@ -90,6 +98,26 @@
         ],
         "sfy": "php bin/console",
         "sf-about": "@sfy about",
+        "sf-env": "@sfy debug:dotenv",
+        "sf-trans": "@sfy translation:extract fr --format=yaml --force",
+        "sf-icons": [
+            "@sfy ux:icons:lock --force",
+            "@sfy ux:icons:warm-cache"
+        ],
+        "sf-assets": "@sfy asset-map:compile",
+
+        "to-prod": [
+            "@sf-trans",
+            "@sf-icons",
+            "@sf-assets",
+            "composer dump-env prod",
+            "composer install --no-dev --optimize-autoloader"
+        ],
+        "to-dev": [
+            "rm -rf public/assets",
+            "composer dump-env dev",
+            "composer install --optimize-autoloader"
+        ],
         "commit": "git add --all && git commit -m",
         "git-log": "git log --oneline"
     },

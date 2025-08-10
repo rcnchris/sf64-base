@@ -1,0 +1,10 @@
+ux_icons:
+    icon_dir: '%kernel.project_dir%/assets/icons'
+    default_icon_attributes:
+        fill: currentColor
+        aria-hidden: true
+        width: '16'
+        height: '16'
+        class: 'mb-1'
+    aliases:
+        home: bi:house
