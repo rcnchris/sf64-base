@@ -119,7 +119,19 @@
             "composer install --optimize-autoloader"
         ],
         "commit": "git add --all && git commit -m",
-        "git-log": "git log --oneline"
+        "git-log": "git log --oneline",
+        "db-create": "@sfy doctrine:database:create --if-not-exists",
+        "db-drop": "@sfy doctrine:database:drop --force --if-exists",
+        "db-migration": "@sfy doctrine:migrations:diff --formatted -n",
+        "db-migrate": "@sfy doctrine:migrations:migrate -n",
+        "db-schema": "@sfy doctrine:schema:create -q -n",
+        "db-meta": "@sfy doctrine:migrations:sync-metadata-storage",
+        "db-init": [
+            "@db-drop",
+            "@db-create"
+        ],
+        "db-save": "mysqldump -u root sf64-base > ./var/dump/sf64-base.sql",
+        "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql"
     },
     "conflict": {
         "symfony/symfony": "*"
