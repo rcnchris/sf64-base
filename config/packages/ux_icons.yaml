@@ -7,4 +7,5 @@ ux_icons:
         height: '16'
         class: 'mb-1'
     aliases:
+        gear: bi:gear
         home: bi:house
