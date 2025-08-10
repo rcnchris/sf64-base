@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|trans|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<h1>
+		{{ ux_icon('home', {width: '20', height: '20'}) }}
+		{{ 'welcome on'|trans|capitalize }} {{ app_name }}
+	</h1>
+    <h2>{{ 'hello'|trans|capitalize }}</h2>
+	<hr>
+{% endblock %}
