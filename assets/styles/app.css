@@ -1,3 +1,27 @@
+@charset "UTF-8";
+
+:root {
+    --color-pomegranate: #c0392b;
+    --color-silver: #bdc3c7;
+    --color-asphalt: #34495e;
+}
+
 body {
-    background-color: skyblue;
+    background: linear-gradient(
+        120deg,
+        var(--color-silver),
+        var(--color-asphalt)
+    );
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    font-family: sans-serif;
+}
+
+label.required:before {
+    content: '*';
+    color: var(--color-pomegranate);
+}
+
+code {
+    border-radius: 3px;
 }

@@ -25,4 +25,51 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+    'bootstrap' => [
+        'version' => '5.3.7',
+    ],
+    '@popperjs/core' => [
+        'version' => '2.11.8',
+    ],
+    'bootstrap/dist/css/bootstrap.min.css' => [
+        'version' => '5.3.7',
+        'type' => 'css',
+    ],
+    'highlight.js/lib/core' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/apache' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/bash' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/css' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/javascript' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/json' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/makefile' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/php' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/sql' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/twig' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/lib/languages/yaml' => [
+        'version' => '11.11.1',
+    ],
+    'highlight.js/styles/agate.css' => [
+        'version' => '11.11.1',
+        'type' => 'css',
+    ],
 ];

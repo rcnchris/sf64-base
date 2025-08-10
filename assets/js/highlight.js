@@ -1,0 +1,24 @@
+import hljs from 'highlight.js/lib/core';
+import apache from 'highlight.js/lib/languages/apache';
+import bash from 'highlight.js/lib/languages/bash';
+import css from 'highlight.js/lib/languages/css';
+import javascript from 'highlight.js/lib/languages/javascript';
+import json from 'highlight.js/lib/languages/json';
+import makefile from 'highlight.js/lib/languages/makefile';
+import php from 'highlight.js/lib/languages/php';
+import sql from 'highlight.js/lib/languages/sql';
+import twig from 'highlight.js/lib/languages/twig';
+import yaml from 'highlight.js/lib/languages/yaml';
+import 'highlight.js/styles/agate.css';
+
+hljs.registerLanguage('apache', apache);
+hljs.registerLanguage('bash', bash);
+hljs.registerLanguage('css', css);
+hljs.registerLanguage('javascript', javascript);
+hljs.registerLanguage('json', json);
+hljs.registerLanguage('makefile', makefile);
+hljs.registerLanguage('php', php);
+hljs.registerLanguage('sql', sql);
+hljs.registerLanguage('twig', twig);
+hljs.registerLanguage('yaml', yaml);
+hljs.highlightAll();
