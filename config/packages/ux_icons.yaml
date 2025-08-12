@@ -7,7 +7,10 @@ ux_icons:
         height: '16'
         class: 'mb-1'
     aliases:
+        book: bi:book
         category: bi:inboxes
         gear: bi:gear
         hierarchy: bi:diagram-3
         home: bi:house
+        list: bi:card-list
+        new: bi:plus-circle

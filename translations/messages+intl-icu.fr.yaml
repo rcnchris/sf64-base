@@ -1,6 +1,14 @@
 application: application
 'back to list': 'retour à la liste'
+entity.tablette: >-
+  {tablettes, plural,
+    =0 {tablette}
+    =1 {tablette}
+    other {tablettes}
+  }
 hello: bonjour
 home: accueil
+create: créer
+edit: éditer
+readme: 'à propos'
 'welcome on': 'bienvenue sur'
-

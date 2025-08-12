@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|trans|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	{% include "partials/page_title.html.twig" with {
+        title: title|trans, 
+        icon: 'book',
+    } %}
+	<div class="card shadow">
+		<div class="card-body">
+			<h2>{{ app_name }}</h2>
+			<p>Version :
+				<span class="badge text-bg-secondary"><samp>{{ version }}</samp></span>
+			</p>
+			<hr>
+			<h3>Installation</h3>
+			{{ install_code|highlight }}
+			<h3>Mise à jour</h3>
+			{{ update_code|highlight }}
+		</div>
+	</div>
+{% endblock %}

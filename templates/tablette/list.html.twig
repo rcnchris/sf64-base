@@ -1,13 +1,16 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-	{{ title|trans|capitalize }}
+	{{ title|capitalize }}
 	-
 	{{ parent() }}
 {% endblock %}
 
 {% block body %}
-    <h1>{{ title }}</h1>
-    <a href="{{ path('tablette.new') }}">Create new</a>
+	{% include "partials/page_title.html.twig" with {
+        title: title, 
+        icon: constant('App\\Entity\\Tablette::ICON'),
+        prefix: 'tablette'
+    } %}
     {% include "tablette/_table.html.twig" %}
 {% endblock %}

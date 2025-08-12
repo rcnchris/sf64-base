@@ -10,15 +10,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/tablette', name: 'tablette.')]
 final class TabletteController extends AbstractController
 {
     #[Route('/list', name: 'list', methods: ['GET'])]
-    public function list(TabletteRepository $tabletteRepository): Response
+    public function list(TabletteRepository $tabletteRepository, TranslatorInterface $translator): Response
     {
         return $this->render('tablette/list.html.twig', [
-            'title' => sprintf('%s tablettes', __FUNCTION__),
+            'title' => $translator->trans('entity.tablette', ['tablettes' => 2]),
             'tablettes' => $tabletteRepository->findBy(['lvl' => 0]),
         ]);
     }

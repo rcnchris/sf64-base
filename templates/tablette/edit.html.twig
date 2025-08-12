@@ -7,7 +7,11 @@
 {% endblock %}
 
 {% block body %}
-	<h1>{{ title }}</h1>
+	{% include "partials/page_title.html.twig" with {
+        title: title, 
+        icon: constant('App\\Entity\\Tablette::ICON'),
+        prefix: 'tablette'
+    } %}
 
 	{{ include('tablette/_form.html.twig', {'button_label': 'Save'}) }}
 
