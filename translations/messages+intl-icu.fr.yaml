@@ -1,14 +1,23 @@
 application: application
+'Are you sure you want to delete this item?': 'Certain(e) de vouloir supprimer cet enregistrement ?'
 'back to list': 'retour à la liste'
-entity.tablette: >-
-  {tablettes, plural,
-    =0 {tablette}
-    =1 {tablette}
-    other {tablettes}
-  }
+children: enfants
+close: fermer
+color: couleur
+create: créer
+toast.new: 'Enregistrement créé'
+toast.edit: 'Enregistrement modifié'
+toast.delete: 'Enregistrement supprimé'
+delete: supprimer
+description: description
+edit: éditer
+entity.tablette: "{tablettes, plural,\n  =0 {tablette}\n  =1 {tablette}\n  other {tablettes}\n}"
 hello: bonjour
 home: accueil
-create: créer
-edit: éditer
+icon: icône
+name: nom
+new: créer
 readme: 'à propos'
+save: enregistrer
 'welcome on': 'bienvenue sur'
+

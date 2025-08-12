@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Tablette;
 use App\Form\TabletteType;
 use App\Repository\TabletteRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -31,12 +30,12 @@ final class TabletteController extends AppAbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $tabletteRepository->save($tablette);
-            $this->addFlash('toast-success', "Enregistrement créé");
+            $this->addFlash('toast-success', $this->trans('toast.' . __FUNCTION__));
             return $this->redirectToRoute('tablette.list', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('tablette/edit.html.twig', [
-            'title' => sprintf('%s tablette', __FUNCTION__),
+            'title' => $this->trans('new'). ' une tablette',
             'tablette' => $tablette,
             'form' => $form,
         ]);
@@ -55,7 +54,7 @@ final class TabletteController extends AppAbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $tabletteRepository->save($tablette);
-            $this->addFlash('toast-success', "Enregistrement modifié");
+            $this->addFlash('toast-success', $this->trans('toast.' . __FUNCTION__));
 
             return $this->redirectToRoute(
                 'tablette.edit',
@@ -65,7 +64,7 @@ final class TabletteController extends AppAbstractController
         }
 
         return $this->render('tablette/edit.html.twig', [
-            'title' => sprintf('%s tablette', __FUNCTION__),
+            'title' => $this->trans(__FUNCTION__). ' une tablette',
             'tablette' => $tablette,
             'form' => $form,
         ]);
@@ -76,6 +75,7 @@ final class TabletteController extends AppAbstractController
     {
         if ($this->isCsrfTokenValid('delete' . $tablette->getId(), $request->getPayload()->getString('_token'))) {
             $tabletteRepository->remove($tablette);
+            $this->addFlash('toast-success', $this->trans('toast.' . __FUNCTION__));
         }
         return $this->redirectToRoute('tablette.list', [], Response::HTTP_SEE_OTHER);
     }

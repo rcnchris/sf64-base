@@ -1,4 +1,8 @@
+{% set route_suffix = app.current_route|split('.')|last %}
 {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_widget(form) }}
+<button type="submit" class="btn btn-{{ route_suffix == 'new' ? 'success' : 'primary' }}">
+	{{ ux_icon(route_suffix == 'new' ? 'bi:plus-circle' : 'bi:save') }}
+	{{ (route_suffix == 'new' ? 'new' : 'save')|trans|capitalize }}
+</button>
 {{ form_end(form) }}

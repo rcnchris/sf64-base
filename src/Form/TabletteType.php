@@ -28,6 +28,7 @@ class TabletteType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Tablette::class,
+            'translation_domain' => 'forms',
         ]);
     }
 }

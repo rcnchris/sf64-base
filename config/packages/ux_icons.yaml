@@ -9,10 +9,14 @@ ux_icons:
     aliases:
         book: bi:book
         category: bi:inboxes
+        danger: bi:radioactive
+        delete: bi:trash
         gear: bi:gear
         hierarchy: bi:diagram-3
         home: bi:house
         info-circle: bi:info-circle
         list: bi:card-list
         new: bi:plus-circle
+        pointer: bi:hand-index-thumb
+        save: bi:save
         success: bi:check-circle-fill

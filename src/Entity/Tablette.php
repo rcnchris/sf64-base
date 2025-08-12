@@ -10,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Sluggable\Handler\TreeSlugHandler;
+use Symfony\Component\Validator\Constraints\Length;
 
 #[ORM\Entity(repositoryClass: TabletteRepository::class)]
 #[Gedmo\Tree(type: 'nested')]
@@ -20,6 +21,7 @@ class Tablette
     public const ICON = 'hierarchy';
 
     #[ORM\Column(type: Types::STRING, length: 255)]
+    #[Length(min: 3, minMessage: 'This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.')]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::STRING, length: 255, unique: true)]

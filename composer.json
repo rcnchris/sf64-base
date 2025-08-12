@@ -129,9 +129,12 @@
         "db-migrate": "@sfy doctrine:migrations:migrate -n",
         "db-schema": "@sfy doctrine:schema:create -q -n",
         "db-meta": "@sfy doctrine:migrations:sync-metadata-storage",
+        "db-load": "@sfy doctrine:fixtures:load -n",
         "db-init": [
             "@db-drop",
-            "@db-create"
+            "@db-create",
+            "@db-migrate",
+            "@db-load --append"
         ],
         "db-save": "mysqldump -u root sf64-base > ./var/dump/sf64-base.sql",
         "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql"

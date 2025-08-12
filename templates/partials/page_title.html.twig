@@ -3,17 +3,22 @@
 		{{ ux_icon(icon, {class: 'mb-2', width: '35', height: '35'}) }}
 		{{ title|capitalize }}
 	</h1>
-	<div class="btn-toolbar" role="toolbar">
-		<div class="btn-group" role="group">
-			{% if app.current_route ends with '.list'  %}
-				<a href="{{ path(prefix ~ '.new') }}" class="btn btn-light" title="{{ 'create'|trans|capitalize }}" data-toggle="tooltip">
-					{{ ux_icon('new', {class: 'text-success mb-1'}) }}
-				</a>
-			{% elseif app.current_route ends with '.edit' or app.current_route ends with '.new' or app.current_route ends with '.show' %}
-				<a href="{{ path(prefix ~ '.list') }}" class="btn btn-light" title="{{ 'back to list'|trans|capitalize }}" data-toggle="tooltip">
-					{{ ux_icon('list', {class: 'text-success mb-1'}) }}
-				</a>
-			{% endif %}
+	{% if prefix is defined %}
+		<div class="btn-toolbar" role="toolbar">
+			<div class="btn-group" role="group">
+
+				{% if app.current_route != prefix ~ '.new'  %}
+					<a href="{{ path(prefix ~ '.new') }}" class="btn btn-light" title="{{ 'create'|trans|capitalize }}" data-toggle="tooltip">
+						{{ ux_icon('new', {class: 'text-success mb-1'}) }}
+					</a>
+				{% endif %}
+
+				{% if app.current_route ends with '.edit' or app.current_route ends with '.new' or app.current_route ends with '.show' %}
+					<a href="{{ path(prefix ~ '.list') }}" class="btn btn-light" title="{{ 'back to list'|trans|capitalize }}" data-toggle="tooltip">
+						{{ ux_icon('list', {class: 'text-success mb-1'}) }}
+					</a>
+				{% endif %}
+			</div>
 		</div>
-	</div>
+	{% endif %}
 </div>
