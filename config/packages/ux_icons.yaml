@@ -12,5 +12,7 @@ ux_icons:
         gear: bi:gear
         hierarchy: bi:diagram-3
         home: bi:house
+        info-circle: bi:info-circle
         list: bi:card-list
         new: bi:plus-circle
+        success: bi:check-circle-fill

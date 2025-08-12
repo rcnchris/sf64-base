@@ -12,5 +12,40 @@
         icon: constant('App\\Entity\\Tablette::ICON'),
         prefix: 'tablette'
     } %}
-    {% include "tablette/_table.html.twig" %}
+	<div class="card bg-light shadow">
+		<div class="card-body">
+			<table class="table table-striped table-hover align-middle">
+				<thead>
+					<tr>
+						<th class="text-center">Name</th>
+						<th class="text-center">Slug</th>
+						<th class="text-center">Icon</th>
+						<th class="text-center">Color</th>
+						<th class="text-center">Description</th>
+						<th class="text-center">Enfants</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tablette in tablettes %}
+						<tr>
+							<td>{{ tablette.name }}</td>
+							<td>{{ tablette.slug }}</td>
+							<td class="text-center">{{ tablette.icon ? ux_icon(tablette.icon) : null }}</td>
+							<td class="text-center">{{ tablette.color|canvas }}</td>
+							<td>{{ tablette.description }}</td>
+							<td class="text-center">
+								<span class="badge text-bg-info">{{ tablette.children }}</span>
+							</td>
+							<td class="text-center">
+								<a href="{{ path('tablette.edit', {id: tablette.id, slug: tablette.slug}) }}" class="btn btn-sm btn-primary" title="{{ 'edit'|trans|capitalize }}" data-toggle="tooltip">
+									{{ ux_icon('bi:pencil-square') }}
+								</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 {% endblock %}

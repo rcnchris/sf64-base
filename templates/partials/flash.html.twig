@@ -1,0 +1,26 @@
+<div class="container-sm">
+	{% for type, messages in app.flashes(['primary', 'secondary', 'info', 'success', 'warning', 'danger', 'light', 'dark']) %}
+		{% for message in messages %}
+			<twig:Alert type="{{ type }}" icon="{{ type }}" content="{{ message }}" centered="{{ true }}" bold="{{ true }}" dismissible="{{ true }}"/>
+		{% endfor %}
+	{% endfor %}
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+	{% for type, messages in app.flashes|filter((messages, type) => type starts with 'toast-') %}
+		{% for message in messages %}
+			<div class="toast text-bg-{{ type|split('-')|last }}" role="alert" aria-live="assertive" aria-atomic="true">
+				<div class="toast-header">
+					<strong class="me-auto">
+						{{ ux_icon(type|split('-')|last, {class: 'mb-1 text-' ~ type|split('-')|last}) }}
+						{{ app_name }}
+					</strong>
+					<button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="{{ 'close'|trans|capitalize }}"></button>
+				</div>
+				<div class="toast-body">
+					{{ message }}
+				</div>
+			</div>
+		{% endfor %}
+	{% endfor %}
+</div>

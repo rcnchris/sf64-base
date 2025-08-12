@@ -6,35 +6,32 @@ use App\Entity\Tablette;
 use App\Form\TabletteType;
 use App\Repository\TabletteRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/tablette', name: 'tablette.')]
-final class TabletteController extends AbstractController
+final class TabletteController extends AppAbstractController
 {
     #[Route('/list', name: 'list', methods: ['GET'])]
-    public function list(TabletteRepository $tabletteRepository, TranslatorInterface $translator): Response
+    public function list(TabletteRepository $tabletteRepository): Response
     {
         return $this->render('tablette/list.html.twig', [
-            'title' => $translator->trans('entity.tablette', ['tablettes' => 2]),
-            'tablettes' => $tabletteRepository->findBy(['lvl' => 0]),
+            'title' => $this->trans('entity.tablette', ['tablettes' => 2]),
+            'tablettes' => $tabletteRepository->findListQb()->where('t.lvl = 0')->getQuery()->getResult(),
         ]);
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, TabletteRepository $tabletteRepository): Response
     {
         $tablette = new Tablette();
         $form = $this->createForm(TabletteType::class, $tablette);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($tablette);
-            $entityManager->flush();
-
+            $tabletteRepository->save($tablette);
+            $this->addFlash('toast-success', "Enregistrement créé");
             return $this->redirectToRoute('tablette.list', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -51,13 +48,14 @@ final class TabletteController extends AbstractController
         methods: ['GET', 'POST'],
         requirements: ['id' => Requirement::DIGITS, 'slug' => '[a-z0-9\-]+']
     )]
-    public function edit(Request $request, Tablette $tablette, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Tablette $tablette, TabletteRepository $tabletteRepository): Response
     {
         $form = $this->createForm(TabletteType::class, $tablette);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            $tabletteRepository->save($tablette);
+            $this->addFlash('toast-success', "Enregistrement modifié");
 
             return $this->redirectToRoute(
                 'tablette.edit',
@@ -74,11 +72,10 @@ final class TabletteController extends AbstractController
     }
 
     #[Route('/delete/{id}', name: 'delete', methods: ['POST'], requirements: ['id' => Requirement::DIGITS])]
-    public function delete(Request $request, Tablette $tablette, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Tablette $tablette, TabletteRepository $tabletteRepository): Response
     {
         if ($this->isCsrfTokenValid('delete' . $tablette->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($tablette);
-            $entityManager->flush();
+            $tabletteRepository->remove($tablette);
         }
         return $this->redirectToRoute('tablette.list', [], Response::HTTP_SEE_OTHER);
     }
