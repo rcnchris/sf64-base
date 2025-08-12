@@ -137,7 +137,17 @@
             "@db-load --append"
         ],
         "db-save": "mysqldump -u root sf64-base > ./var/dump/sf64-base.sql",
-        "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql"
+        "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql",
+        "app-install": [
+            "composer install",
+            "@sfy app:install-env",
+            "@db-init"
+        ],
+        "app-update": [
+            "git pull origin main",
+            "composer update",
+            "@db-migrate"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"
