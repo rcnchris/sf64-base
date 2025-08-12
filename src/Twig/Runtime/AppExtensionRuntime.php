@@ -27,23 +27,4 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
             is_null($height) ? $width : $height
         );
     }
-
-    /**
-     * Filtre qui permet d'obtenir un canvas à partir d'un code hexadécimal d'une couleur
-     * 
-     * @param ?string $hex Code hexadécimal d'une couleur
-     * @param ?int $width Largeur
-     * @param ?int $height Hauteur. Si null identique à la largeur.
-     */
-    public function highlight(string|array $code, ?string $language = 'bash'): string
-    {
-        if (is_string($code)) {
-            $code = [$code];
-        }
-        return sprintf(
-            '<pre><code class="%s">%s</code></pre>',
-            $language,
-            join("\n", $code)
-        );
-    }
 }

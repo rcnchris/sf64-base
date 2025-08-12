@@ -8,9 +8,9 @@
 
 {% block body %}
 	<h1>
-		{{ ux_icon('home', {width: '30', height: '30'}) }}
+		{{ ux_icon('home', {class: 'mb-2', width: '30', height: '30'}) }}
 		{{ 'welcome on'|trans|capitalize }} {{ app_name }}
 	</h1>
-    <h2>{{ 'hello'|trans|capitalize }}</h2>
-	<hr>
+    <hr>
+	<twig:Alert title="{{ 'hello'|trans|capitalize }}" content="Oyé les gens" />
 {% endblock %}

@@ -35,7 +35,7 @@ final class TabletteController extends AppAbstractController
         }
 
         return $this->render('tablette/edit.html.twig', [
-            'title' => $this->trans('new'). ' une tablette',
+            'title' => $this->trans('new') . ' une tablette',
             'tablette' => $tablette,
             'form' => $form,
         ]);
@@ -47,8 +47,16 @@ final class TabletteController extends AppAbstractController
         methods: ['GET', 'POST'],
         requirements: ['id' => Requirement::DIGITS, 'slug' => '[a-z0-9\-]+']
     )]
-    public function edit(Request $request, Tablette $tablette, TabletteRepository $tabletteRepository): Response
+    public function edit(string $slug, Request $request, Tablette $tablette, TabletteRepository $tabletteRepository): Response
     {
+        if ($slug !== $tablette->getSlug()) {
+            return $this->redirectToRoute(
+                'tablette.edit',
+                ['id' => $tablette->getId(), 'slug' => $tablette->getSlug()],
+                Response::HTTP_SEE_OTHER
+            );
+        }
+
         $form = $this->createForm(TabletteType::class, $tablette);
         $form->handleRequest($request);
 
@@ -64,7 +72,7 @@ final class TabletteController extends AppAbstractController
         }
 
         return $this->render('tablette/edit.html.twig', [
-            'title' => $this->trans(__FUNCTION__). ' une tablette',
+            'title' => $this->trans(__FUNCTION__) . ' une tablette',
             'tablette' => $tablette,
             'form' => $form,
         ]);

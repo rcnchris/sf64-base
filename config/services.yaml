@@ -6,6 +6,8 @@
 parameters:
     app.name: "Projet Symfony 6.4.* de base"
     app.locale: fr
+    app.country: FR
+    app.locale_country: '%app.locale%_%app.country%'
     app.timezone: 'Europe/Paris'
     app.logo_path: 'images/logo.png'
 

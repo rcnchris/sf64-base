@@ -31,4 +31,12 @@ class TabletteType extends AbstractType
             'translation_domain' => 'forms',
         ]);
     }
+
+    /**
+     * Permet de supprimer le nom du formulaire dans les inputs et paramètres de l'uri
+     */
+    public function getBlockPrefix(): string
+    {
+        return '';
+    }
 }

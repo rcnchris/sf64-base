@@ -12,7 +12,6 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('canvas', [AppExtensionRuntime::class, 'canvas'], ['is_safe' => ['html']]),
-            new TwigFilter('highlight', [AppExtensionRuntime::class, 'highlight'], ['is_safe' => ['html']]),
         ];
     }
 

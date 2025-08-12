@@ -57,7 +57,7 @@ trait AppRepositoryTrait
      * @param ?string $criteria Critères de sélection
      * @param ?int $limit Nombre d'entité à retourner
      */
-    public function findRand(string $alias, ?string $criteria = null, ?int $limit = 1): array
+    public function findRand(string $alias, ?string $criteria = null, ?int $limit = 1): array|object|null
     {
         $query = $this->findRandQb($alias, $criteria, $limit)->getQuery();
         if ($limit === 1) {
@@ -93,5 +93,18 @@ trait AppRepositoryTrait
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * Retourne la dernière entité créée
+     */
+    public function getLastInsert(): object|null
+    {
+        return $this
+            ->createQueryBuilder('t')
+            ->setMaxResults(1)
+            ->orderBy('t.id', 'DESC')
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

@@ -1,8 +1,6 @@
 <div class="{{ this.class }}">
     {{ (this.title ? '<h2>' ~ this.title ~ '</h2>' : null)|raw }}
 
-	{{ this.icon ? ux_icon(this.icon(), {class: 'mb-1 text-' ~ (this.type == 'light' ? 'secondary' : this.type) }) : null }}
-
 	{{ (this.bold ? '<strong>' ~ this.content ~ '</strong>' : this.content)|raw }}
 
 	{% if this.dismissible %}

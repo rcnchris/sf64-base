@@ -147,6 +147,27 @@
             "git pull origin main",
             "composer update",
             "@db-migrate"
+        ],
+        "test-yaml": "@sfy lint:yaml config translations --parse-tags",
+        "test-container": "@sfy lint:container",
+        "test-template": "@sfy lint:twig --show-deprecations templates/",
+        "test-mailer": "@sfy mailer:test test@mailer.fr -vvv",
+        "tests-lint": [
+            "@test-yaml",
+            "@test-container",
+            "@test-template",
+            "@test-mailer"
+        ],
+        "tests": "php bin/phpunit --stop-on-failure --testdox -v --colors=always",
+        "coverage": [
+            "@db-drop --env=test",
+            "@db-create --env=test",
+            "@db-migrate --env=test",
+            "@db-load --env=test",
+            "@tests-lint",
+            "rm -rf var/coverage/*",
+            "@putenv XDEBUG_MODE=coverage",
+            "@tests --coverage-html var/coverage --testdox-html var/coverage/testdox.html"
         ]
     },
     "conflict": {

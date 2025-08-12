@@ -131,35 +131,14 @@ class Tablette
         return $this->lft;
     }
 
-    public function setLft(int $lft): static
-    {
-        $this->lft = $lft;
-
-        return $this;
-    }
-
     public function getRgt(): ?int
     {
         return $this->rgt;
     }
 
-    public function setRgt(int $rgt): static
-    {
-        $this->rgt = $rgt;
-
-        return $this;
-    }
-
     public function getLvl(): ?int
     {
         return $this->lvl;
-    }
-
-    public function setLvl(int $lvl): static
-    {
-        $this->lvl = $lvl;
-
-        return $this;
     }
 
     public function getRoot(): ?self
