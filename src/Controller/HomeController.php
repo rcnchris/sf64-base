@@ -25,17 +25,25 @@ final class HomeController extends AppAbstractController
     #[Route('/readme', name: 'readme')]
     public function readme(): Response
     {
+        $composer = json_decode($this->getFileContent('composer.json'), true);
+        $readme = [
+            sprintf("## %s\n", $composer['description']),
+            sprintf("Version : **%s**\n", $composer['version']),
+            "### Installation\n",
+            '```bash',
+            'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
+            'cd my-project-dir',
+            'composer app-install',
+            '```',
+            "\n### Mise à jour\n",
+            '```bash',
+            'composer app-update',
+            '```',
+        ];
+        file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
         return $this->render('home/readme.html.twig', [
             'title' => __FUNCTION__,
-            'version' => json_decode($this->getFileContent('composer.json'), true)['version'],
-            'install_code' => [
-                'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
-                'cd my-project-dir',
-                'composer app-install'
-            ],
-            'update_code' => [
-                'composer app-update'
-            ],
+            'readme' => $this->getFileContent('readme.md'),
         ]);
     }
 }
