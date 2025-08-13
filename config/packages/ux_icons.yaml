@@ -22,6 +22,7 @@ ux_icons:
         logout: bi:box-arrow-right
         mail: bi:envelope
         new: bi:plus-circle
+        phone: bi:telephone
         pointer: bi:hand-index-thumb
         profile: bi:person-vcard-fill
         register: bi:person-fill-add

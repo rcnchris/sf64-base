@@ -3,11 +3,14 @@ Color: Couleur
 Children: Enfants
 Description: Description
 Email: Courriel
+Firstname: Prénom
 Icon: Icône
 Id: Identifiant
 Identifier: Identifiant
+Lastname: Nom
 Name: Nom
 Parent: Parent
 Password: 'Mot de passe'
+Phone: Téléphone
 'Remember me': 'Laisser une empreinte'
 Slug: Slug

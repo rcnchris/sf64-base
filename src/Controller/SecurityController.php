@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\ProfileForm;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
@@ -108,5 +109,24 @@ final class SecurityController extends AppAbstractController
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    #[Route('/profile', name: 'profile', methods: ['GET', 'POST'])]
+    public function profile(Request $request, UserRepository $userRepository): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getAuthUser();
+        $form = $this->createForm(ProfileForm::class, $user);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $userRepository->save($user);
+            $this->addFlash('toast-success', $this->trans('toast.edit'));
+            return $this->redirectToRoute('security.profile');
+        }
+        // $this->addLog($this->trans(__FUNCTION__));
+        return $this->render('security/profile.html.twig', [
+            'title' => __FUNCTION__,
+            'form' => $form,
+        ]);
     }
 }

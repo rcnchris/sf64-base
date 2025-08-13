@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|trans|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+        title: title|trans, 
+        icon: 'profile',
+    } %}
+	<div class="card bg-light shadow mx-auto" style="max-width: 35rem;">
+		<div class="card-body">
+			{{ form_start(form) }}
+			<div class="row">
+				<div class="col">{{ form_row(form.email) }}</div>
+				<div class="col">{{ form_row(form.pseudo) }}</div>
+			</div>
+			<div class="row">
+				<div class="col">{{ form_row(form.firstname) }}</div>
+				<div class="col">{{ form_row(form.lastname) }}</div>
+			</div>
+			<div class="row">
+				<div class="col">{{ form_row(form.phone) }}</div>
+			</div>
+			{{ form_row(form.description) }}
+
+			<div class="d-grid mx-auto">
+				<button type="submit" class="btn btn-lg btn-primary">
+					{{ ux_icon('save', {width: '20', height: '20'}) }}
+					{{ 'save'|trans|capitalize }}
+				</button>
+			</div>
+			{{ form_rest(form) }}
+		</div>
+	</div>
+{% endblock %}
