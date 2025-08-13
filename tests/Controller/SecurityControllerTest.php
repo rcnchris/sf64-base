@@ -147,16 +147,41 @@ final class SecurityControllerTest extends AppWebTestCase
         self::assertSelectorTextContains('.alert-info', 'Vous êtes connecté en tant que');
     }
 
-    // public function testLoginWithTarget(): void
-    // {
-    //     $client = $this->makeClient();
-    //     $client->request('GET', '/security/login');
-    //     self::assertResponseIsSuccessful();
+    public function testLoginWithTarget(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/profile');
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
 
-    //     $client->submitForm('Se connecter', [
-    //         '_username' => 'tst',
-    //         '_password' => 'tsttst',
-    //     ]);
-    //     self::assertResponseRedirects('/home');
-    // }
+        $client->submitForm('Se connecter', [
+            '_username' => 'tst',
+            '_password' => 'tsttst',
+        ]);
+        self::assertResponseRedirects('/security/profile');
+    }
+
+    public function testProfileWhenNotAuthenticatedRedirectToLogin(): void
+    {
+        $this->makeClient()->request('GET', '/security/profile');
+        self::assertResponseRedirects('/security/login');
+    }
+
+    public function testProfile(): void
+    {
+        $client = $this->makeClient('tst');
+        $client->request('GET', '/security/profile');
+        self::assertResponseIsSuccessful();
+        $title = 'Profil';
+        self::assertPageTitleContains($title);
+        self::assertSelectorTextContains('h1', $title);
+
+        $faker = $this->getFaker();
+        $client->submitForm('Enregistrer', [
+            'firstname' => $faker->firstName(),
+            'lastname' => $faker->lastName(),
+            'phone' => $faker->phoneNumber(),
+        ]);
+        self::assertResponseRedirects('/security/profile');
+    }
 }
