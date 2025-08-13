@@ -81,4 +81,56 @@ final class SecurityControllerTest extends AppWebTestCase
         $client->request('GET', '/security/verify/email?expires=1746938367&id=3&signature=sgX6kUhT%2BnDIsprk99WLj&token=ImAhMR1tEqLfV3');
         self::assertResponseRedirects('/security/register');
     }
+
+    public function testLoginWithUnknowUser(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/login');
+        self::assertResponseIsSuccessful();
+        self::assertPageTitleContains('Se connecter');
+        self::assertSelectorTextContains('h1', 'Se connecter');
+
+        $client->submitForm('Se connecter', [
+            '_username' => 'jobi',
+            '_password' => 'joba',
+        ]);
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
+        self::assertSelectorTextContains('.alert-danger', 'Identifiants invalides.');
+    }
+
+    public function testLoginWithWrongPassword(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/login');
+        self::assertResponseIsSuccessful();
+
+        $client->submitForm('Se connecter', [
+            '_username' => 'tst',
+            '_password' => 'ola',
+        ]);
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
+        self::assertSelectorTextContains('.alert-danger', 'Identifiants invalides.');
+    }
+
+    public function testLoginWithGoodCredentials(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/login');
+        self::assertResponseIsSuccessful();
+
+        $client->submitForm('Se connecter', [
+            '_username' => 'tst',
+            '_password' => 'tsttst',
+        ]);
+        self::assertResponseRedirects();
+    }
+
+    public function testLoginWhenAuthenticated(): void
+    {
+        $this->makeClient('tst')->request('GET', '/security/login');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.alert-info', 'Vous êtes connecté en tant que');
+    }
 }

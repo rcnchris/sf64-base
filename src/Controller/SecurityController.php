@@ -12,12 +12,8 @@ final class SecurityController extends AppAbstractController
     #[Route(path: '/login', name: 'login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
-
-        // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
-
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
@@ -25,6 +21,7 @@ final class SecurityController extends AppAbstractController
         ]);
     }
 
+    /** @codeCoverageIgnore */
     #[Route(path: '/logout', name: 'logout', methods: ['GET'])]
     public function logout(): void
     {
