@@ -62,8 +62,8 @@ final class UserEntityTest extends AppKernelTestCase
 
         $this->assertEntityUseDatefieldTrait($user);
 
-        self::assertSame($data['email'], (string)$user);
-        self::assertSame($data['email'], $user->getUserIdentifier());
+        self::assertSame(substr($data['pseudo'], 0, 20), (string)$user);
+        self::assertSame(substr($data['pseudo'], 0, 20), $user->getUserIdentifier());
         self::assertSame(sprintf('%s %s', $data['firstname'], $data['lastname']), $user->getFullname());
 
         // self::assertEmpty($user->getLogs());

@@ -15,6 +15,7 @@ ux_icons:
         fingerprint: bi:fingerprint
         hierarchy: bi:diagram-3
         home: bi:house
+        info: bi:info-circle-fill
         info-circle: bi:info-circle
         list: bi:card-list
         login: bi:box-arrow-in-right

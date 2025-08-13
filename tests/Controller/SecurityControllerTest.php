@@ -114,7 +114,20 @@ final class SecurityControllerTest extends AppWebTestCase
         self::assertSelectorTextContains('.alert-danger', 'Identifiants invalides.');
     }
 
-    public function testLoginWithGoodCredentials(): void
+    public function testLoginWithGoodEmail(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/login');
+        self::assertResponseIsSuccessful();
+
+        $client->submitForm('Se connecter', [
+            '_username' => 'tst@sf64-base.fr',
+            '_password' => 'tsttst',
+        ]);
+        self::assertResponseRedirects('/home');
+    }
+
+    public function testLoginWithGoodPseudo(): void
     {
         $client = $this->makeClient();
         $client->request('GET', '/security/login');
@@ -124,7 +137,7 @@ final class SecurityControllerTest extends AppWebTestCase
             '_username' => 'tst',
             '_password' => 'tsttst',
         ]);
-        self::assertResponseRedirects();
+        self::assertResponseRedirects('/home');
     }
 
     public function testLoginWhenAuthenticated(): void
@@ -133,4 +146,17 @@ final class SecurityControllerTest extends AppWebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.alert-info', 'Vous êtes connecté en tant que');
     }
+
+    // public function testLoginWithTarget(): void
+    // {
+    //     $client = $this->makeClient();
+    //     $client->request('GET', '/security/login');
+    //     self::assertResponseIsSuccessful();
+
+    //     $client->submitForm('Se connecter', [
+    //         '_username' => 'tst',
+    //         '_password' => 'tsttst',
+    //     ]);
+    //     self::assertResponseRedirects('/home');
+    // }
 }
