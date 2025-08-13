@@ -12,12 +12,16 @@ delete: supprimer
 description: description
 edit: éditer
 entity.tablette: "{tablettes, plural,\n  =0 {tablette}\n  =1 {tablette}\n  other {tablettes}\n}"
+'forgotten password': 'mot de passe oublié'
 hello: bonjour
 home: accueil
 icon: icône
+login: 'se connecter'
+logout: 'se déconnecter'
 name: nom
 new: créer
 readme: 'à propos'
+register: inscription
 save: enregistrer
+thanks: merci
 'welcome on': 'bienvenue sur'
-

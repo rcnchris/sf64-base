@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+:root {
+    --color-clouds: #ecf0f1;
+    --color-silver: #7f8c8d;
+    --color-asphalt: #34495e;
+    --color-turquoise: #5edcd4;
+}
+
+body {
+    background: var(--color-clouds);
+    font-family: Helvetica, Arial, "Lucida Grande", sans-serif;
+    color: var(--color-asphalt);
+}
+
+.header, footer {
+    display: flex;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-end {
+    text-align: right !important;
+}

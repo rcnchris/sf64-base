@@ -1,12 +1,11 @@
 <div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pt-2 pb-2 mb-3">
-	<h1>
+	<h1 class="text-white">
 		{{ ux_icon(icon, {class: 'mb-2', width: '35', height: '35'}) }}
 		{{ title|capitalize }}
 	</h1>
 	{% if prefix is defined %}
 		<div class="btn-toolbar" role="toolbar">
 			<div class="btn-group" role="group">
-
 				{% if app.current_route != prefix ~ '.new'  %}
 					<a href="{{ path(prefix ~ '.new') }}" class="btn btn-light" title="{{ 'create'|trans|capitalize }}" data-toggle="tooltip">
 						{{ ux_icon('new', {class: 'text-success mb-1'}) }}

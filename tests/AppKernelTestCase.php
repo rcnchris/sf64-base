@@ -2,7 +2,7 @@
 
 namespace App\Tests;
 
-use App\Repository\{TabletteRepository};
+use App\Repository\{TabletteRepository, UserRepository};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Faker\{Factory, Generator};
@@ -48,6 +48,11 @@ class AppKernelTestCase extends KernelTestCase
     protected function getTabletteRepository(): TabletteRepository
     {
         return static::getContainer()->get(TabletteRepository::class);
+    }
+
+    protected function getUserRepository(): UserRepository
+    {
+        return static::getContainer()->get(UserRepository::class);
     }
 
     /**

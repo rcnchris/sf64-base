@@ -16,7 +16,12 @@ ux_icons:
         home: bi:house
         info-circle: bi:info-circle
         list: bi:card-list
+        login: bi:box-arrow-in-right
+        logout: bi:box-arrow-right
+        mail: bi:envelope
         new: bi:plus-circle
         pointer: bi:hand-index-thumb
+        register: bi:person-fill-add
+        reload: bi:arrow-clockwise
         save: bi:save
         success: bi:check-circle-fill

@@ -1,0 +1,23 @@
+{% apply inline_css(source('@styles/email.css')) %}
+
+<div class="header">
+	<img src="{{ logo }}" alt="Logo {{ app_name }}" width="100px">
+	<h1>{{ app_name }}</h1>
+</div>
+
+{% block body %}{% endblock %}
+
+<hr>
+<div class="footer">
+	{% set url = url('app.home') %}
+	<a href="{{ url }}" target="_blank">
+		{{ ux_icon('bi:globe') }}
+		{{ url }}
+	</a>
+	|
+	<a href="mailto:contact@sf64-base.fr">
+		{{ ux_icon('mail') }}
+		contact@sf64-base.fr
+	</a>
+</div>
+{% endapply %}

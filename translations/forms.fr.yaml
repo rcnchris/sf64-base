@@ -1,8 +1,11 @@
+'Agree terms': 'Accepter les conditions'
 Color: Couleur
 Children: Enfants
 Description: Description
+Email: Courriel
 Icon: Icône
 Id: Identifiant
 Name: Nom
 Parent: Parent
+Password: 'Mot de passe'
 Slug: Slug

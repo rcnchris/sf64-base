@@ -10,25 +10,25 @@
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 				<li class="nav-item">
 					<a class="nav-link {{ app.current_route == 'app.home' ? 'active' : null }}" href="{{ path('app.home') }}">
-                        {{ ux_icon('home') }}
+                        {{ ux_icon('home', {class: 'text-info mb-1'}) }}
                         {{ 'home'|trans|capitalize}}
                     </a>
 				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-						{{ ux_icon('gear') }}
+						{{ ux_icon('gear', {class: 'text-info mb-1'}) }}
                         {{ 'application'|trans|capitalize }}
 					</a>
 					<ul class="dropdown-menu">
 						<li>
 							<a class="dropdown-item {{ app.current_route starts with 'tablette.' ? 'active' : null }}" href="{{ path('tablette.list') }}">
-								{{ ux_icon(constant('App\\Entity\\Tablette::ICON')) }}
+								{{ ux_icon(constant('App\\Entity\\Tablette::ICON'), {class: 'text-info mb-1'}) }}
 								Tablettes
 							</a>
 						</li>
 						<li>
 							<a class="dropdown-item" href="{{ path('app.readme') }}">
-								{{ ux_icon('book') }}
+								{{ ux_icon('book', {class: 'text-info mb-1'}) }}
 								{{ 'readme'|trans|capitalize }}
 							</a>
 						</li>

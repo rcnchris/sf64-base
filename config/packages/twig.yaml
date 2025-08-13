@@ -7,6 +7,10 @@ twig:
         app_name: '%app.name%'
         app_logo_path: '%app.logo_path%'
 
+    paths:
+        '%app.assets_dir%/images': images
+        '%app.assets_dir%/styles': styles
+
 when@test:
     twig:
         strict_variables: true

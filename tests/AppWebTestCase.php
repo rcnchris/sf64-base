@@ -2,13 +2,14 @@
 
 namespace App\Tests;
 
-use App\Entity\{Tablette};
-use App\Repository\{TabletteRepository};
+use App\Entity\{Tablette, User};
+use App\Repository\{TabletteRepository, UserRepository};
 use Doctrine\ORM\{EntityManagerInterface, EntityRepository};
 use Faker\{Factory, Generator};
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DomCrawler\Crawler;
 
 class AppWebTestCase extends WebTestCase
 {
@@ -18,10 +19,10 @@ class AppWebTestCase extends WebTestCase
         if ($randUserAgent) {
             $client->setServerParameter('HTTP_USER_AGENT', $this->getFaker()->userAgent());
         }
-        // if (!is_null($identifier)) {
-        //     $user = $this->getUserRepository()->getByPseudoOrEmail($identifier);
-        //     $client->loginUser($user);
-        // }
+        if (!is_null($identifier)) {
+            $user = $this->getUserRepository()->getByPseudoOrEmail($identifier);
+            $client->loginUser($user);
+        }
         return $client;
     }
 
@@ -52,10 +53,10 @@ class AppWebTestCase extends WebTestCase
         return $this->getEntityManager()->getRepository($entityClassname);
     }
 
-    // protected function getUserRepository(): UserRepository
-    // {
-    //     return $this->getRepository(User::class);
-    // }
+    protected function getUserRepository(): UserRepository
+    {
+        return $this->getRepository(User::class);
+    }
 
     protected function getTabletteRepository(): TabletteRepository
     {
@@ -67,5 +68,49 @@ class AppWebTestCase extends WebTestCase
         foreach ($keys as $key) {
             self::assertArrayHasKey($key, $array);
         }
+    }
+    
+    protected function assertRequestRedirectTo(
+        string $uri,
+        ?array $params = [],
+        ?string $uriTo = null,
+        ?string $user = null,
+        ?string $method = 'GET',
+        ?int $expectedCode = null,
+        ?KernelBrowser $client = null,
+    ): Crawler {
+        if (is_null($client)) {
+            $client = $this->makeClient($user);
+        }
+        $crawler = $client->request($method, $uri, $params);
+        self::assertResponseRedirects(
+            expectedLocation: $uriTo,
+            expectedCode: $expectedCode
+        );
+        return $crawler;
+    }
+
+    protected function assertRequestIsSuccessful(
+        string $uri,
+        ?array $params = [],
+        ?string $user = null,
+        ?string $method = 'GET',
+        ?string $pageTitle = null,
+        ?string $selector = null,
+        ?string $pageContains = null,
+        ?KernelBrowser $client = null,
+    ): Crawler {
+        if (is_null($client)) {
+            $client = $this->makeClient($user);
+        }
+        $crawler = $client->request($method, $uri, $params);
+        self::assertResponseIsSuccessful();
+        if (!is_null($pageTitle)) {
+            self::assertPageTitleContains($pageTitle);
+        }
+        if (!is_null($pageContains)) {
+            self::assertSelectorTextContains($selector, $pageContains);
+        }
+        return $crawler;
     }
 }

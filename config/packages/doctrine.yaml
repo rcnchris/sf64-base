@@ -41,6 +41,7 @@ doctrine:
                 GROUP_CONCAT: DoctrineExtensions\Query\Mysql\GroupConcat
                 IFNULL: DoctrineExtensions\Query\Mysql\IfNull
                 JSON_EXTRACT: App\Query\Mysql\JsonExtract
+                JSON_SEARCH: App\Query\Mysql\JsonSearch
 
 when@test:
     doctrine:

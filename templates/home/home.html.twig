@@ -7,10 +7,34 @@
 {% endblock %}
 
 {% block body %}
-	<h1>
-		{{ ux_icon('home', {class: 'mb-2', width: '30', height: '30'}) }}
-		{{ 'welcome on'|trans|capitalize }} {{ app_name }}
-	</h1>
-    <hr>
-	<twig:Alert title="{{ 'hello'|trans|capitalize }}" content="Oyé les gens" />
+
+	{% include "partials/page_title.html.twig" with {
+        title: (title|trans ~ ' ' ~ app_name), 
+        icon: 'home',
+    } %}
+
+	<twig:Alert title="{{ 'hello'|trans|capitalize }}" content="Oyé les gens"/>
+
+	<div class="row mt-3">
+		<div class="col text-center">
+			<a href="#" class="btn btn-lg btn-primary">
+				{{ ux_icon('login', {width: '20', height: '20'}) }}
+				{{ 'login'|trans|capitalize }}
+			</a>
+		</div>
+		<div class="col text-center">
+			<a href="{{ path('security.register') }}" class="btn btn-lg btn-success">
+				{{ ux_icon('register', {width: '20', height: '20'}) }}
+				{{ 'register'|trans|capitalize }}
+			</a>
+		</div>
+		<div class="col text-center">
+			<a href="#" class="btn btn-lg btn-primary">
+				{{ ux_icon('reload', {width: '20', height: '20'}) }}
+				{{ 'forgotten password'|trans|capitalize }}
+			</a>
+		</div>
+	</div>
+
+
 {% endblock %}

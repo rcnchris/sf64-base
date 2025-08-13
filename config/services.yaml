@@ -9,6 +9,8 @@ parameters:
     app.country: FR
     app.locale_country: '%app.locale%_%app.country%'
     app.timezone: 'Europe/Paris'
+    app.assets_dir: '%kernel.project_dir%/assets'
+    app.logo: '%app.assets_dir%/images/logo.png'
     app.logo_path: 'images/logo.png'
 
 services:

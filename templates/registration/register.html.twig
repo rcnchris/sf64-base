@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|trans|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+        title: title|trans, 
+        icon: 'register',
+    } %}
+
+	{% for flash_error in app.flashes('verify_email_error') %}
+		<div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+	{% endfor %}
+
+	<div class="card bg-light shadow mx-auto" style="max-width: 35rem;">
+		<div class="card-body">
+			{{ form_errors(form) }}
+
+			{{ form_start(form) }}
+			{{ form_row(form.email) }}
+			{{ form_row(form.pseudo) }}
+			{{ form_row(form.plainPassword) }}
+			{{ form_row(form.agreeTerms) }}
+
+			<div class="d-grid mx-auto">
+				<button type="submit" class="btn btn-lg btn-success">
+					{{ ux_icon('register', {width: '20', height: '20'}) }}
+					{{ title|trans|capitalize }}
+				</button>
+			</div>
+			{{ form_end(form) }}
+		</div>
+		<div class="card-footer">
+			<div class="d-flex gap-2 justify-content-center">
+				<a href="#" class="btn btn-sm btn-outline-secondary">
+					{{ ux_icon('login') }}
+					{{ 'login'|trans|capitalize }}
+				</a href="#">
+				<a href="#" class="btn btn-sm btn-outline-secondary">
+					{{ ux_icon('reload') }}
+					{{ 'forgotten password'|trans|capitalize }}
+				</a href="#">
+			</div>
+		</div>
+	</div>
+{% endblock %}

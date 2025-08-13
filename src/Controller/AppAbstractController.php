@@ -2,12 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppAbstractController extends AbstractController
 {
     public function __construct(private readonly TranslatorInterface $translator) {}
+
+    /**
+     * Retourne l'instance de l'utilisateur authentifié
+     */
+    protected function getAuthUser(): ?User
+    {
+        return $this->getUser();
+    }
 
     /**
      * Retourne le contenu d'un fichier du projet

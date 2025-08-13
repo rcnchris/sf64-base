@@ -18,7 +18,7 @@ final class HomeControllerTest extends AppWebTestCase
         $this->makeClient()->request('GET', '/home');
         self::assertResponseIsSuccessful();
         self::assertPageTitleContains('Accueil');
-        self::assertSelectorTextContains('h1', $this->getParameter('app.name'));
+        self::assertSelectorTextContains('h1', strtolower($this->getParameter('app.name')));
     }
 
     public function testReadme(): void
