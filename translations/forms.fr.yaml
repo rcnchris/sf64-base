@@ -8,4 +8,5 @@ Id: Identifiant
 Name: Nom
 Parent: Parent
 Password: 'Mot de passe'
+'Remember me': 'Laisser une empreinte'
 Slug: Slug

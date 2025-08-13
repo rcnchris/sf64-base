@@ -12,6 +12,7 @@ ux_icons:
         danger: bi:radioactive
         delete: bi:trash
         gear: bi:gear
+        fingerprint: bi:fingerprint
         hierarchy: bi:diagram-3
         home: bi:house
         info-circle: bi:info-circle
@@ -21,7 +22,10 @@ ux_icons:
         mail: bi:envelope
         new: bi:plus-circle
         pointer: bi:hand-index-thumb
+        profile: bi:person-vcard-fill
         register: bi:person-fill-add
         reload: bi:arrow-clockwise
         save: bi:save
         success: bi:check-circle-fill
+        user: bi:person
+        users: bi:people

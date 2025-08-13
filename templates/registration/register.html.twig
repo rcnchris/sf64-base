@@ -1,5 +1,4 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}
 	{{ title|trans|capitalize }}
 	-
@@ -37,14 +36,14 @@
 		</div>
 		<div class="card-footer">
 			<div class="d-flex gap-2 justify-content-center">
-				<a href="#" class="btn btn-sm btn-outline-secondary">
+				<a href="{{ path('security.login') }}" class="btn btn-sm btn-outline-secondary">
 					{{ ux_icon('login') }}
 					{{ 'login'|trans|capitalize }}
-				</a href="#">
+				</a>
 				<a href="#" class="btn btn-sm btn-outline-secondary">
 					{{ ux_icon('reload') }}
 					{{ 'forgotten password'|trans|capitalize }}
-				</a href="#">
+				</a>
 			</div>
 		</div>
 	</div>

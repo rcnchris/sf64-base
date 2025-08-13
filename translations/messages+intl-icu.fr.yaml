@@ -20,6 +20,7 @@ login: 'se connecter'
 logout: 'se déconnecter'
 name: nom
 new: créer
+profile: profil
 readme: 'à propos'
 register: inscription
 save: enregistrer

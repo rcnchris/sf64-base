@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 #[Route('/security', name: 'security.')]
-class RegistrationController extends AppAbstractController
+final class RegistrationController extends AppAbstractController
 {
     public function __construct(
         private readonly EmailVerifier $emailVerifier,

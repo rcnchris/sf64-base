@@ -1,8 +1,8 @@
 <nav class="navbar navbar-expand-lg sticky-top bg-body-tertiary shadow mb-3">
 	<div class="container-fluid">
 		<a class="navbar-brand" href="{{ path('app.index') }}">
-            <img src="{{ asset(app_logo_path) }}" alt="Logo" width="35" height="35">
-        </a>
+			<img src="{{ asset(app_logo_path) }}" alt="Logo" width="35" height="35">
+		</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
@@ -10,14 +10,14 @@
 			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 				<li class="nav-item">
 					<a class="nav-link {{ app.current_route == 'app.home' ? 'active' : null }}" href="{{ path('app.home') }}">
-                        {{ ux_icon('home', {class: 'text-info mb-1'}) }}
-                        {{ 'home'|trans|capitalize}}
-                    </a>
+						{{ ux_icon('home', {class: 'text-info mb-1'}) }}
+						{{ 'home'|trans|capitalize}}
+					</a>
 				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						{{ ux_icon('gear', {class: 'text-info mb-1'}) }}
-                        {{ 'application'|trans|capitalize }}
+						{{ 'application'|trans|capitalize }}
 					</a>
 					<ul class="dropdown-menu">
 						<li>
@@ -35,6 +35,31 @@
 					</ul>
 				</li>
 			</ul>
-		</div>
+			{% if app.user %}
+				<ul class="navbar-nav d-flex">
+					<li class="nav-item dropdown dropstart">
+						<a class="nav-link dropdown-toggle dropend" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							{{ ux_icon(constant('App\\Entity\\User::ICON'), {class: 'text-success'}) }}
+							<strong>{{ app.user }}</strong>
+						</a>
+						<ul class="dropdown-menu">
+							<li>
+								<a class="dropdown-item" href="#">
+									{{ ux_icon('profile', {class: 'text-muted mb-1'}) }}
+									{{ 'profile'|trans|capitalize }}
+								</a>
+							</li>
+							<li><hr class="dropdown-divider"></li>
+							<li>
+								<a class="dropdown-item" href="{{ path('security.logout') }}">
+									{{ ux_icon('logout', {class: 'text-danger mb-1'}) }}
+									{{ 'logout'|trans|capitalize }}
+								</a>
+							</li>
+						</li>
+					</li>
+				</ul>
+			</ul>
+		{% endif %}
 	</div>
-</nav>
+</div></nav>
