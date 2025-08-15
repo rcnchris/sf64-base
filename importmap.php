@@ -75,4 +75,14 @@ return [
     '@symfony/ux-live-component' => [
         'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
     ],
+    'pivottable' => [
+        'version' => '2.23.0',
+    ],
+    'jquery' => [
+        'version' => '3.3.1',
+    ],
+    'pivottable/dist/pivot.min.css' => [
+        'version' => '2.23.0',
+        'type' => 'css',
+    ],
 ];

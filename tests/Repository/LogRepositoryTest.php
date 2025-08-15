@@ -33,4 +33,9 @@ final class LogRepositoryTest extends AppKernelTestCase
         $result = $this->getRepo()->findListQb($model);
         self::assertInstanceOf(LogsDTO::class, current($result->getQuery()->getResult()));
     }
+
+    public function testCountByHour(): void 
+    {
+        self::assertIsArray($this->getRepo()->countByHour());
+    }
 }

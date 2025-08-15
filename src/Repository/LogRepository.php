@@ -67,4 +67,41 @@ class LogRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
+    public function countByAllTime(): array
+    {
+        $this->setLocale();
+        $select = [
+            'YEAR(l.createdAt) as Annee',
+            'DATE_FORMAT(l.createdAt, \'%m-%M\') as Mois',
+            'DATE_FORMAT(l.createdAt, \'%d\') as Jour',
+            'count(0) as cnt'
+        ];
+        return $this->createQueryBuilder('l')
+            ->select(join(', ', $select))
+            ->groupBy('Annee')
+            ->addGroupBy('Mois')
+            ->addGroupBy('Jour')
+            ->orderBy('Annee')
+            ->addOrderBy('Mois')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function countByDateFormatQb(?string $format = '%Y-%m-%d', ?string $alias = 'periode'): QueryBuilder
+    {
+        $select = [
+            sprintf('DATE_FORMAT(l.createdAt, \'%s\') as %s', $format, $alias),
+            'count(0) as cnt'
+        ];
+        return $this->createQueryBuilder('l')
+            ->select(join(', ', $select))
+            ->groupBy($alias)
+            ->orderBy($alias, 'ASC');
+    }
+
+    public function countByHour(): array
+    {
+        return $this->countByDateFormatQb('%H', 'hour')->getQuery()->getArrayResult();
+    }
 }

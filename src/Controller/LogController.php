@@ -45,4 +45,36 @@ final class LogController extends AppAbstractController
             'log' => $log,
         ]);
     }
+    
+    #[Route('/calendar', name: 'calendar', methods: ['GET'])]
+    public function calendar(): Response
+    {
+        $title = 'Calendrier logs';
+        $this->addLog($title, [
+            'action' => __FUNCTION__,
+            'entity' => 'Log',
+        ]);
+        return $this->render('log/calendar.html.twig', [
+            'title' => $title,
+        ]);
+    }
+
+    #[Route('/pivottable', name: 'pivottable')]
+    public function pivottable(LogRepository $logRepository, Request $request): Response
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return $this->redirectToRoute('log.list');
+        }
+        $this->addLog(ucfirst(__FUNCTION__), [
+            'action' => __FUNCTION__,
+            'entity' => 'Log'
+        ]);
+        $data = [
+            'rows' => ['Annee', 'Mois'],
+            'cols' => ['Jour'],
+            'aggregate' => ['cnt'],
+            'items' => $logRepository->countByAllTime(),
+        ];
+        return $this->json($data);
+    }
 }

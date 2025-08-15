@@ -21,4 +21,29 @@ final class LogControllerTest extends AppWebTestCase
         $client->request('GET', $uri);
         self::assertResponseIsSuccessful();
     }
+
+    public function testCalendar(): void
+    {
+        $this->makeClient()->request('GET', '/log/calendar');
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testPivottableNotAjaxRedirectToList(): void 
+    {
+        $this->makeClient()->request('GET', '/log/pivottable');
+        self::assertResponseRedirects('/log/list');
+    }
+
+    public function testPivottableInAjax(): void 
+    {
+        $client = $this->makeClient();
+        $client->xmlHttpRequest('GET', '/log/pivottable');
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('Content-Type', 'application/json');
+
+        $results = json_decode($client->getResponse()->getContent(), true);
+        self::assertEquals(0, json_last_error(), 'Erreur structure JSON');
+        self::assertIsArray($results);
+        $this->assertArrayHasKeys($results, ['rows', 'cols', 'aggregate', 'items']);
+    }
 }

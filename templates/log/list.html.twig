@@ -46,39 +46,47 @@
 		</div>
 	</div>
 
-	<div class="card bg-light shadow">
-		<div class="card-body">
-			<table class="table table-sm table-striped table-hover align-middle">
-				<thead>
-					<tr>
-						<th class="text-center">{{ ux_icon('event')}}</th>
-						<th class="text-center">{{ 'message'|trans|capitalize }}</th>
-						<th class="text-center">{{ ux_icon(constant('App\\Entity\\User::ICON')) }}</th>
-						<th class="text-center">{{ 'level'|trans|capitalize }}</th>
-						<th class="text-center">{{ 'channel'|trans|capitalize }}</th>
-						<th class="text-center">{{ ux_icon('pointer') }}</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for log in logs %}
-						<tr>
-							<td class="text-center">{{ log.createdAt|format_datetime('full', 'short') }}</td>
-							<td class="text-center">{{ log.message }}</td>
-							<td class="text-center">{{ log.user }}</td>
-							<td class="text-center">
-								{% include "partials/badge_log.html.twig" with {level: log.level} only %}
-							</td>
-							<td class="text-center">{{ log.channel }}</td>
-							<td class="text-center">
-								<a href="{{ path('log.show', {id: log.id}) }}" class="btn btn-sm btn-info">
-									{{ ux_icon('eye') }}
-								</a>
-							</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-			{{ knp_pagination_render(logs) }}
+	<div class="row">
+		<div class="col-md-2">
+			{% include "log/_sidebar.html.twig" %}
+		</div>
+		<div class="col-md-10">
+			<div class="card bg-light shadow">
+				<div class="card-body">
+					<table class="table table-sm table-striped table-hover align-middle">
+						<thead>
+							<tr>
+								<th class="text-center">{{ ux_icon('event')}}</th>
+								<th class="text-center">{{ 'message'|trans|capitalize }}</th>
+								<th class="text-center">{{ ux_icon(constant('App\\Entity\\User::ICON')) }}</th>
+								<th class="text-center">{{ 'level'|trans|capitalize }}</th>
+								<th class="text-center">{{ 'channel'|trans|capitalize }}</th>
+								<th class="text-center">{{ ux_icon('pointer') }}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for log in logs %}
+								<tr>
+									<td class="text-center">{{ log.createdAt|format_datetime('full', 'short') }}</td>
+									<td class="text-center">{{ log.message }}</td>
+									<td class="text-center">{{ log.user }}</td>
+									<td class="text-center">
+										{% include "partials/badge_log.html.twig" with {level: log.level} only %}
+									</td>
+									<td class="text-center">{{ log.channel }}</td>
+									<td class="text-center">
+										<a href="{{ path('log.show', {id: log.id}) }}" class="btn btn-sm btn-info">
+											{{ ux_icon('eye') }}
+										</a>
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+					{{ knp_pagination_render(logs) }}
+				</div>
+			</div>
 		</div>
 	</div>
+
 {% endblock %}

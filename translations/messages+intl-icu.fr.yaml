@@ -20,6 +20,7 @@ hello: bonjour
 home: accueil
 icon: icône
 level: niveau
+list: liste
 login: 'se connecter'
 logout: 'se déconnecter'
 logs: journaux

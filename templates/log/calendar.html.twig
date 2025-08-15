@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	<div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pt-2 pb-2 mb-3">
+		<h1 class="text-white">
+			{{ ux_icon(constant('App\\Entity\\Log::ICON'), {class: 'mb-2', width: '35', height: '35'}) }}
+			{{ title|capitalize }}
+		</h1>
+	</div>
+
+	<div class="row">
+		<div class="col-md-2">
+			{% include "log/_sidebar.html.twig" %}
+		</div>
+		<div class="col-md-10">
+			<div class="card bg-light shadow">
+				<div class="card-header">
+					<h3 class="h4 card-title">
+						{{ ux_icon('bi:calendar4-week', {class: 'mb-2', width: '25', height: '25'}) }}
+						Calendrier de fréquentation
+					</h3>
+				</div>
+				<div class="card-body">
+					<div id="pvt-log-dates" data-controller="pivottable" data-path="{{ path('log.pivottable') }}"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
