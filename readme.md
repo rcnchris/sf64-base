@@ -25,11 +25,12 @@ composer app-update
    - Mot de passe oublié
 - Logs
    - Formulaire de recherche
+- EasyAdmin
+- UX Charts
+- Pivottable
 
 ### Todo
 
 - Captcha
 - PDF
 - Makefile
-- UX Charts
-- Pivottable

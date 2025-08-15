@@ -1,0 +1,82 @@
+{% extends '@!EasyAdmin/layout.html.twig' %}
+{% block main %}
+	<h1 class="d-flex align-items-center text-white-50">
+		<img src="{{ asset(app_logo_path) }}" alt="Logo" class="my-4">
+		{{ ux_icon('dashboard', {class: 'text-muted me-1', width:'35', height: '35'}) }}
+		{{ title|trans|capitalize }}
+		-
+		{{ app_name }}
+	</h1>
+	<hr>
+	<div class="row row-cols-1 row-cols-md-2 g-4">
+		<div class="col">
+			<div class="card shadow">
+				<div class="card-body">
+					<h5 class="card-title">
+						Serveur
+						{{ ux_icon('php', {width: '35', height: '35'}) }}
+					</h5>
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item">Version :
+							<strong>{{ php_version }}</strong>
+							sur
+							{{ php_os }}
+						</li>
+						<li class="list-group-item">
+							SAPI :
+							<samp>{{ php_sapi }}</samp>
+						</li>
+						<li class="list-group-item">
+							Emplacement :
+							<samp>{{ php_path }}</samp>
+						</li>
+						<li class="list-group-item">
+							Mémoire :
+							<samp>{{ memory_peak|format_bytes }}</samp>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="col">
+			<div class="card shadow">
+				<div class="card-body">
+					<h5 class="card-title">
+						Serveur
+						{{ ux_icon('mysql', {width: '35', height: '35'}) }}
+					</h5>
+
+					<ul class="list-group list-group-flush">
+						<li class="list-group-item">Version :
+							<strong>{{ db_server_info.versionText }}</strong>
+						</li>
+						<li class="list-group-item">
+							Nom :
+							{{ db_server_info.serverName }}
+						</li>
+						<li class="list-group-item">
+							Moteur :
+							{{ db_server_info.engine }}
+						</li>
+						<li class="list-group-item">Emplacement :
+							<samp>{{ db_server_info.dbFileDir }}</samp>
+						</li>
+						<li class="list-group-item">
+							Langue :
+							{{ db_server_info.language|locale_name(app.request.locale) }}
+							{{ ux_icon('flag:' ~ db_server_info.language|split('_')|last|lower ~ '-4x3') }}
+						</li>
+						<li class="list-group-item">
+							Base de données :
+							<strong>{{ db_name }}</strong><br>
+							créée le
+							{{ db_created|format_datetime('full', 'short') }}. 
+														Taille :
+							{{ db_size|format_bytes }}.
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

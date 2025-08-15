@@ -10,8 +10,10 @@ use App\Service\ChartJsService;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/log', name: 'log.')]
+#[IsGranted('ROLE_APP')]
 final class LogController extends AppAbstractController
 {
     #[Route('/list', name: 'list', methods: ['GET'])]

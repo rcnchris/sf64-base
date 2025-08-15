@@ -6,6 +6,7 @@
 parameters:
     app.name: "Projet Symfony 6.4.* de base"
     app.locale: fr
+    app.locales: en|fr|es
     app.country: FR
     app.locale_country: '%app.locale%_%app.country%'
     app.timezone: 'Europe/Paris'

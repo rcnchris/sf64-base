@@ -26,15 +26,19 @@
 								Tablettes
 							</a>
 						</li>
-						{% if app.user %}
-							<li>
-								<a class="dropdown-item {{ app.current_route starts with 'log.' ? 'active' : null }}" href="{{ path('log.list') }}">
-									{{ ux_icon(constant('App\\Entity\\Log::ICON'), {class: 'text-info mb-1'}) }}
-									{{ 'logs'|trans|capitalize }}
-								</a>
-							</li>
-						{% endif %}
+						<li>
+							<a class="dropdown-item {{ app.current_route starts with 'log.' ? 'active' : null }}" href="{{ path('log.list') }}">
+								{{ ux_icon(constant('App\\Entity\\Log::ICON'), {class: 'text-info mb-1'}) }}
+								{{ 'logs'|trans|capitalize }}
+							</a>
+						</li>
 						<li><hr class="dropdown-divider"></li>
+						<li>
+							<a class="dropdown-item" href="{{ path('admin') }}">
+								{{ ux_icon('dashboard', {class: 'text-warning mb-1'}) }}
+								{{ 'administration'|trans|capitalize }}
+							</a>
+						</li>
 						<li>
 							<a class="dropdown-item" href="{{ path('app.readme') }}">
 								{{ ux_icon('book', {class: 'text-info mb-1'}) }}

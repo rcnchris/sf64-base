@@ -15,6 +15,7 @@ ux_icons:
         chart-pie: bi:pie-chart-fill
         close: bi:x-square-fill
         danger: bi:radioactive
+        dashboard: bi:speedometer2
         delete: bi:trash
         event: bi:calendar-event
         eye: bi:eye
@@ -30,8 +31,10 @@ ux_icons:
         login: bi:box-arrow-in-right
         logout: bi:box-arrow-right
         mail: bi:envelope
+        mysql: logos:mysql
         new: bi:plus-circle
         phone: bi:telephone
+        php: logos:php
         pointer: bi:hand-index-thumb
         profile: bi:person-vcard-fill
         register: bi:person-fill-add

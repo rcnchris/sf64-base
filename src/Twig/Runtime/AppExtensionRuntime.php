@@ -2,6 +2,7 @@
 
 namespace App\Twig\Runtime;
 
+use App\Utils\Tools;
 use Twig\Extension\RuntimeExtensionInterface;
 
 class AppExtensionRuntime implements RuntimeExtensionInterface
@@ -28,6 +29,12 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
         );
     }
 
+    /**
+     * Retourne le contenu dans une balise code pour Highlight.js
+     * 
+     * @param string|array $content Contenu
+     * @param ?string $lang Langage à utiliser
+     */
     public function highlight(string|array $content, ?string $lang = 'bash'): string
     {
         $rows = [];
@@ -39,5 +46,16 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
             }
         }
         return sprintf('<pre><code class="%s">%s</code></pre>', $lang, join(PHP_EOL, $rows));
+    }
+
+    /**
+     * Convertit un nombre de bytes en unité lisible par un humain
+     *
+     * @param int $bytes Nombre de bytes
+     * @param int|null $decimals Nombre de décimales souhaité
+     */
+    public function bytesToHuman(int $bytes, ?int $decimals = 2): string
+    {
+        return Tools::bytesToHumanSize($bytes, $decimals);
     }
 }

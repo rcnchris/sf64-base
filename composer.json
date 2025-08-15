@@ -15,6 +15,7 @@
         "doctrine/doctrine-bundle": "^2.15",
         "doctrine/doctrine-migrations-bundle": "^3.4",
         "doctrine/orm": "^3.5",
+        "easycorp/easyadmin-bundle": "^4.24",
         "intervention/image": "^2.7",
         "knplabs/knp-paginator-bundle": "^6.9",
         "league/commonmark": "^2.7",
