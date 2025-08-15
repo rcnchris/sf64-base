@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+	
+    {% include "partials/page_title.html.twig" with {
+        title: title, 
+        icon: constant('App\\Entity\\Log::ICON'),
+		prefix: 'log'
+    } %}
+
+    <table class="table align-middle">
+        <tbody>
+            <tr>
+                <th>{{ 'message'|trans|capitalize }}</th>
+                <td>{{ log.message }}</td>
+            </tr>
+            {% if log.user %}
+            <tr>
+                <th>{{ ux_icon(constant('App\\Entity\\User::ICON')) }}</th>
+                <td>{{ log.user.fullname }}</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th>{{ ux_icon('event') }}</th>
+                <td>{{ log.createdAt|format_datetime('full', 'short') }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'level'|trans|capitalize }}</th>
+                <td>{{ log.level }} - {{ log.levelName }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'channel'|trans|capitalize }}</th>
+                <td>{{ log.channel }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'context'|trans|capitalize }}</th>
+                <td>{{ log.context ? log.context|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|highlight : '' }}</td>
+            </tr>
+            <tr>
+                <th>{{ 'extra'|trans|capitalize }}</th>
+                <td>{{ log.extra ? log.extra|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|highlight : '' }}</td>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <td>{{ log.id }}</td>
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}

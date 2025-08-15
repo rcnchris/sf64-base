@@ -15,6 +15,10 @@ final class TabletteController extends AppAbstractController
     #[Route('/list', name: 'list', methods: ['GET'])]
     public function list(TabletteRepository $tabletteRepository): Response
     {
+        $this->addLog('Tablettes', [
+            'action' => __FUNCTION__,
+            'entity' => 'Tablette'
+        ]);
         return $this->render('tablette/list.html.twig', [
             'title' => $this->trans('entity.tablette', ['tablettes' => 2]),
             'tablettes' => $tabletteRepository->findListQb()->where('t.lvl = 0')->getQuery()->getResult(),
@@ -33,9 +37,13 @@ final class TabletteController extends AppAbstractController
             $this->addFlash('toast-success', $this->trans('toast.' . __FUNCTION__));
             return $this->redirectToRoute('tablette.list', [], Response::HTTP_SEE_OTHER);
         }
-
+        $title = $this->trans('new') . ' une tablette';
+        $this->addLog($title, [
+            'action' => __FUNCTION__,
+            'entity' => 'Tablette'
+        ]);
         return $this->render('tablette/edit.html.twig', [
-            'title' => $this->trans('new') . ' une tablette',
+            'title' => $title,
             'tablette' => $tablette,
             'form' => $form,
         ]);
@@ -70,9 +78,14 @@ final class TabletteController extends AppAbstractController
                 Response::HTTP_SEE_OTHER
             );
         }
-
+        $title = $this->trans(__FUNCTION__) . ' une tablette';
+        $this->addLog($title, [
+            'action' => 'Editer une tablette',
+            'entity' => 'Tablette',
+            'entity_id' => $tablette->getId()
+        ]);
         return $this->render('tablette/edit.html.twig', [
-            'title' => $this->trans(__FUNCTION__) . ' une tablette',
+            'title' => $title,
             'tablette' => $tablette,
             'form' => $form,
         ]);

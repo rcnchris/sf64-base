@@ -1,9 +1,11 @@
 application: application
 'Are you sure you want to delete this item?': 'Certain(e) de vouloir supprimer cet enregistrement ?'
 'back to list': 'retour à la liste'
+channel: canal
 children: enfants
 close: fermer
 color: couleur
+context: contexte
 create: créer
 toast.new: 'Enregistrement créé'
 toast.edit: 'Enregistrement modifié'
@@ -12,11 +14,15 @@ delete: supprimer
 description: description
 edit: éditer
 entity.tablette: "{tablettes, plural,\n  =0 {tablette}\n  =1 {tablette}\n  other {tablettes}\n}"
+extra: extra
 hello: bonjour
 home: accueil
 icon: icône
+level: niveau
 login: 'se connecter'
 logout: 'se déconnecter'
+logs: journaux
+message: message
 name: nom
 new: créer
 profile: profil

@@ -6,7 +6,7 @@
 	{% if prefix is defined %}
 		<div class="btn-toolbar" role="toolbar">
 			<div class="btn-group" role="group">
-				{% if app.current_route != prefix ~ '.new'  %}
+				{% if app.current_route != prefix ~ '.new' and prefix != 'log'  %}
 					<a href="{{ path(prefix ~ '.new') }}" class="btn btn-light" title="{{ 'create'|trans|capitalize }}" data-toggle="tooltip">
 						{{ ux_icon('new', {class: 'text-success mb-1'}) }}
 					</a>

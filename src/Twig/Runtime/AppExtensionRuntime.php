@@ -27,4 +27,17 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
             is_null($height) ? $width : $height
         );
     }
+
+    public function highlight(string|array $content, ?string $lang = 'bash'): string
+    {
+        $rows = [];
+        if (is_string($content)) {
+            array_push($rows, $content);
+        } elseif (is_array($content)) {
+            foreach ($content as $row) {
+                array_push($rows, $row);
+            }
+        }
+        return sprintf('<pre><code class="%s">%s</code></pre>', $lang, join(PHP_EOL, $rows));
+    }
 }

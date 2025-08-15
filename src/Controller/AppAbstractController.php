@@ -3,15 +3,19 @@
 namespace App\Controller;
 
 use App\Entity\{Log, User};
+use Knp\Component\Pager\Pagination\PaginationInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppAbstractController extends AbstractController
 {
     public function __construct(
         private readonly LoggerInterface $dbLogger,
-        private readonly TranslatorInterface $translator
+        private readonly TranslatorInterface $translator,
+        private readonly PaginatorInterface $paginator,
     ) {}
 
     /**
@@ -61,6 +65,28 @@ class AppAbstractController extends AbstractController
     {
         $tz = is_null($stringTimezone) ? $this->getParameter('app.timezone') : $stringTimezone;
         return new \DateTimeImmutable('now', new \DateTimeZone($tz));
+    }
+
+    /**
+     * Retourne une liste paginée
+     * 
+     * @param mixed $data Données à paginer
+     * @param Request $request Requête
+     * @param ?int $limit Nombre d'items par page
+     * @param ?array $options Options de la pagination
+     */
+    protected function paginate(
+        mixed $data,
+        Request $request,
+        ?int $limit = null,
+        ?array $options = []
+    ): PaginationInterface {
+        return $this->paginator->paginate(
+            $data,
+            $request->query->get('page', 1),
+            $limit,
+            $options
+        );
     }
 
     /**

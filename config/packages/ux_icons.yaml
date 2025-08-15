@@ -7,10 +7,13 @@ ux_icons:
         height: '16'
         class: 'mb-1'
     aliases:
+        activity: bi:activity
         book: bi:book
         category: bi:inboxes
         danger: bi:radioactive
         delete: bi:trash
+        event: bi:calendar-event
+        eye: bi:eye
         gear: bi:gear
         fingerprint: bi:fingerprint
         hierarchy: bi:diagram-3

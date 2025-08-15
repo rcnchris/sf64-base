@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\Token;
-use App\Entity\User;
+use App\Entity\{Token, User};
 use App\Form\{ProfileForm, RegistrationFormType, ResetPasswordForm, ResetPasswordRequestForm};
 use App\Repository\{TokenRepository, UserRepository};
 use App\Security\EmailVerifier;
 use App\Service\MailerService;
+use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -25,8 +25,9 @@ final class SecurityController extends AppAbstractController
         private readonly EmailVerifier $emailVerifier,
         private readonly TranslatorInterface $translator,
         private readonly LoggerInterface $dbLogger,
+        private readonly PaginatorInterface $paginator,
     ) {
-        parent::__construct($dbLogger, $translator);
+        parent::__construct($dbLogger, $translator, $paginator);
     }
 
     #[Route('/register', name: 'register', methods: ['GET', 'POST'])]
@@ -131,7 +132,7 @@ final class SecurityController extends AppAbstractController
             'action' => __FUNCTION__,
             'entity' => 'User',
             'last_username' => $lastUsername,
-            'error' => $error->getMessage(),
+            'error' => is_null($error) ? '' : $error->getMessage(),
         ]);
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
