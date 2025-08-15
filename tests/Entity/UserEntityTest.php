@@ -67,5 +67,6 @@ final class UserEntityTest extends AppKernelTestCase
         self::assertSame(sprintf('%s %s', $data['firstname'], $data['lastname']), $user->getFullname());
 
         self::assertEmpty($user->getTokens());
+        self::assertEmpty($user->getLogs());
     }
 }

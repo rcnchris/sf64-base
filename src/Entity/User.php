@@ -71,9 +71,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'user', orphanRemoval: true, cascade: ['persist'])]
     private Collection $tokens;
 
+    /**
+     * @var Collection<int, Log>
+     */
+    #[ORM\OneToMany(targetEntity: Log::class, mappedBy: 'user')]
+    private Collection $logs;
+
     public function __construct()
     {
         $this->tokens = new ArrayCollection();
+        $this->logs = new ArrayCollection();
     }
 
     public function __toString(): string
@@ -252,6 +259,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->tokens->removeElement($token)) {
             if ($token->getUser() === $this) {
                 $token->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Log>
+     */
+    public function getLogs(): Collection
+    {
+        return $this->logs;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function addLog(Log $log): static
+    {
+        if (!$this->logs->contains($log)) {
+            $this->logs->add($log);
+            $log->setUser($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function removeLog(Log $log): static
+    {
+        if ($this->logs->removeElement($log)) {
+            if ($log->getUser() === $this) {
+                $log->setUser(null);
             }
         }
         return $this;
