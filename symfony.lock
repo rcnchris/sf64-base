@@ -297,6 +297,9 @@
             "./templates/base.html.twig"
         ]
     },
+    "symfony/ux-chartjs": {
+        "version": "v2.29.1"
+    },
     "symfony/ux-icons": {
         "version": "2.29",
         "recipe": {

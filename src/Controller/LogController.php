@@ -6,8 +6,10 @@ use App\Entity\Log;
 use App\Form\LogSearchForm;
 use App\Model\LogSearchModel;
 use App\Repository\LogRepository;
+use App\Service\ChartJsService;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
 #[Route('/log', name: 'log.')]
 final class LogController extends AppAbstractController
@@ -31,7 +33,7 @@ final class LogController extends AppAbstractController
         ]);
     }
 
-    #[Route('/show/{id}', name: 'show', methods: ['GET'])]
+    #[Route('/show/{id}', name: 'show', methods: ['GET'], requirements: ['id' => Requirement::DIGITS])]
     public function show(Log $log): Response
     {
         $title = 'Voir log';
@@ -45,7 +47,7 @@ final class LogController extends AppAbstractController
             'log' => $log,
         ]);
     }
-    
+
     #[Route('/calendar', name: 'calendar', methods: ['GET'])]
     public function calendar(): Response
     {
@@ -59,7 +61,7 @@ final class LogController extends AppAbstractController
         ]);
     }
 
-    #[Route('/pivottable', name: 'pivottable')]
+    #[Route('/pivottable', name: 'pivottable', methods: ['GET'])]
     public function pivottable(LogRepository $logRepository, Request $request): Response
     {
         if (!$request->isXmlHttpRequest()) {
@@ -76,5 +78,53 @@ final class LogController extends AppAbstractController
             'items' => $logRepository->countByAllTime(),
         ];
         return $this->json($data);
+    }
+
+    #[Route('/chart', name: 'chart', methods: ['GET'])]
+    public function chart(
+        LogRepository $logRepository,
+        ChartJsService $chartJsService
+    ): Response {
+        $countHours = $logRepository->countByHour();
+        $chartHours = $chartJsService
+            ->make('line', ['height' => 70])
+            ->setData([
+                'labels' => array_column($countHours, 'hour'),
+                'datasets' => [
+                    [
+                        'label' => 'Actions par heures',
+                        'borderColor' => '#0dcaf0',
+                        'backgroundColor' => '#1abc9c',
+                        'tension' => .3,
+                        'data' => array_column($countHours, 'cnt')
+                    ]
+                ]
+            ]);
+
+        $countHours = $logRepository->countByDays();
+        $chartDays = $chartJsService
+            ->make('bar', ['height' => 70])
+            ->setData([
+                'labels' => array_column($countHours, 'day'),
+                'datasets' => [
+                    [
+                        'label' => 'Actions par jours de la semaine',
+                        'borderColor' => '#0dcaf0',
+                        'backgroundColor' => '#1abc9c',
+                        'tension' => .3,
+                        'data' => array_column($countHours, 'cnt')
+                    ]
+                ]
+            ]);
+        $title = 'Graphiques logs';
+        $this->addLog($title, [
+            'action' => __FUNCTION__,
+            'entity' => 'Log'
+        ]);
+        return $this->render('log/chart.html.twig', [
+            'title' => $title,
+            'chart_hours' => $chartHours,
+            'chart_days' => $chartDays,
+        ]);
     }
 }

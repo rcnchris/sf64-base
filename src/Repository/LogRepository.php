@@ -104,4 +104,10 @@ class LogRepository extends ServiceEntityRepository
     {
         return $this->countByDateFormatQb('%H', 'hour')->getQuery()->getArrayResult();
     }
+
+    public function countByDays(): array
+    {
+        $this->setLocale();
+        return $this->countByDateFormatQb('%w-%W', 'day')->getQuery()->getArrayResult();
+    }
 }

@@ -7,4 +7,8 @@
 		{{ ux_icon('event') }}
 		Calendrier fréquentation
 	</a>
+	<a href="{{ path('log.chart') }}" class="list-group-item list-group-item-action {{ app.current_route == 'log.chart' ? 'active' : null }}">
+		{{ ux_icon('chart-line') }}
+		Graphiques fréquentation
+	</a>
 </ul>

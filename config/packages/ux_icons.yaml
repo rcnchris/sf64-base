@@ -10,6 +10,9 @@ ux_icons:
         activity: bi:activity
         book: bi:book
         category: bi:inboxes
+        chart-line: bi:graph-up
+        chart-bar: bi:bar-chart-line-fill
+        chart-pie: bi:pie-chart-fill
         close: bi:x-square-fill
         danger: bi:radioactive
         delete: bi:trash
@@ -37,5 +40,7 @@ ux_icons:
         search: bi:search
         send: bi:send-fill
         success: bi:check-circle-fill
+        table: bi:table
         user: bi:person
         users: bi:people
+        watch: bi:watch

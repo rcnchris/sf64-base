@@ -46,4 +46,10 @@ final class LogControllerTest extends AppWebTestCase
         self::assertIsArray($results);
         $this->assertArrayHasKeys($results, ['rows', 'cols', 'aggregate', 'items']);
     }
+
+    public function testChart(): void
+    {
+        $this->makeClient()->request('GET', '/log/chart');
+        self::assertResponseIsSuccessful();
+    }
 }
