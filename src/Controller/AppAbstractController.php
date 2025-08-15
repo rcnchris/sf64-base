@@ -47,4 +47,15 @@ class AppAbstractController extends AbstractController
     ): string {
         return $this->translator->trans($content, $params, $domain, $locale);
     }
+
+    /**
+     * Retourne la date et l'heure actuelle
+     * 
+     * @param ?string $stringTimezone Fuseau horaire au format chaîne de caractères
+     */
+    protected function getNow(?string $stringTimezone = null): \DateTimeImmutable
+    {
+        $tz = is_null($stringTimezone) ? $this->getParameter('app.timezone') : $stringTimezone;
+        return new \DateTimeImmutable('now', new \DateTimeZone($tz));
+    }
 }

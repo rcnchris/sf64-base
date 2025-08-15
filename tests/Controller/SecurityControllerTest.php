@@ -184,4 +184,89 @@ final class SecurityControllerTest extends AppWebTestCase
         ]);
         self::assertResponseRedirects('/security/profile');
     }
+
+    public function testForgotPasswordRequestWithUnknowEmail(): void
+    {
+        $client = $this->makeClient('tst');
+        $title = "Réinitialisation du mot de passe";
+
+        $this->assertRequestIsSuccessful(
+            client: $client,
+            uri: '/security/forgot-pass',
+            pageTitle: $title,
+            selector: 'h1',
+            pageContains: $title,
+        );
+
+        $faker = $this->getFaker();
+        $client->submitForm('Envoyer', [
+            'email' => $faker->email(),
+        ]);
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
+        self::assertSelectorTextContains(
+            '.alert-danger',
+            'Un problème est survenu lors de la réinitialisation du mot de passe.'
+        );
+    }
+
+    public function testForgotPasswordRequestSendOneEmail(): void
+    {
+        $client = $this->makeClient('tst');
+        $title = "Réinitialisation du mot de passe";
+
+        $this->assertRequestIsSuccessful(
+            client: $client,
+            uri: '/security/forgot-pass',
+            pageTitle: $title,
+            selector: 'h1',
+            pageContains: $title,
+        );
+
+        $client->submitForm('Envoyer', [
+            'email' => 'tst@sf64-base.fr',
+        ]);
+        self::assertEmailCount(1);
+
+        /** @var TemplatedEmail $email */
+        $email = self::getMailerMessage();
+        self::assertInstanceOf(TemplatedEmail::class, $email);
+        self::assertEmailAddressContains($email, 'to', 'tst@sf64-base.fr');
+        self::assertEmailHtmlBodyContains($email, sprintf('Réinitialisation du mot de passe sur %s', $this->getParameter('app.name')));
+
+        $messageBody = $email->getHtmlBody();
+        self::assertIsString($messageBody);
+
+        // http://localhost/security/forgot-pass/X_mxxpUZ-1HVBLirYsGtG4Cn6F3iwUijMBCx10ngF7c
+        preg_match('#(http://localhost/security/forgot-pass.+)">#', $messageBody, $forgotLink);
+        $forgotLink = str_replace('http://localhost', '', $forgotLink[1]);
+
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
+        self::assertSelectorTextContains(
+            '.alert-success',
+            'Un mail de réinitialisation du mot de passe a été envoyé à tst@sf64-base.fr.'
+        );
+
+        $forgotLinkError = substr($forgotLink, 0, strlen($forgotLink) - 5);
+        $client->request('GET', $forgotLinkError);
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
+        self::assertSelectorTextContains(
+            '.alert-danger',
+            'Jeton invalide'
+        );
+        $client->request('GET', $forgotLink);
+        self::assertResponseIsSuccessful();
+
+        $client->submitForm('Enregistrer', [
+            'password' => 'tsttst',
+        ]);
+        self::assertResponseRedirects('/security/login');
+        $client->followRedirect();
+        self::assertSelectorTextContains(
+            '.alert-success',
+            'Mot de passe changé avec succès'
+        );
+    }
 }

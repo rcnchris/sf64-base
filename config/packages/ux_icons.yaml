@@ -28,6 +28,7 @@ ux_icons:
         register: bi:person-fill-add
         reload: bi:arrow-clockwise
         save: bi:save
+        send: bi:send-fill
         success: bi:check-circle-fill
         user: bi:person
         users: bi:people

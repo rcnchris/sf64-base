@@ -2,14 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Token;
 use App\Entity\User;
-use App\Form\{ProfileForm, RegistrationFormType};
+use App\Form\{ProfileForm, RegistrationFormType, ResetPasswordForm, ResetPasswordRequestForm};
+use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use App\Service\MailerService;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
@@ -127,5 +131,106 @@ final class SecurityController extends AppAbstractController
             'title' => __FUNCTION__,
             'form' => $form,
         ]);
+    }
+
+    #[Route('/forgot-pass', name: 'forgotten_password', methods: ['GET', 'POST'])]
+    public function forgottenPassword(
+        Request $request,
+        UserRepository $userRepository,
+        TokenGeneratorInterface $tokenGenerator,
+        MailerService $mailer,
+    ): Response {
+        $email = $request->query->get('email');
+        $form = $this->createForm(ResetPasswordRequestForm::class, compact('email'));
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $userRepository->getByPseudoOrEmail($form->get('email')->getData());
+            if ($user) {
+                // Génération d'un token de réinitialisation
+                $token = $tokenGenerator->generateToken();
+                $start = $this->getNow();
+                $end = $start->modify('+1 hours');
+                $user->addToken(
+                    (new Token())
+                        ->setToken($token)
+                        ->setStartAt($start)
+                        ->setEndAt($end)
+                );
+                $userRepository->save($user);
+
+                // lien de réinitialisation du mot de passe
+                $url = $this->generateUrl(
+                    'security.reset_password',
+                    compact('token'),
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
+                // mail
+                $mailer->makeMail([
+                    'to' => $user->getEmail(),
+                    'subject' => $this->trans(
+                        'Reset password on {{ name }}',
+                        ['{{ name }}' => $this->getParameter('app.name')],
+                        'security'
+                    ),
+                    'html_template' => 'mails/reset_password.html.twig',
+                    'context' => [
+                        'contact' => $user->getPseudo(),
+                        'created' => $user->getCreatedAt(),
+                        'url' => $url,
+                    ],
+                ], true);
+
+                $msg = $this->trans(
+                    'A password reset email has been sent to {{ email }}.',
+                    ['{{ email }}' => $user->getEmail()],
+                    'security'
+                );
+                $this->addFlash('success', $msg);
+                // $this->addLog($msg);
+                return $this->redirectToRoute('security.login');
+            }
+            $this->addFlash('danger', "Un problème est survenu lors de la réinitialisation du mot de passe.");
+            return $this->redirectToRoute('security.login');
+        }
+
+        return $this->render('security/reset_password_request.html.twig', [
+            'title' => 'password reset',
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/forgot-pass/{token}', name: 'reset_password', methods: ['GET', 'POST'])]
+    public function resetPass(
+        string $token,
+        Request $request,
+        UserRepository $userRepository,
+        TokenRepository $tokenRepository,
+        UserPasswordHasherInterface $hasher,
+    ): Response {
+        $token = $tokenRepository->findOneBy(compact('token'));
+        if ($token) {
+            $form = $this->createForm(ResetPasswordForm::class);
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $userRepository->upgradePassword(
+                    $token->getUser(),
+                    $hasher->hashPassword($token->getUser(), $form->get('password')->getData())
+                );
+                $tokenRepository->remove($token);
+                $tokenRepository->removeExpired();
+
+                $this->addFlash('success', "Mot de passe changé avec succès");
+                // $this->addLog("Mot de passe changé avec succès", ['user' => $user->getPseudo()]);
+                return $this->redirectToRoute('security.login');
+            }
+            return $this->render('security/reset_password.html.twig', [
+                'title' => 'password reset',
+                'form' => $form,
+            ]);
+        }
+        $msg = 'Jeton invalide';
+        $this->addFlash('danger', $msg);
+        return $this->redirectToRoute('security.login');
     }
 }

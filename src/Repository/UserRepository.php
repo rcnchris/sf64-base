@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Repository\Trait\AppRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\{PasswordAuthenticatedUserInterface, PasswordUpgraderInterface};
@@ -28,8 +29,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     {
         if ($user instanceof User) {
             $user->setPassword($newHashedPassword);
-            $this->getEntityManager()->persist($user);
-            $this->getEntityManager()->flush();
+            $this->save($user);
         }
     }
 

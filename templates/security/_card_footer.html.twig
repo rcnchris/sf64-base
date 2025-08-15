@@ -1,0 +1,25 @@
+<div class="card-footer">
+	<div class="d-flex gap-2 justify-content-center">
+
+		{% if app.current_route != 'security.register' %}
+			<a href="{{ path('security.register') }}" class="btn btn-sm btn-outline-secondary">
+				{{ ux_icon('register') }}
+				{{ 'register'|trans|capitalize }}
+			</a>
+		{% endif %}
+
+		{% if app.current_route != 'security.login' %}
+			<a href="{{ path('security.login') }}" class="btn btn-sm btn-outline-secondary">
+				{{ ux_icon('login') }}
+				{{ 'login'|trans|capitalize }}
+			</a>
+		{% endif %}
+
+		{% if app.current_route != 'security.forgotten_password' %}
+			<a href="{{ path('security.forgotten_password') }}" class="btn btn-sm btn-outline-secondary">
+				{{ ux_icon('reload') }}
+				{{ 'forgotten password'|trans([], 'security')|capitalize }}
+			</a>
+		{% endif %}
+	</div>
+</div>

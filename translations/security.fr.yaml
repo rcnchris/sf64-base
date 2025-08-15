@@ -18,3 +18,8 @@
 'Too many failed login attempts, please try again in %minutes% minute.': 'Plusieurs tentatives de connexion ont échoué, veuillez réessayer dans %minutes% minute.'
 'Too many failed login attempts, please try again in %minutes% minutes.': 'Trop de tentatives de connexion échouées, veuillez réessayer dans %minutes% minutes.'
 'You are logged in as': 'Vous êtes connecté en tant que'
+'forgotten password': 'mot de passe oublié'
+'password reset': 'réinitialisation du mot de passe'
+'A password reset email has been sent to {{ email }}.': 'Un mail de réinitialisation du mot de passe a été envoyé à {{ email }}.'
+'Reset password on {{ name }}': 'Réinitialisation du mot de passe sur {{ name }}'
+'For your reset request, please click on the following link:': 'Pour votre demande de réinitialisation, veuillez cliquer sur le lien suivant :'

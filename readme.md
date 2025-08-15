@@ -15,3 +15,18 @@ composer app-install
 ```bash
 composer app-update
 ```
+
+### Fonctionalités
+
+- Tablettes
+- Utilisateurs
+   - Inscription
+   - Authentification
+   - Mot de passe oublié
+
+### Todo
+
+- Logs
+- Captcha
+- PDF
+- Makefile

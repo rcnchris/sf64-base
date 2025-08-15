@@ -13,7 +13,7 @@
         icon: 'login',
     } %}
 
-	<div class="card bg-light shadow mx-auto" style="max-width: 35rem;">
+	<div class="card bg-light shadow w-50 m-auto">
 		<div class="card-body">
 
 			<form method="post">
@@ -61,17 +61,6 @@
 				</div>
 			</form>
 		</div>
-		<div class="card-footer">
-			<div class="d-flex gap-2 justify-content-center">
-				<a href="{{ path('security.register') }}" class="btn btn-sm btn-outline-secondary">
-					{{ ux_icon('register') }}
-					{{ 'register'|trans|capitalize }}
-				</a>
-				<a href="#" class="btn btn-sm btn-outline-secondary">
-					{{ ux_icon('reload') }}
-					{{ 'forgotten password'|trans|capitalize }}
-				</a>
-			</div>
-		</div>
+		{% include "security/_card_footer.html.twig" %}
 	</div>
 {% endblock %}

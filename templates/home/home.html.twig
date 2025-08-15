@@ -13,7 +13,7 @@
         icon: 'home',
     } %}
 
-	<twig:Alert title="{{ 'hello'|trans|capitalize }}" content="Oyé les gens"/>
+	<twig:Alert title="{{ 'hello'|trans|capitalize }}" content="Oyé les gens" />
 
 	<div class="row mt-3">
 		<div class="col text-center">
@@ -29,9 +29,9 @@
 			</a>
 		</div>
 		<div class="col text-center">
-			<a href="#" class="btn btn-lg btn-primary">
+			<a href="{{ path('security.forgotten_password') }}" class="btn btn-lg btn-primary">
 				{{ ux_icon('reload', {width: '20', height: '20'}) }}
-				{{ 'forgotten password'|trans|capitalize }}
+				{{ 'forgotten password'|trans([], 'security')|capitalize }}
 			</a>
 		</div>
 	</div>

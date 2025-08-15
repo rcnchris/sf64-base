@@ -39,6 +39,17 @@ final class HomeController extends AppAbstractController
             '```bash',
             'composer app-update',
             '```',
+            "\n### Fonctionalités\n",
+            "- Tablettes",
+            "- Utilisateurs",
+            "   - Inscription",
+            "   - Authentification",
+            "   - Mot de passe oublié",
+            "\n### Todo\n",
+            "- Logs",
+            "- Captcha",
+            "- PDF",
+            "- Makefile"
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
         return $this->render('home/readme.html.twig', [

@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+
 {% block title %}
 	{{ title|trans|capitalize }}
 	-
@@ -16,7 +17,7 @@
 		<div class="alert alert-danger" role="alert">{{ flash_error }}</div>
 	{% endfor %}
 
-	<div class="card bg-light shadow mx-auto" style="max-width: 35rem;">
+	<div class="card bg-light shadow w-50 m-auto">
 		<div class="card-body">
 			{{ form_errors(form) }}
 
@@ -34,17 +35,6 @@
 			</div>
 			{{ form_end(form) }}
 		</div>
-		<div class="card-footer">
-			<div class="d-flex gap-2 justify-content-center">
-				<a href="{{ path('security.login') }}" class="btn btn-sm btn-outline-secondary">
-					{{ ux_icon('login') }}
-					{{ 'login'|trans|capitalize }}
-				</a>
-				<a href="#" class="btn btn-sm btn-outline-secondary">
-					{{ ux_icon('reload') }}
-					{{ 'forgotten password'|trans|capitalize }}
-				</a>
-			</div>
-		</div>
+		{% include "security/_card_footer.html.twig" %}
 	</div>
 {% endblock %}
