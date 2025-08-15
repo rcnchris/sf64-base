@@ -10,6 +10,9 @@ parameters:
     app.country: FR
     app.locale_country: '%app.locale%_%app.country%'
     app.timezone: 'Europe/Paris'
+    app.public_dir: '%kernel.project_dir%/public'
+    app.docs_dir: '%app.public_dir%/docs'
+    app.docs_path: '/docs'
     app.assets_dir: '%kernel.project_dir%/assets'
     app.logo: '%app.assets_dir%/images/logo.png'
     app.logo_path: 'images/logo.png'

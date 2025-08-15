@@ -37,9 +37,6 @@ class UserCrudController extends AppAbstractCrudController
     {
         return [
             FormField::addFieldset('Authentication', 'fas fa-user-lock text-info'),
-            AvatarField::new('email', 'Avatar')
-                ->setIsGravatarEmail()
-                ->setHeight($pageName === Crud::PAGE_DETAIL ? 'xl' : 'lg'),
             TextField::new('pseudo')->setColumns(1),
             EmailField::new('email')->setColumns(2),
             BooleanField::new('isVerified')->setColumns(1),
@@ -59,7 +56,17 @@ class UserCrudController extends AppAbstractCrudController
             TextField::new('lastname')->setColumns(2),
             TelephoneField::new('phone')->setColumns(2),
             ColorField::new('color')->setColumns(1),
-            TextEditorField::new('description')->setColumns(12),
+            AvatarField::new('email', 'Avatar')
+                ->setIsGravatarEmail()
+                ->setHeight($pageName === Crud::PAGE_DETAIL ? 'xl' : 'lg'),
+            TextEditorField::new('description')
+                ->setTrixEditorConfig([
+                    'blockAttributes' => [
+                        'default' => ['tagName' => 'p'],
+                        'heading1' => ['tagName' => 'h2'],
+                    ],
+                ])
+                ->setColumns(12),
 
             FormField::addFieldset('Database', 'fas fa-database text-info'),
             IdField::new('id')

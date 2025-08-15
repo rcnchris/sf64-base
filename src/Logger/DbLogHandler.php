@@ -3,6 +3,7 @@
 namespace App\Logger;
 
 use App\Entity\Log;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\{Level, LogRecord};
@@ -16,7 +17,7 @@ final class DbLogHandler extends AbstractProcessingHandler
         #[Autowire('%app.timezone%')]
         private readonly string $tz,
         private readonly EntityManagerInterface $em,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
     ) {
         parent::__construct();
     }
@@ -34,7 +35,7 @@ final class DbLogHandler extends AbstractProcessingHandler
                 ->setCreatedAt(new \DateTimeImmutable('now', new \DateTimeZone($this->tz)));
 
             $extra = $record->extra;
-            if (array_key_exists('user', $extra)) {
+            if (array_key_exists('user', $extra) && !is_null($extra['user'])) {
                 $log->setUser($extra['user']);
                 unset($extra['user']);
             }

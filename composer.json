@@ -63,7 +63,8 @@
         "twig/intl-extra": "^3.21",
         "twig/markdown-extra": "^3.21",
         "twig/string-extra": "^3.21",
-        "twig/twig": "^2.12|^3.0"
+        "twig/twig": "^2.12|^3.0",
+        "vich/uploader-bundle": "^2.7"
     },
     "config": {
         "allow-plugins": {

@@ -51,10 +51,10 @@ final class HomeController extends AppAbstractController
             "- EasyAdmin",
             "- UX Charts",
             "- Pivottable",
+            "- Makefile",
             "\n### Todo\n",
             "- Captcha",
             "- PDF",
-            "- Makefile",
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);

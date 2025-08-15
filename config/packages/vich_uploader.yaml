@@ -1,0 +1,15 @@
+vich_uploader:
+    db_driver: orm
+    
+    metadata:
+        type: attribute
+
+    mappings:
+        docs:
+            uri_prefix: '%app.docs_path%'
+            upload_destination: '%app.docs_dir%'
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true

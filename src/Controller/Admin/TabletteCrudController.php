@@ -40,7 +40,14 @@ class TabletteCrudController extends AppAbstractCrudController
             FormField::addFieldset('Qualification', 'fas fa-info text-info'),
             TextField::new('icon')->setColumns(2),
             ColorField::new('color')->setColumns(1),
-            TextEditorField::new('description')->setColumns(12),
+            TextEditorField::new('description')
+                ->setTrixEditorConfig([
+                    'blockAttributes' => [
+                        'default' => ['tagName' => 'p'],
+                        'heading1' => ['tagName' => 'h2'],
+                    ],
+                ])
+                ->setColumns(12),
 
             FormField::addFieldset('Database', 'fas fa-database text-info'),
             IdField::new('id')
