@@ -2,13 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\{Log, User};
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppAbstractController extends AbstractController
 {
-    public function __construct(private readonly TranslatorInterface $translator) {}
+    public function __construct(
+        private readonly LoggerInterface $dbLogger,
+        private readonly TranslatorInterface $translator
+    ) {}
 
     /**
      * Retourne l'instance de l'utilisateur authentifié
@@ -57,5 +61,47 @@ class AppAbstractController extends AbstractController
     {
         $tz = is_null($stringTimezone) ? $this->getParameter('app.timezone') : $stringTimezone;
         return new \DateTimeImmutable('now', new \DateTimeZone($tz));
+    }
+
+    /**
+     * Ajoute un log en base de données
+     * 
+     * @param string $message Message du log
+     * @param ?array $context Contexte
+     * @param ?string $type Type de log
+     */
+    protected function addLog(string $message, ?array $context = [], ?string $type = 'info'): void
+    {
+        if (!in_array(strtoupper($type), Log::LEVELS)) {
+            switch ($type) {
+                case 'danger':
+                    $type = 'error';
+                    break;
+
+                default:
+                    $type = 'info';
+                    break;
+            }
+        }
+        $this->dbLogger->{$type}($message, $context);
+    }
+
+    /**
+     * Ajoute un message flash à la session en cours pour le type.
+     * 
+     * @param string $type Type du message
+     * @param mixed $message Contenu du message
+     * @param ?bool Ajoute le message aux logs
+     * @param ?array $context Contexte du log
+     *
+     * @throws \LogicException
+     */
+    protected function addFlash(string $type, mixed $message, ?bool $addLog = false, ?array $context = []): void
+    {
+        parent::addFlash($type, $message);
+
+        if($addLog){
+            $this->addLog($message, $context, $type);
+        }
     }
 }

@@ -5,10 +5,10 @@ namespace App\Controller;
 use App\Entity\Token;
 use App\Entity\User;
 use App\Form\{ProfileForm, RegistrationFormType, ResetPasswordForm, ResetPasswordRequestForm};
-use App\Repository\TokenRepository;
-use App\Repository\UserRepository;
+use App\Repository\{TokenRepository, UserRepository};
 use App\Security\EmailVerifier;
 use App\Service\MailerService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,9 +23,10 @@ final class SecurityController extends AppAbstractController
 {
     public function __construct(
         private readonly EmailVerifier $emailVerifier,
-        private readonly TranslatorInterface $translator
+        private readonly TranslatorInterface $translator,
+        private readonly LoggerInterface $dbLogger,
     ) {
-        parent::__construct($translator);
+        parent::__construct($dbLogger, $translator);
     }
 
     #[Route('/register', name: 'register', methods: ['GET', 'POST'])]
@@ -55,11 +56,18 @@ final class SecurityController extends AppAbstractController
 
             $this->addFlash(
                 'success',
-                $this->trans('An email has been sent to you to confirm your registration.', [], 'VerifyEmailBundle')
+                $this->trans('An email has been sent to you to confirm your registration.', [], 'VerifyEmailBundle'),
+                true,
+                [
+                    'action' => __FUNCTION__,
+                    'entity' => 'User',
+                    'entity_id' => $user->getId(),
+                ]
             );
             return $this->redirectToRoute('app.home');
         }
 
+        $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
         return $this->render('security/register.html.twig', [
             'title' => __FUNCTION__,
             'form' => $form,
@@ -86,11 +94,29 @@ final class SecurityController extends AppAbstractController
         try {
             $this->emailVerifier->handleEmailConfirmation($request, $user, $userRepository);
         } catch (VerifyEmailExceptionInterface $e) {
-            $this->addFlash('danger', $this->trans('verify_email_error', [], 'VerifyEmailBundle'));
+            $this->addFlash(
+                'danger',
+                $this->trans('verify_email_error', [], 'VerifyEmailBundle'),
+                true,
+                [
+                    'action' => 'verify',
+                    'entity' => 'User',
+                    'entity_id' => $user->getId(),
+                ]
+            );
             return $this->redirectToRoute('security.register');
         }
 
-        $this->addFlash('success', $this->trans('Your email address has been verified.', [], 'VerifyEmailBundle'));
+        $this->addFlash(
+            'success',
+            $this->trans('Your email address has been verified.', [], 'VerifyEmailBundle'),
+            true,
+            [
+                'action' => 'verify',
+                'entity' => 'User',
+                'entity_id' => $user->getId(),
+            ]
+        );
 
         return $this->redirectToRoute('app.home');
     }
@@ -100,6 +126,13 @@ final class SecurityController extends AppAbstractController
     {
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
+
+        $this->addLog(ucfirst($this->trans(__FUNCTION__)), [
+            'action' => __FUNCTION__,
+            'entity' => 'User',
+            'last_username' => $lastUsername,
+            'error' => $error->getMessage(),
+        ]);
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
@@ -126,7 +159,11 @@ final class SecurityController extends AppAbstractController
             $this->addFlash('toast-success', $this->trans('toast.edit'));
             return $this->redirectToRoute('security.profile');
         }
-        // $this->addLog($this->trans(__FUNCTION__));
+        $this->addLog($this->trans(__FUNCTION__), [
+            'action' => 'show',
+            'entity' => 'User',
+            'entity_id' => $user->getId(),
+        ]);
         return $this->render('security/profile.html.twig', [
             'title' => __FUNCTION__,
             'form' => $form,
@@ -187,10 +224,17 @@ final class SecurityController extends AppAbstractController
                     'security'
                 );
                 $this->addFlash('success', $msg);
-                // $this->addLog($msg);
                 return $this->redirectToRoute('security.login');
             }
-            $this->addFlash('danger', "Un problème est survenu lors de la réinitialisation du mot de passe.");
+            $this->addFlash(
+                'danger',
+                "Un problème est survenu lors de la réinitialisation du mot de passe.",
+                true,
+                [
+                    'action' => __FUNCTION__,
+                    'entity' => 'User'
+                ]
+            );
             return $this->redirectToRoute('security.login');
         }
 
@@ -221,7 +265,6 @@ final class SecurityController extends AppAbstractController
                 $tokenRepository->removeExpired();
 
                 $this->addFlash('success', "Mot de passe changé avec succès");
-                // $this->addLog("Mot de passe changé avec succès", ['user' => $user->getPseudo()]);
                 return $this->redirectToRoute('security.login');
             }
             return $this->render('security/reset_password.html.twig', [
@@ -230,7 +273,15 @@ final class SecurityController extends AppAbstractController
             ]);
         }
         $msg = 'Jeton invalide';
-        $this->addFlash('danger', $msg);
+        $this->addFlash(
+            'danger',
+            $msg,
+            true,
+            [
+                'action' => __FUNCTION__,
+                'entity' => 'User'
+            ]
+        );
         return $this->redirectToRoute('security.login');
     }
 }

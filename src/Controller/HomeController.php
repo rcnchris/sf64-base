@@ -17,6 +17,7 @@ final class HomeController extends AppAbstractController
     #[Route('/home', name: 'home')]
     public function home(): Response
     {
+        $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
         return $this->render('home/home.html.twig', [
             'title' => __FUNCTION__,
         ]);
@@ -52,6 +53,7 @@ final class HomeController extends AppAbstractController
             "- Makefile"
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
+        $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
         return $this->render('home/readme.html.twig', [
             'title' => __FUNCTION__,
             'readme' => $this->getFileContent('readme.md'),

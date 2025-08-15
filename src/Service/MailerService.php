@@ -150,16 +150,17 @@ final class MailerService extends AppAbstractController
     {
         try {
             $this->mailer->send($email);
-            $message = sprintf(
-                'Le mail %s a été envoyé à %s',
-                $email->getSubject(),
-                current($email->getTo())->getAddress()
-            );
-            $this->dbLogger->info($message);
+            $message = 'Mail envoyé';
+            $this->dbLogger->info($message, [
+                'action' => 'email',
+                'subject' => $email->getSubject(),
+                'from' => current($email->getFrom())->getAddress(),
+                'to' => current($email->getTo())->getAddress(),
+            ]);
             if ($this->hasSession()) {
                 $this->addFlash('toast-success', $message);
             }
-        } 
+        }
         // @codeCoverageIgnoreStart
         catch (TransportExceptionInterface $e) {
             $message = sprintf(
