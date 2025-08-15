@@ -23,10 +23,13 @@ composer app-update
    - Inscription
    - Authentification
    - Mot de passe oublié
+- Logs
+   - Formulaire de recherche
 
 ### Todo
 
-- Logs
 - Captcha
 - PDF
 - Makefile
+- UX Charts
+- Pivottable

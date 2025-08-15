@@ -46,11 +46,14 @@ final class HomeController extends AppAbstractController
             "   - Inscription",
             "   - Authentification",
             "   - Mot de passe oublié",
-            "\n### Todo\n",
             "- Logs",
+            "   - Formulaire de recherche",
+            "\n### Todo\n",
             "- Captcha",
             "- PDF",
-            "- Makefile"
+            "- Makefile",
+            "- UX Charts",
+            "- Pivottable",
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);

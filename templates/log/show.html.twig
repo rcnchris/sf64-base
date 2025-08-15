@@ -32,7 +32,7 @@
             </tr>
             <tr>
                 <th>{{ 'level'|trans|capitalize }}</th>
-                <td>{{ log.level }} - {{ log.levelName }}</td>
+                <td>{% include "partials/badge_log.html.twig" with {level: log.level} only %}</td>
             </tr>
             <tr>
                 <th>{{ 'channel'|trans|capitalize }}</th>

@@ -10,10 +10,13 @@ ux_icons:
         activity: bi:activity
         book: bi:book
         category: bi:inboxes
+        close: bi:x-square-fill
         danger: bi:radioactive
         delete: bi:trash
         event: bi:calendar-event
         eye: bi:eye
+        filter: bi:funnel
+        filter-f: bi:funnel-fill
         gear: bi:gear
         fingerprint: bi:fingerprint
         hierarchy: bi:diagram-3
@@ -31,6 +34,7 @@ ux_icons:
         register: bi:person-fill-add
         reload: bi:arrow-clockwise
         save: bi:save
+        search: bi:search
         send: bi:send-fill
         success: bi:check-circle-fill
         user: bi:person

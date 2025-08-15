@@ -1,0 +1,5 @@
+{% set context = level <= 200 ? 'info' : (level < 400 ? 'warning' : 'danger') %}
+<span class="badge text-bg-{{ context }}">
+    {{level}}
+    - {{ constant('App\\Entity\\Log::LEVELS')[level] }}
+</span>

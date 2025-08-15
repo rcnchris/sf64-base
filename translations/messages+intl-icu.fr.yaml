@@ -15,6 +15,7 @@ description: description
 edit: éditer
 entity.tablette: "{tablettes, plural,\n  =0 {tablette}\n  =1 {tablette}\n  other {tablettes}\n}"
 extra: extra
+filter: filtrer
 hello: bonjour
 home: accueil
 icon: icône
@@ -29,6 +30,7 @@ profile: profil
 readme: 'à propos'
 register: inscription
 reset: réinitialisation
+search: rechercher
 save: enregistrer
 send: envoyer
 thanks: merci
