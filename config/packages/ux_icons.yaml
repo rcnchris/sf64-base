@@ -33,6 +33,7 @@ ux_icons:
         mail: bi:envelope
         mysql: logos:mysql
         new: bi:plus-circle
+        pdf: bi:file-earmark-pdf
         phone: bi:telephone
         php: logos:php
         pointer: bi:hand-index-thumb

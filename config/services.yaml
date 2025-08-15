@@ -16,6 +16,22 @@ parameters:
     app.assets_dir: '%kernel.project_dir%/assets'
     app.logo: '%app.assets_dir%/images/logo.png'
     app.logo_path: 'images/logo.png'
+    app.tmp_dir: '%kernel.project_dir%/var/tmp'
+
+    app.pdf:
+        orientation: P
+        unit: mm
+        size: A4
+        font: helvetica
+        font_size: 10
+        format: A4
+        tmp_dir: '%app.tmp_dir%/pdf'
+        text_color: '#000000'
+        draw_color: '#000000'
+        fill_color: '#ecf0f1'
+        php: true
+        creator: '%app.name%'
+        logo: '%app.logo%'
 
 services:
     # default configuration for services in *this* file

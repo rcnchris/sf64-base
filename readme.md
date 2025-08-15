@@ -28,9 +28,9 @@ composer app-update
 - EasyAdmin
 - UX Charts
 - Pivottable
+- Makefile
+- PDF
 
 ### Todo
 
 - Captcha
-- PDF
-- Makefile

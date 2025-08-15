@@ -1,0 +1,961 @@
+<?php
+
+namespace App\Pdf;
+
+use App\Utils\{Collection, Tools};
+
+class MyFPDF extends \FPDF
+{
+    /**
+     * Options par défaut
+     */
+    private array $defaultOptions = [
+        'orientation' => 'P', // P ou L
+        'unit' => 'mm', // Unité du document (pt, mm, cm ou in)
+        'size' => 'A4', // Taille des pages (A3, A4, A5, Letter ou Legal)
+
+        'font_family' => 'Arial', // Police
+        'font_style' => '', // Chaîne vide normal, B gras, I italique ou U souligné
+        'font_size' => 12, // Taille de la police en point
+
+        'margin_top' => 10, // Marge du haut
+        'margin_bottom' => 7, // Marge du bas
+        'margin_left' => 10, // Marge gauche
+        'margin_right' => 10, // Marge droite
+        'margin_cell' => 1, // Marge des cellules
+
+        'line_height' => 5, // Hauteur des lignes
+
+        'text_color' => '#000000', // Couleur du texte
+        'draw_color' => '#000000', // Couleur des contours (bordure et dessin)
+        'fill_color' => '#ecf0f1', // Couleur de remplissage
+
+        'title' => '', // Metas
+        'subject' => '', // Metas
+        'creator' => '', // Metas
+        'author' => '', // Metas
+        'keywords' => '', // Metas
+
+        'ensure_page_exists' => true, // S'assure qu'au moins une page existe
+
+        'zoom' => 'fullpage', // fullpage, fullwidth, real, default ou facteur de zoom à utiliser
+        'layout' => 'single', // single, continuous, two ou default
+
+        'graduated_grid' => false, // Dessine une grille graduée. Si true l'échelle est de 5, sinon la spécifier en unité du document.
+        'graduated_grid_color' => '#ccffff', // Couleur de la grille graduée.
+        'graduated_grid_thickness' => .35, // Epaisseur des lignes graduées.
+        'graduated_grid_text_color' => '#cccccc', // Couleur des repères textes gradués.
+
+        'logo' => false, // Chemin logo de l'entête
+        'logo_link' => false, // URL cliquable sur le logo
+
+        'header_height' => false, // Hauteur de l'entête de page. false pour aucun.
+        'header_border' => 0, // Bordure(s) de l'entête de page (0, 1, L, T, R ou B)
+        'header_fill' => false, // Remplissage de l'entête de page
+
+        'footer_height' => false, // Hauteur du pied de page. false pour aucun.
+        'footer_border' => 0, // Bordure(s) du pied de page (0, 1, L, T, R ou B)
+        'footer_fill' => false, // Remplissage du pied de page
+
+        'pagination_enabled' => false, // Active la pagination (false, header ou footer)
+        'pagination_border' => 0, // Bordure de la pagination (0, 1, L, T, R ou B)
+        'pagination_fill' => false, // Code hexa ou booléen. Si true, c'est la couleur de remplissage par défaut.
+        'pagination_align' => 'R', // Alignement de la pagination (L, C ou R).
+
+        'timezone' => 'Europe/Paris',
+        'tmp_dir' => null,
+    ];
+
+    /**
+     * Options définies de l'instance
+     */
+    protected ?Collection $options;
+
+    /**
+     * Données définies de l'instance
+     */
+    protected ?Collection $data;
+
+    /**
+     * Infos de l'instance
+     */
+    protected ?Collection $infos;
+
+    /**
+     * @param array $options Options du document
+     * @param array $data Données du document
+     */
+    public function __construct(array $options = [], array $data = [])
+    {
+        $this->setData($data);
+
+        // Fusion des options par défaut avec celles spécifiées
+        $this->options = new Collection(
+            array_merge($this->defaultOptions, $options),
+            'Options du document'
+        );
+
+        // Document
+        parent::__construct(
+            $this->options->orientation,
+            $this->options->unit,
+            $this->options->size,
+        );
+
+        // Page
+        if ($this->options->pagination_enabled !== false) {
+            $this->AliasNbPages();
+        }
+
+        if ($this->options->ensure_page_exists) {
+            $this->ensurePageExists();
+        }
+
+        $this->SetDisplayMode(
+            $this->options->zoom,
+            $this->options->layout
+        );
+
+        // Marges
+        $this
+            ->setMargin('top', $this->options->margin_top)
+            ->setMargin('bottom', $this->options->margin_bottom)
+            ->setMargin('left', $this->options->margin_left)
+            ->setMargin('right', $this->options->margin_right)
+            ->setMargin('cell', $this->options->margin_cell);
+
+        // Couleurs
+        $this->setToolColor();
+
+        // Propriétés
+        $this->SetTitle($this->convertText($this->options->title));
+        $this->SetSubject($this->convertText($this->options->subject));
+        $this->SetCreator($this->convertText($this->options->creator));
+        $this->SetAuthor($this->convertText($this->options->author));
+        $this->SetKeywords($this->convertText($this->options->keywords));
+    }
+
+    public function __destruct()
+    {
+        $this->defaultOptions = [];
+        $this->options = null;
+        $this->data = null;
+        $this->infos = null;
+    }
+
+    /**
+     * En-tête
+     * Appelée automatiquement par AddPage().
+     */
+    public function Header(): void
+    {
+        // Police
+        $this->SetFont(
+            $this->options->font_family,
+            $this->options->font_style,
+            $this->options->font_size,
+        );
+
+        // Grille graduée
+        if ($this->options->graduated_grid !== false) {
+            $this->drawGraduatedGrid();
+        }
+
+        if ($this->options->header_height === false) {
+            return;
+        }
+
+        $this
+            ->setCursor($this->lMargin, $this->tMargin)
+            ->setToolColor('draw', $this->options->draw_color)
+            ->print(
+                content: ' ',
+                h: $this->options->header_height,
+                w: $this->getBodyWidth(),
+                border: $this->options->header_border,
+                fill: $this->options->header_fill
+            )
+            ->setCursor($this->lMargin, $this->tMargin);
+
+        // Pagination
+        if ($this->options->pagination_enabled === 'header') {
+            $this
+                ->setCursor($this->lMargin, $this->tMargin)
+                ->setFontStyle(style: 'I', size: 8);
+            if (is_string($this->options->pagination_fill)) {
+                $this->setToolColor('fill', $this->options->pagination_fill);
+            } elseif ($this->options->pagination_fill === true) {
+                $this->setToolColor('fill');
+            }
+            $this
+                ->print(
+                    content: 'Page ' . $this->PageNo() . ' sur {nb}',
+                    mode: 'cell',
+                    align: $this->options->pagination_align,
+                    fill: $this->options->pagination_fill !== false,
+                    border: $this->options->pagination_border,
+                )
+                ->setCursor($this->lMargin, $this->tMargin);
+        }
+    }
+
+    /**
+     * Pied de page
+     * Appelée automatiquement par AddPage() et Close().
+     */
+    public function Footer(): void
+    {
+        if ($this->options->footer_height === false) {
+            return;
+        }
+
+        $this
+            ->setCursor($this->lMargin, $this->getStartFooterY())
+            ->print(
+                content: ' ',
+                h: $this->options->footer_height,
+                w: $this->getBodyWidth(),
+                border: $this->options->footer_border,
+                fill: $this->options->footer_fill
+            )
+            ->setCursor($this->lMargin, $this->getStartFooterY());
+
+        // Pagination
+        if ($this->options->pagination_enabled === 'footer') {
+            $this
+                ->setCursor($this->lMargin, $this->getStartFooterY())
+                ->setFontStyle(style: 'I', size: 8);
+            if (is_string($this->options->pagination_fill)) {
+                $this->setToolColor('fill', $this->options->pagination_fill);
+            } elseif ($this->options->pagination_fill === true) {
+                $this->setToolColor('fill');
+            }
+            $this
+                ->print(
+                    content: 'Page ' . $this->PageNo() . ' sur {nb}',
+                    mode: 'cell',
+                    align: $this->options->pagination_align,
+                    fill: $this->options->pagination_fill !== false,
+                    border: $this->options->pagination_border,
+                )
+                ->setCursor($this->lMargin, $this->getStartFooterY());
+        }
+    }
+
+    /**
+     * S'assure qu'une page existe
+     */
+    protected function ensurePageExists(): self
+    {
+        if ($this->getTotalPages() === 0) {
+            $this->AddPage(
+                $this->options->orientation,
+                $this->options->size,
+                $this->options->rotation
+            );
+        }
+        return $this;
+    }
+
+    /**
+     * Retourne l'ordonnée de départ du contenu du document
+     */
+    public function getStartContentY(): float
+    {
+        return $this->tMargin 
+            + ($this->options->header_height === false ? 0 : $this->options->header_height) 
+            + $this->options->line_height;
+    }
+
+    /**
+     * Retourne l'ordonnée de départ du pied de page
+     */
+    public function getStartFooterY(): float
+    {
+        return $this->GetPageHeight()
+            - ($this->bMargin + ($this->options->footer_height === false ? 0 : $this->options->footer_height));
+    }
+
+    /**
+     * Ajoute une page et retourne l'instance
+     * @param ?string $orientation P ou L
+     * @param ?string $size Type de page 
+     * - A3
+     * - A4
+     * - A5
+     * - Letter
+     * - Legal
+     * ou bien d'un tableau contenant la largeur et la hauteur (exprimées en unité utilisateur).
+     * @param ?float $rotation Angle de rotation de la page. La valeur doit être un multiple de 90 et la rotation s'effectue dans le sens horaire.
+     * @param ?float $y Définir l'ordonnée
+     */
+    public function newPage(
+        ?string $orientation = '',
+        ?string $size = '',
+        ?float $rotation = 0,
+        ?float $y = null
+    ): self {
+        $this->AddPage($orientation, $size, $rotation);
+        if (!is_null($y)) {
+            $this->SetY($y);
+        }
+        return $this;
+    }
+
+    /**
+     * Ajoute un saut de ligne de hauteur $h et retourne l'instance
+     * @param ?float $h Hauteur du saut de ligne
+     */
+    public function addLn(?float $h = null): self
+    {
+        $this->Ln($h);
+        return $this;
+    }
+
+    /**
+     * Définit la couleur d'un outil
+     * @param string $tool Nom de l'outil (text, draw, fill ou all) à colorer
+     * @param ?string $hexa Code hexadécimal d'une couleur. Si non renseigné, c'est la couleur des options de l'instance qui s'applique.
+     */
+    public function setToolColor(string $tool = 'all', ?string $hexa = null): self
+    {
+        $tools = ['text', 'draw', 'fill', 'all'];
+        if (!in_array($tool, $tools)) {
+            $msg = sprintf(
+                "Le nom de l'outil à colorer est incorrect : \"%s\". Seules les valeurs \"%s\" sont acceptées.",
+                $tool,
+                join(', ', $tools)
+            );
+            $this->Error($msg);
+        }
+
+        if (is_null($hexa) && $tool !== 'all') {
+            $hexa = $this->options->get($tool . '_color');
+        }
+
+        switch ($tool) {
+            case 'text':
+                list($r, $g, $b) = $this->convertColor($hexa);
+                $this->SetTextColor($r, $g, $b);
+                break;
+            case 'draw':
+                list($r, $g, $b) = $this->convertColor($hexa);
+                $this->SetDrawColor($r, $g, $b);
+                break;
+            case 'fill':
+                list($r, $g, $b) = $this->convertColor($hexa);
+                $this->SetFillColor($r, $g, $b);
+                break;
+            default:
+                list($r, $g, $b) = $this->convertColor(is_null($hexa) ? $this->options->text_color : $hexa);
+                $this->SetTextColor($r, $g, $b);
+                list($r, $g, $b) = $this->convertColor(is_null($hexa) ? $this->options->draw_color : $hexa);
+                $this->SetDrawColor($r, $g, $b);
+                list($r, $g, $b) = $this->convertColor(is_null($hexa) ? $this->options->fill_color : $hexa);
+                $this->SetFillColor($r, $g, $b);
+                break;
+        }
+        return $this;
+    }
+
+    /**
+     * Définit le style de la police
+     * @param string $family Nom de la police
+     * @param string $style Style de la police ('', B, I ou U)
+     * @param int $size Taille de la police en point
+     */
+    public function setFontStyle(string $family = '', string $style = '', int $size = 0): self
+    {
+        $this->SetFont(
+            family: empty($family) ? $this->options->font_family : $family,
+            style: empty($style) ? $this->options->font_style : $style,
+            size: ($size == 0) ? $this->options->font_size : $size
+        );
+        return $this;
+    }
+
+    /**
+     * Définit la valeur d'un type de marge
+     * @param string $type Nom de la marge
+     * @param float $value Valeur de la marge en unité du document
+     */
+    public function setMargin(string $type, float $value): self
+    {
+        switch ($type) {
+            case 'top':
+                $this->SetTopMargin($value);
+                break;
+            case 'left':
+                $this->SetLeftMargin($value);
+                break;
+            case 'right':
+                $this->SetRightMargin($value);
+                break;
+            case 'bottom':
+                $this->bMargin = $value;
+                break;
+            case 'cell':
+                $this->cMargin = $value;
+                break;
+            default:
+                $this->Error(sprintf("Le type \"%s\" no correspond pas à un type de marge. Utiliser seulement top, bottom, left, right ou cell.", $type));
+        }
+        return $this;
+    }
+
+    /**
+     * Retourne le nombre total de pages du document
+     */
+    public function getTotalPages(): int
+    {
+        return count($this->pages);
+    }
+
+    /**
+     * Retourne la date de création du document s'il a été rendu.
+     */
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        if ($this->state === 3) {
+            return (new \DateTimeImmutable())
+                ->setTimestamp($this->CreationDate)
+                ->setTimezone(new \DateTimeZone($this->options->timezone));
+        }
+        return null;
+    }
+
+    /**
+     * Retourne la position courante du curseur dans un tableau
+     * @param ?float $x Abscisse (position horizontale)
+     * @param ?float $y Ordonnée (position verticale)
+     * @param bool $associative Si true le tableau retournée contient les clés "x" et "y"
+     */
+    public function getCursor(
+        ?float $x = null,
+        ?float $y = null,
+        ?bool $associative = false
+    ): array {
+        $x = is_null($x) ? $this->GetX() : $x;
+        $y = is_null($y) ? $this->GetY() : $y;
+        return $associative ? compact('x', 'y') : [$x, $y];
+    }
+
+    /**
+     * Définit la position du curseur et retourne l'instance
+     * 
+     * @param ?float $x Abscisse du curseur
+     * @param ?float $y Ordonnée du curseur
+     */
+    public function setCursor(?float $x = null, ?float $y = null): self
+    {
+        $this->SetXY(
+            is_null($x) ? $this->GetX() : $x,
+            is_null($y) ? $this->GetY() : $y
+        );
+        return $this;
+    }
+
+    /**
+     * Retourne toutes les marges dans une collection
+     */
+    public function getMargins(): Collection
+    {
+        return new Collection([
+            'left' => $this->lMargin,
+            'right' => $this->rMargin,
+            'top' => $this->tMargin,
+            'bottom' => $this->bMargin,
+            'cell' => $this->cMargin,
+        ], 'Marges du document PDF');
+    }
+
+    /**
+     * Retourne la largeur utile de la page (sans les marges)
+     */
+    public function getBodyWidth(): float
+    {
+        return parent::GetPageWidth() - ($this->lMargin + $this->rMargin);
+    }
+
+    /**
+     * Retourne la hauteur utile de la page (sans les marges)
+     */
+    public function getBodyHeight(): float
+    {
+        return parent::GetPageHeight() - ($this->tMargin + $this->bMargin);
+    }
+
+    /**
+     * Retourne la valeur du milieu pour le type spécifié
+     * @param string $type x ou y
+     */
+    public function getMiddleOf(string $type): float
+    {
+        $middle = 0;
+        switch ($type) {
+            case 'x':
+                $middle = $this->GetPageWidth() / 2;
+                break;
+
+            case 'y':
+                $middle = $this->GetPageHeight() / 2;
+                break;
+
+            default:
+                $this->Error('Le type doit être "x" ou "y"');
+        }
+        return $middle;
+    }
+
+    /**
+     * Retourne les métas dans une collection
+     */
+    public function getMetas(): Collection
+    {
+        return new Collection($this->metadata, "Métas données du document PDF");
+    }
+
+    /**
+     * Retourne les options dans une collection
+     */
+    public function getOptions(): ?Collection
+    {
+        return $this->options;
+    }
+
+    /**
+     * Retourne les données dans une collection
+     */
+    public function getData(): ?Collection
+    {
+        return $this->data;
+    }
+
+    /**
+     * Définit les données du document
+     * @param array $data Données dans un tableau
+     */
+    public function setData(array $data = []): self
+    {
+        $this->data = new Collection($data, 'Données du document PDF');
+        return $this;
+    }
+
+    /**
+     * Convertit de l'UTF-8 en Windows-1252 si nécessaire
+     * @param string $text Texte à convertir
+     */
+    public function convertText(?string $text = null): string
+    {
+        if (is_null($text)) {
+            return '';
+        }
+        if (mb_detect_encoding($text) === 'UTF-8') {
+            $text = mb_convert_encoding($text, 'Windows-1252', 'UTF-8');
+        }
+        return $text;
+    }
+
+    /**
+     * Convertit une couleur en RGB ou hexadécimal
+     * 
+     * @param array|string $color Couleur à convertir. 
+     * - Si c'est un tableau, RGB vers hexadécimal
+     * - Si c'est une chaîne de caractères, hexadécimal vers RGB
+     * @param ?bool $rgbAssociative Si true, le tableau de valeurs RGB sera associatif avec les clés "r", "g" et "b" et les valeurs associées.
+     */
+    public function convertColor(array|string $color, ?bool $rgbAssociative = false): array|string
+    {
+        return Tools::convertColor($color, $rgbAssociative);
+    }
+
+    /**
+     * Ecrit sur le document PDF
+     * 
+     * @param mixed $content Contenu à écrire
+     * @param ?float $h Hauteur de la ligne à écrire
+     * @param ?float $w Largeur de la ligne à écrire
+     * @param int|string $border Bordure (0, 1, L, R, T, B)
+     * @param ?string $align Aligement du contenu (L, R, J ou C)
+     * @param ?int $ln Positionnement après écriture (0, 1 ou 2).
+     * @param ?bool $fill Remplissage pour les modes cell et multi
+     * @param ?string $link Lien pour les modes text et cell
+     * @param ?bool $wAuto Limiter la largeur de la cellule à la taille du contenu  pour les modes cell et multi
+     * @param ?string $mode Mode d'écriture (text, cell ou multi)
+     */
+    public function print(
+        mixed $content,
+        ?float $h = null,
+        ?float $w = 0,
+        int|string $border = 0,
+        ?string $align = 'L',
+        ?int $ln = 0,
+        ?bool $fill = false,
+        ?string $link = '',
+        ?bool $wAuto = false,
+        ?string $mode = 'multi',
+    ): self {
+
+        if (empty($content)) {
+            return $this;
+        }
+
+        // Hauteur de la ligne
+        if (is_null($h)) {
+            $h = $this->options->line_height;
+        }
+        switch ($mode) {
+            case 'text':
+                if (is_string($content) || is_numeric($content)) {
+                    $this->Write(
+                        h: $h,
+                        txt: $this->convertText($content),
+                        link: $link
+                    );
+                } elseif (is_object($content) && method_exists($content, '__toString')) {
+                    $content = (string) $content;
+                    $this->Write(
+                        h: $h,
+                        txt: $this->convertText($content),
+                        link: $link
+                    );
+                } elseif (is_array($content) && !empty($content)) {
+                    foreach ($content as $row) {
+                        $this->Write(
+                            h: $h,
+                            txt: $this->convertText($row),
+                            link: $link
+                        );
+                    }
+                }
+                break;
+
+            case 'cell':
+                if (is_string($content) || is_numeric($content)) {
+                    $content = $this->convertText($content);
+                    $this->Cell(
+                        w: $wAuto ? $this->GetStringWidth($content) : $w,
+                        h: $h,
+                        txt: $content,
+                        border: $border,
+                        ln: $ln,
+                        align: $align,
+                        fill: $fill,
+                        link: $link
+                    );
+                } elseif (is_object($content) && method_exists($content, '__toString')) {
+                    $content = $this->convertText((string)$content);
+                    $this->Cell(
+                        w: $wAuto ? $this->GetStringWidth($content) : $w,
+                        h: $h,
+                        txt: $content,
+                        border: $border,
+                        ln: $ln,
+                        align: $align,
+                        fill: $fill,
+                        link: $link
+                    );
+                } elseif (is_array($content) && !empty($content)) {
+                    foreach ($content as $row) {
+                        $row = $this->convertText($row);
+                        $this->Cell(
+                            w: $wAuto ? $this->GetStringWidth($row) : $w,
+                            h: $h,
+                            txt: $row,
+                            border: $border,
+                            ln: $ln,
+                            align: $align,
+                            fill: $fill,
+                            link: $link
+                        );
+                    }
+                }
+                break;
+
+            case 'multi':
+                if (is_string($content) || is_numeric($content)) {
+                    $content = $this->convertText($content);
+                    $this->MultiCell(
+                        w: $wAuto ? $this->GetStringWidth($content) : $w,
+                        h: $h,
+                        txt: $content,
+                        border: $border,
+                        align: $align,
+                        fill: $fill
+                    );
+                } elseif (is_object($content) && method_exists($content, '__toString')) {
+                    $content = $this->convertText((string)$content);
+                    $this->MultiCell(
+                        w: $wAuto ? $this->GetStringWidth($content) : $w,
+                        h: $h,
+                        txt: $content,
+                        border: $border,
+                        align: $align,
+                        fill: $fill
+                    );
+                } elseif (is_array($content) && !empty($content)) {
+                    if (array_is_list($content)) {
+                        foreach ($content as $row) {
+                            $row = $this->convertText($row);
+                            $this->MultiCell(
+                                w: $wAuto ? $this->GetStringWidth($row) : $w,
+                                h: $h,
+                                txt: $row,
+                                border: $border,
+                                align: $align,
+                                fill: $fill
+                            );
+                        }
+                    } else {
+                        foreach ($content as $key => $value) {
+                            $value = $this->convertText($value);
+                            $this
+                                ->setFontStyle(style: 'B')
+                                ->print(sprintf('%s : ', $key), mode: 'cell', wAuto: true)
+                                ->setFontStyle()
+                                ->MultiCell(
+                                    w: $wAuto ? $this->GetStringWidth($value) : $w,
+                                    h: $h,
+                                    txt: $value,
+                                    border: $border,
+                                    align: $align,
+                                    fill: $fill
+                                );
+                        }
+                    }
+                }
+                break;
+
+            default:
+                $this->Error(sprintf(
+                    "Le mode \"%s\" n'est pas géré dans la méthode \"%s\" de la classe \"%s\".",
+                    $mode,
+                    __FUNCTION__,
+                    __CLASS__
+                ));
+        }
+        return $this;
+    }
+
+    /**
+     * Ecrit du code source
+     * 
+     * @apram string|array $code Code source à écrire
+     */
+    public function printCode(string|array $code): self
+    {
+        return $this
+            ->setFontStyle(family: 'courier', size: 8)
+            ->print($code, fill: true)
+            ->setFontStyle();
+    }
+
+    /**
+     * Retourne les informations du document dans une collection
+     */
+    public function getInfos(): Collection
+    {
+        $vars = array_keys(get_object_vars($this));
+
+        $nbFiles = in_array('joinedFiles', $vars)
+            ? count($this->{'joinedFiles'})
+            : 0;
+
+        $nbBookmarks = in_array('bookmarks', $vars)
+            ? count($this->{'bookmarks'})
+            : 0;
+
+        $infos = [
+            'Titre' => $this->metadata['Title'],
+            'Sujet' => $this->metadata['Subject'],
+            'Créateur' => $this->metadata['Creator'],
+            'Auteur' => $this->metadata['Author'],
+            'Mots clés' => $this->metadata['Keywords'],
+            'Orientation' => $this->CurOrientation,
+            'Unité' => $this->options->unit,
+            'Taille' => $this->options->size,
+            'Fuseau horaire' => $this->options->timezone,
+            'Zoom' => $this->options->zoom,
+            'Layout' => $this->options->layout,
+            'Pages' => $this->getTotalPages(),
+            'Facteur d\'échelle' => $this->k,
+            'Largeur' => $this->w,
+            'Hauteur' => $this->h,
+            'Marge haut' => $this->tMargin,
+            'Marge bas' => $this->bMargin,
+            'Marge gauche' => $this->lMargin,
+            'Marge droite' => $this->rMargin,
+            'Marge cellule' => $this->cMargin,
+            'Hauteur ligne texte' => $this->options->line_height,
+            'Epaisseur ligne' => $this->LineWidth,
+            'Largeur corps' => $this->getBodyWidth(),
+            'Hauteur corps' => $this->getBodyHeight(),
+            'Police' => $this->FontFamily,
+            'Polices' => join(', ', $this->CoreFonts),
+            'Rotation' => empty($this->CurRotation) ? 'Aucune' : $this->CurRotation,
+            'Données' => $this->data->count(),
+            'Images' => count($this->images),
+            'Fichiers' => $nbFiles,
+            'Signets' => $nbBookmarks,
+            'Javascript' => in_array('javascript', $vars) ? 'Oui' : 'Non',
+            'Version PHP' => PHP_VERSION,
+            'Version FPDF' => $this->metadata['Producer'],
+            'Classe PDF' => get_class($this),
+            'Parents' => join(', ', array_map(function (string $name) {
+                return Tools::namespaceSplit($name, true);
+            }, class_parents($this))),
+            'Traits' => join(', ', array_map(function (string $name) {
+                return Tools::namespaceSplit($name, true);
+            }, class_uses($this))),
+            'Fichier classe' => __FILE__,
+        ];
+
+        return new Collection($infos, 'Informations du document PDF');
+    }
+
+    /**
+     * Imprime la liste des informations du document
+     * 
+     * @param ?bool $addPage Si vrai, une page est ajoutée pour les informations
+     */
+    public function printInfos(?bool $addPage = true): self
+    {
+        $infos = $this->getInfos();
+        $this
+            ->setToolColor()
+            ->setFontStyle('Arial', 'B', 12);
+
+        if ($addPage) {
+            $this->AddPage();
+        }
+
+        // Calcul de la taille de la colonne des labels
+        $maxWidth = 0;
+        foreach ($infos->keys() as $key) {
+            $width = $this->GetStringWidth($this->convertText($key)) + $this->getMargins()->cell;
+            if ($maxWidth < $width) {
+                $maxWidth = $width;
+            }
+        }
+
+        // Titre
+        $this
+            ->setCursor($this->GetX(), $this->tMargin + $this->options->header_height + 5)
+            ->setFontStyle(style: 'BU', size: 18)
+            ->print('Informations sur le document', align: 'C')
+            ->Ln(3);
+
+        // Ecrit toutes les informations
+        foreach ($infos as $name => $value) {
+            $this->SetFont('Arial', 'B', 12);
+            $this->Cell($maxWidth, 6, $this->convertText($name), 1, 0, 'C', true);
+            $this->SetFont('Courier', '', 10);
+            $this->Cell(0, 6, $this->convertText($value), 1, 1);
+        }
+
+        // Fichiers attachés
+        if ($infos->Fichiers > 0) {
+            $this->Ln(5);
+            $this->SetFont('Arial', 'B', 12);
+            $this->Cell(0, 8, $this->convertText('Fichier(s) attaché(s)'), 1, 1, 'C', true);
+
+            // Entêtes
+            $this->SetFont('Arial', '', 10);
+            $this->Cell(50, 8, 'Nom', 1, 0, 'C');
+            $this->Cell(120, 8, 'Fichier', 1, 0, 'C');
+            $this->Cell(0, 8, 'Taille', 1, 1, 'C');
+
+            // Lignes
+            foreach ($this->{'joinedFiles'} as $file) {
+                $this->Cell(50, 6, $file['name'], 1, 0, 'C');
+                $this->Cell(120, 6, $file['file'], 1);
+                $this->Cell(0, 6, Tools::bytesToHumanSize($file['size'], 2), 1, 1, 'C');
+            }
+        }
+
+        return $this
+            ->setToolColor()
+            ->setFontStyle();
+    }
+
+    /**
+     * Dessine une ligne
+     * 
+     * @param ?float $xStart Abscisse de départ
+     * @param ?float $yStart Ordonnée de départ
+     * @param ?float $xEnd Abscisse de fin
+     * @param ?float $yEnd = Ordonnée de fin
+     */
+    public function drawLine(
+        ?float $xStart = null,
+        ?float $yStart = null,
+        ?float $xEnd = null,
+        ?float $yEnd = null
+    ): self {
+        $xStart = $xStart ?? $this->lMargin;
+        $yStart = $yStart ?? $this->GetY();
+        $xEnd = $xEnd ?? $this->GetPageWidth() - $this->rMargin;
+        $yEnd = $yEnd ?? $this->GetY();
+
+        $this->Line($xStart, $yStart, $xEnd, $yEnd);
+        return $this;
+    }
+
+    /**
+     * Dessine une grille graduée.
+     * Si l'option "graduated_grid" est true, l'échelle est de 5, sinon la spécifier en unité du document.
+     */
+    public function drawGraduatedGrid(): self
+    {
+        $spacing = is_bool($this->options->graduated_grid)
+            ? 5
+            : (is_numeric($this->options->graduated_grid) ? $this->options->graduated_grid : 5);
+
+        $this
+            ->setToolColor('draw', $this->options->graduated_grid_color)
+            ->SetLineWidth($this->options->graduated_grid_thickness);
+        for ($i = 0; $i < $this->w; $i += $spacing) {
+            $this->Line($i, 0, $i, $this->h);
+        }
+        for ($i = 0; $i < $this->h; $i += $spacing) {
+            $this->Line(0, $i, $this->w, $i);
+        }
+        $this->setToolColor('draw');
+        list($x, $y) = $this->getCursor();
+
+        $this
+            ->setToolColor('text', $this->options->graduated_grid_text_color)
+            ->SetFont('Arial', 'I', 8);
+        for ($i = 20; $i < $this->h; $i += 20) {
+            $this->SetXY(1, $i - 3);
+            $this->Write(4, $i);
+        }
+        for ($i = 20; $i < (($this->w) - ($this->rMargin) - 10); $i += 20) {
+            $this->SetXY($i - 1, 1);
+            $this->Write(4, $i);
+        }
+
+        $this->SetXY($x, $y);
+
+        return $this->setToolColor();
+    }
+
+    /**
+     * Envoie le document vers une destination donnée en fonction du type demandé
+     * 
+     * @param string $type Envoie le document vers une destination donnée en fonction du type demandé :
+     * - I : navigateur
+     * - D : télécharger en utilisant $name pour le nom du fichier
+     * - F : fichier en utilisant $name pour le nom du fichier
+     * - S : chaîne de caractères 
+     * @param string $name Le nom du fichier. Il est ignoré si le type est "S".
+     * @param bool $isUtf8 Indique si $name est encodé en ISO-8859-1 (false) ou en UTF-8 (true). Ce paramètre est utilisé uniquement pour les types "I" et "D".
+     */
+    public function render(string $type = 'I', string $name = 'doc.pdf', bool $isUtf8 = false): string
+    {
+        if (in_array($type, ['F', 'D']) && !is_dir(dirname($name))) {
+            mkdir(dirname($name));
+        }
+        return $this->Output($type, $name, $isUtf8);
+    }
+}

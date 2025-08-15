@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Service\PdfService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,8 +26,14 @@ final class HomeController extends AppAbstractController
     }
 
     #[Route('/readme', name: 'readme')]
-    public function readme(): Response
+    public function readme(Request $request, PdfService $pdfService): Response
     {
+        if ($request->query->has('pdf')) {
+            $filename = sprintf('%s/readme.pdf', $this->getParameter('app.docs_dir'));
+            $pdfService->make(['title' => $this->getParameter('app.name')])->render('F', $filename);
+            return $this->file($filename);
+        }
+
         $composer = json_decode($this->getFileContent('composer.json'), true);
         $readme = [
             sprintf("## %s\n", $composer['description']),
@@ -52,9 +60,9 @@ final class HomeController extends AppAbstractController
             "- UX Charts",
             "- Pivottable",
             "- Makefile",
+            "- PDF",
             "\n### Todo\n",
             "- Captcha",
-            "- PDF",
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
