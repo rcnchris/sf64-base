@@ -3,8 +3,7 @@
 namespace App\Controller;
 
 use App\Service\PdfService;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/', name: 'app.', methods: ['GET'])]
@@ -53,7 +52,7 @@ final class HomeController extends AppAbstractController
                 ->printBulletArray([
                     'Tablettes',
                     'Utilisateurs' => [
-                        'Inscription',
+                        'Inscription (captcha)',
                         'Authentification',
                         'Mot de passe oublié',
                     ],
@@ -110,6 +109,18 @@ final class HomeController extends AppAbstractController
         return $this->render('home/readme.html.twig', [
             'title' => __FUNCTION__,
             'readme' => $this->getFileContent('readme.md'),
+        ]);
+    }
+
+    #[Route('/changelog', name: 'changelog')]
+    public function changelog(): Response
+    {
+        $filename = sprintf('%s/changelog.md', $this->getParameter('kernel.project_dir'));
+        $changelog = file_get_contents($filename);
+        $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
+        return $this->render('home/changelog.html.twig', [
+            'title' => __FUNCTION__,
+            'changelog' => $changelog,
         ]);
     }
 }

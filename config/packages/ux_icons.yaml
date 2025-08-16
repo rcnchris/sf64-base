@@ -1,5 +1,5 @@
 ux_icons:
-    icon_dir: '%kernel.project_dir%/assets/icons'
+    icon_dir: '%app.assets_dir%/icons'
     default_icon_attributes:
         fill: currentColor
         aria-hidden: true

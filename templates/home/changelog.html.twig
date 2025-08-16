@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title|trans|capitalize }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+        title: title|trans|capitalize, 
+        icon: 'bi:calendar-week',
+    } %}
+
+	<div class="card shadow">
+		<div class="card-body">
+			{{ changelog|markdown_to_html }}
+		</div>
+	</div>
+{% endblock %}

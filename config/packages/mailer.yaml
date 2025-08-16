@@ -2,7 +2,7 @@ framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
         envelope:
-            sender: 'no-reply@demo.fr'
+            sender: 'no-reply@sf64-base.fr'
         headers:
-            From: '%app.name% <no-reply@demo.fr>'
+            From: '%app.name% <no-reply@sf64-base.fr>'
             X-Custom-Header: '%app.name%'
