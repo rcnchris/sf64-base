@@ -2,15 +2,14 @@ administration: administration
 application: application
 'Are you sure you want to delete this item?': 'Certain(e) de vouloir supprimer cet enregistrement ?'
 'back to list': 'retour à la liste'
+changelog: changements
 channel: canal
 children: enfants
 close: fermer
 color: couleur
 context: contexte
 create: créer
-toast.new: 'Enregistrement créé'
-toast.edit: 'Enregistrement modifié'
-toast.delete: 'Enregistrement supprimé'
+'delete filters': 'supprimer les filtres'
 delete: supprimer
 description: description
 edit: éditer
@@ -37,5 +36,7 @@ save: enregistrer
 send: envoyer
 'show pdf': 'voir le PDF'
 thanks: merci
+toast.new: 'Enregistrement créé'
+toast.edit: 'Enregistrement modifié'
+toast.delete: 'Enregistrement supprimé'
 'welcome on': 'bienvenue sur'
-'delete filters': '__delete filters'

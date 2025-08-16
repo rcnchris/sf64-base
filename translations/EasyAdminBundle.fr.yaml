@@ -105,7 +105,7 @@ Description: Description
 Firstname: Prénom
 Icon: Icône
 ID: Identifiant
-'Is Verified': 'Vérifié'
+'Is Verified': Vérifié
 Lastname: Nom
 Level: Niveau
 'Level Name': 'Nom du Niveau'

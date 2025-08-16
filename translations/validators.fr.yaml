@@ -153,5 +153,3 @@ Error: Erreur
 'You should agree to our terms.': 'Vous devez accepter nos conditions.'
 'Please enter a password': 'Veuillez entrer un mot de passe'
 'Your password should be at least {{ limit }} characters': 'Votre mot de passe doit comporter au moins {{ limit }} caractères'
-'Please enter a password.': '__Please enter a password.'
-'Your password should be at least {{ limit }} characters.': '__Your password should be at least {{ limit }} characters.'

@@ -18,10 +18,10 @@ final class ResetPasswordForm extends AbstractType
             'visible_label' => 'Afficher',
             'attr' => ['autocomplete' => 'new-password'],
             'constraints' => [
-                new NotBlank(['message' => 'Please enter a password.']),
+                new NotBlank(['message' => 'Please enter a password']),
                 new Length([
                     'min' => 6,
-                    'minMessage' => 'Your password should be at least {{ limit }} characters.',
+                    'minMessage' => 'Your password should be at least {{ limit }} characters',
                     'max' => 4096,
                 ]),
             ],
