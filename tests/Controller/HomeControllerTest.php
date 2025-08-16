@@ -32,4 +32,10 @@ final class HomeControllerTest extends AppWebTestCase
         $this->makeClient()->request('GET', '/readme', ['pdf' => true]);
         self::assertResponseIsSuccessful();
     }
+
+    public function testChangelog(): void
+    {
+        $this->makeClient()->request('GET', '/changelog');
+        self::assertResponseIsSuccessful();
+    }
 }

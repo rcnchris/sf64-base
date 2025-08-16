@@ -3959,3 +3959,528 @@ final class PdfService
     }
 }
 ```
+
+-----
+
+## Commande de création d'un utilisateur
+
+```bash
+php bin/console make:command app:add-user
+```
+
+```php
+// Fichier src/Command/AddUserCommand.php
+namespace App\Command;
+
+use App\Entity\User;
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\{InputInterface, InputOption};
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\{ChoiceQuestion, Question};
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+#[AsCommand(
+    name: 'app:add-user',
+    description: 'Ajouter un utilisateur',
+)]
+class AddUserCommand extends Command
+{
+    private bool $isInteractive = true;
+    private array $data = [];
+    private ?QuestionHelper $helper = null;
+
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly UserRepository $userRepository,
+        private readonly UserPasswordHasherInterface $hasher
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->setHelp($this->getCommandHelp())
+            ->addOption('pseudo', 'p', InputOption::VALUE_REQUIRED, 'Pseudo')
+            ->addOption('email', 'm', InputOption::VALUE_REQUIRED, 'Courriel')
+            ->addOption('roles', 'r', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Rôles', [User::ROLES['Application']])
+            ->addOption('password', 'w', InputOption::VALUE_REQUIRED, 'Mot de passe')
+            ->addOption('firstname', 'f', InputOption::VALUE_OPTIONAL, 'Prénom')
+            ->addOption('lastname', 'l', InputOption::VALUE_OPTIONAL, 'Nom')
+            ->addOption('phone', 't', InputOption::VALUE_OPTIONAL, 'Téléphone')
+            ->addOption('color', 'c', InputOption::VALUE_OPTIONAL, 'Couleur')
+            ->addOption('description', 'd', InputOption::VALUE_OPTIONAL, 'Description')
+        ;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $this->isInteractive = !$input->getOption('no-interaction');
+
+        if ($this->isInteractive) {
+            $io->title('Assistant de création d\'un utilisateur');
+            $this->helper = $this->getHelper('question');
+            $repo = $this->userRepository;
+
+            // Pseudo
+            $question = new Question('Pseudo : ', $input->getOption('pseudo'));
+            $question->setValidator(function (string|null $answer) use ($repo): string {
+                if (is_null($answer)) {
+                    throw new RuntimeException('Le pseudo est obligatoire', 1);
+                } elseif (strlen($answer) > 20) {
+                    throw new RuntimeException(sprintf('Le pseudo %s ne doit pas dépasser 20 caractères', $answer), 1);
+                } elseif ($repo->getByPseudoOrEmail($answer)) {
+                    throw new RuntimeException(sprintf('Le pseudo %s existe déjà', $answer), 1);
+                }
+                return $answer;
+            });
+            $this->data['pseudo'] = $this->helper->ask($input, $output, $question);
+
+            // Email
+            $question = new Question('Courriel : ', $input->getOption('email'));
+            $question->setValidator(function (string|null $answer) use ($repo): string {
+                if (is_null($answer)) {
+                    throw new RuntimeException('Le courriel est obligatoire', 1);
+                } elseif ($answer !== filter_var($answer, FILTER_VALIDATE_EMAIL)) {
+                    throw new RuntimeException(sprintf('Le courriel %s est invalide', $answer), 1);
+                } elseif ($repo->getByPseudoOrEmail($answer)) {
+                    throw new RuntimeException(sprintf('Le courriel %s existe déjà', $answer), 1);
+                }
+                return $answer;
+            });
+            $this->data['email'] = $this->helper->ask($input, $output, $question);
+
+            // Rôles
+            $question = new ChoiceQuestion('Rôles (ROLE_BO):', array_values(User::ROLES), 1);
+            $question
+                ->setMultiselect(true)
+                ->setErrorMessage('Rôle "%s" invalide.');
+            $this->data['roles'] = $this->helper->ask($input, $output, $question);
+            $io->note(sprintf('Rôles : %s', join(', ', $this->data['roles'])));
+
+            // Mot de passe
+            $this->data['password'] = $this->helper->ask($input, $output, new Question('Mot de passe : '));
+
+            // Prénom
+            $this->data['firstname'] = $this->helper->ask($input, $output, new Question('Prénom : '));
+
+            // Nom
+            $this->data['lastname'] = $this->helper->ask($input, $output, new Question('Nom : '));
+
+            // Téléphone
+            $this->data['phone'] = $this->helper->ask($input, $output, new Question('Téléphone : '));
+
+            // Couleur
+            $this->data['color'] = $this->helper->ask($input, $output, new Question('Couleur : '));
+
+            // Description
+            $this->data['description'] = $this->helper->ask($input, $output, new Question('Description : '));
+        } else {
+            $this->data = [
+                'pseudo' => $input->getOption('pseudo'),
+                'email' => $input->getOption('email'),
+                'roles' => $input->getOption('roles'),
+                'password' => $input->getOption('password'),
+                'firstname' => $input->getOption('firstname'),
+                'lastname' => $input->getOption('lastname'),
+                'phone' => $input->getOption('phone'),
+                'color' => $input->getOption('color'),
+                'description' => $input->getOption('description'),
+            ];
+        }
+        $user = $this->createUser();
+        $io->success(sprintf('Utilisateur %s créé avec succès', $user->getPseudo()));
+
+        return Command::SUCCESS;
+    }
+
+    private function createUser(): User
+    {
+        $this->data = array_filter($this->data);
+        $user = new User();
+        $user
+            ->setPseudo($this->data['pseudo'])
+            ->setEmail($this->data['email'])
+            ->setRoles($this->data['roles'])
+            ->setPassword($this->hasher->hashPassword($user, $this->data['password']))
+            ->setIsVerified(true)
+            ->setFirstname($this->data['firstname'] ?? null)
+            ->setLastname($this->data['lastname'] ?? null)
+            ->setPhone($this->data['phone'] ?? null)
+            ->setDescription($this->data['description'] ?? null)
+        ;
+        $this->em->persist($user);
+        $this->em->flush();
+        return $user;
+    }
+
+    private function getCommandHelp(): string
+    {
+        return <<<'HELP'
+La commande <info>%command.name%</info> permet d'ajouter un utilisateur à l'application.
+
+Utilisation :
+
+    <info>php %command.full_name%</info> <comment>jobi</comment> <comment>jobi@demo.fr</comment>
+
+HELP;
+    }
+}
+```
+
+-----
+
+## Environnement de test
+
+```
+# Fichier .env.test
+KERNEL_CLASS='App\Kernel'
+APP_SECRET='$ecretf0rt3st'
+SYMFONY_DEPRECATIONS_HELPER=999999
+PANTHER_APP_ENV=panther
+PANTHER_ERROR_SCREENSHOT_DIR=./var/error-screenshots
+DATABASE_URL="mysql://root:@127.0.0.1:3306/sf64-base?serverVersion=8.0.30&charset=utf8mb4"
+MAILER_DSN=smtp://10.0.0.21:1025
+```
+
+### Scripts composer
+
+```json
+"test-yaml": "@sfy lint:yaml config translations --parse-tags",
+"test-container": "@sfy lint:container",
+"test-template": "@sfy lint:twig --show-deprecations templates/",
+"test-mailer": "@sfy mailer:test test@mailer.fr -vvv",
+"tests-lint": [
+    "@test-yaml",
+    "@test-container",
+    "@test-template",
+    "@test-mailer"
+],
+"tests": "php bin/phpunit --stop-on-failure --testdox -v --colors=always",
+"coverage": [
+    "@db-drop --env=test",
+    "@db-create --env=test",
+    "@db-migrate --env=test",
+    "@db-load --env=test",
+    "@sfy app:add-user --env=test -n -p tst -m tst@sf64-base.fr -w tsttst -f Test -l Aillons -t 06.28.40.44.82",
+    "@tests-lint",
+    "rm -rf var/coverage/*",
+    "@putenv XDEBUG_MODE=coverage",
+    "@tests --coverage-html var/coverage --testdox-html var/coverage/testdox.html"
+],
+```
+
+### Vider le cache avant les tests
+
+```php
+// Fichier tests/bootstrap.php
+use Symfony\Component\Dotenv\Dotenv;
+
+require dirname(__DIR__) . '/vendor/autoload.php';
+
+if (method_exists(Dotenv::class, 'bootEnv')) {
+    (new Dotenv())->bootEnv(dirname(__DIR__) . '/.env');
+}
+
+(new \Symfony\Component\Filesystem\Filesystem())->remove(__DIR__ . '/../var/cache/test');
+```
+
+### TestsCase à étendre
+
+#### AppTestCase
+
+```bash
+touch tests/AppTestCase.php
+```
+
+```php
+// Fichier tests/AppTestCase.php
+namespace App\Tests;
+
+use Faker\{Factory, Generator};
+use PHPUnit\Framework\TestCase;
+
+class AppTestCase extends TestCase
+{
+    protected function getRootDir(?string $path = null): string
+    {
+        return dirname(__DIR__) . $path;
+    }
+
+    protected function getFaker(?string $locale = 'fr_FR'): Generator
+    {
+        return Factory::create($locale);
+    }
+
+    protected function assertArrayHasKeys(array $array, array $keys): void
+    {
+        foreach ($keys as $key) {
+            self::assertArrayHasKey($key, $array);
+        }
+    }
+}
+```
+
+#### AppKernelTestCase
+
+```bash
+touch tests/AppKernelTestCase.php
+```
+
+```php
+// Fichier tests/AppKernelTestCase.php
+namespace App\Tests;
+
+use App\Repository\{TabletteRepository, UserRepository};
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Faker\{Factory, Generator};
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+
+class AppKernelTestCase extends KernelTestCase
+{
+    protected EntityManagerInterface $em;
+    protected TabletteRepository $tabRepo;
+    // protected UserRepository $userRepo;
+    protected Generator $faker;
+
+    protected function setUp(): void
+    {
+        self::bootKernel();
+        $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        // $this->userRepo = static::getContainer()->get(UserRepository::class);
+        $this->tabRepo = static::getContainer()->get(TabletteRepository::class);
+        $this->faker = Factory::create('fr_FR');
+    }
+
+    protected function getParameter(string $name): string
+    {
+        return static::getContainer()
+            ->get(ParameterBagInterface::class)
+            ->get($name);
+    }
+
+    protected function getRootDir(?string $path): string
+    {
+        return $this->getParameter('kernel.project_dir') . $path;
+    }
+
+    protected function getRepository(string $repoClassname): ServiceEntityRepository
+    {
+        return static::getContainer()->get($repoClassname);
+    }
+
+    protected function getTabletteRepository(): TabletteRepository
+    {
+        return static::getContainer()->get(TabletteRepository::class);
+    }
+
+    protected function getUserRepository(): UserRepository
+    {
+        return static::getContainer()->get(UserRepository::class);
+    }
+
+    /**
+     * Générateur de données aléatoires
+     */
+    protected function getFaker(?string $locale = null): Generator
+    {
+        return Factory::create(is_null($locale) ? $this->getParameter('app.locale_country') : $locale);
+    }
+
+    /** COMMANDS */
+
+    protected function getCommandTester(string $cmdName, ?bool $tester = true): Command|CommandTester
+    {
+        $application = new Application(self::bootKernel());
+        $command = $application->find($cmdName);
+        return $tester === true ? new CommandTester($command) : $command;
+    }
+
+    /** ASSERTS COMMANDS */
+
+    protected function assertCommandExecuteIsSuccessful(string $cmdName, ?array $params = []): void
+    {
+        $cmdTester = $this->getCommandTester($cmdName);
+        $cmdTester->execute($params);
+        $cmdTester->assertCommandIsSuccessful(sprintf('La commande %s retourne une erreur', $cmdName));
+    }
+
+    /** ASSERTS ENTITY TRAITS */
+    protected function assertEntityUseDatefieldTrait(object $entity): void
+    {
+        $this->assertTrue(in_array('App\Entity\Trait\DateFieldTrait', class_uses($entity)));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getCreatedAt());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getUpdatedAt());
+    }
+
+    protected function assertEntityUseIntervalFieldTrait(object $entity): void
+    {
+        $this->assertTrue(in_array('App\Entity\Trait\IntervalFieldTrait', class_uses($entity)));
+        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getStartAt());
+        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->getEndAt());
+        $this->assertInstanceOf(\DateInterval::class, $entity->getIntervalStart());
+        $this->assertInstanceOf(\DateInterval::class, $entity->getIntervalEnd());
+        $this->assertInstanceOf(\DatePeriod::class, $entity->getPeriode());
+        $this->assertTrue($entity->isCurrent());
+        $this->assertFalse($entity->isPast());
+        $this->assertFalse($entity->isFuture());
+    }
+}
+```
+
+#### AppWebTestCase
+
+```bash
+touch tests/AppWebTestCase.php
+```
+
+```php
+// Fichier tests/AppWebTestCase.php
+namespace App\Tests;
+
+use App\Entity\{Tablette, User};
+use App\Repository\{TabletteRepository, UserRepository};
+use Doctrine\ORM\{EntityManagerInterface, EntityRepository};
+use Faker\{Factory, Generator};
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DomCrawler\Crawler;
+
+class AppWebTestCase extends WebTestCase
+{
+    public function makeClient(?string $identifier = null, ?bool $randUserAgent = true): KernelBrowser
+    {
+        $client = static::createClient();
+        if ($randUserAgent) {
+            $client->setServerParameter('HTTP_USER_AGENT', $this->getFaker()->userAgent());
+        }
+        if (!is_null($identifier)) {
+            $user = $this->getUserRepository()->getByPseudoOrEmail($identifier);
+            $client->loginUser($user);
+        }
+        return $client;
+    }
+
+    protected function getParameter(string $name): mixed
+    {
+        return static::getContainer()
+            ->get(ParameterBagInterface::class)
+            ->get($name);
+    }
+
+    protected function getFaker(?string $locale = null): Generator
+    {
+        return Factory::create(is_null($locale) ? $this->getParameter('app.locale_country') : $locale);
+    }
+
+    protected function getService(string $classname): mixed
+    {
+        return static::getContainer()->get($classname);
+    }
+
+    protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->getService('doctrine')->getManager();
+    }
+
+    protected function getRepository(string $entityClassname): EntityRepository
+    {
+        return $this->getEntityManager()->getRepository($entityClassname);
+    }
+
+    protected function getUserRepository(): UserRepository
+    {
+        return $this->getRepository(User::class);
+    }
+
+    protected function getTabletteRepository(): TabletteRepository
+    {
+        return $this->getRepository(Tablette::class);
+    }
+
+    protected function assertArrayHasKeys(array $array, array $keys): void
+    {
+        foreach ($keys as $key) {
+            self::assertArrayHasKey($key, $array);
+        }
+    }
+    
+    protected function assertRequestRedirectTo(
+        string $uri,
+        ?array $params = [],
+        ?string $uriTo = null,
+        ?string $user = null,
+        ?string $method = 'GET',
+        ?int $expectedCode = null,
+        ?KernelBrowser $client = null,
+    ): Crawler {
+        if (is_null($client)) {
+            $client = $this->makeClient($user);
+        }
+        $crawler = $client->request($method, $uri, $params);
+        self::assertResponseRedirects(
+            expectedLocation: $uriTo,
+            expectedCode: $expectedCode
+        );
+        return $crawler;
+    }
+
+    protected function assertRequestIsSuccessful(
+        string $uri,
+        ?array $params = [],
+        ?string $user = null,
+        ?string $method = 'GET',
+        ?string $pageTitle = null,
+        ?string $selector = null,
+        ?string $pageContains = null,
+        ?KernelBrowser $client = null,
+    ): Crawler {
+        if (is_null($client)) {
+            $client = $this->makeClient($user);
+        }
+        $crawler = $client->request($method, $uri, $params);
+        self::assertResponseIsSuccessful();
+        if (!is_null($pageTitle)) {
+            self::assertPageTitleContains($pageTitle);
+        }
+        if (!is_null($pageContains)) {
+            self::assertSelectorTextContains($selector, $pageContains);
+        }
+        return $crawler;
+    }
+}
+```
+
+### Création du test à exécuter toujours en premier
+
+```bash
+php bin/console make:test KernelTestCase A
+```
+
+```php
+// Fichier tests/ATest.php
+namespace App\Tests;
+
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+
+final class ATest extends KernelTestCase
+{
+    public function testEnvIsTest(): void
+    {
+        self::assertSame('test', self::bootKernel()->getEnvironment());
+    }
+}
+```
