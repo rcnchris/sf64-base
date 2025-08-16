@@ -30,7 +30,51 @@ final class HomeController extends AppAbstractController
     {
         if ($request->query->has('pdf')) {
             $filename = sprintf('%s/readme.pdf', $this->getParameter('app.docs_dir'));
-            $pdfService->make(['title' => $this->getParameter('app.name')])->render('F', $filename);
+            $pdf = $pdfService->make([
+                'title' => $this->getParameter('app.name'),
+                'graduated_grid' => true,
+            ]);
+            $pdf
+                ->setFontStyle(style: 'B', size: 14)
+                ->print('Installation')
+                ->printCode([
+                    'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
+                    'cd my-project-dir',
+                    'composer app-install'
+                ])
+                ->addLn(5)
+                ->setFontStyle(style: 'B', size: 14)
+                ->print('Mise à jour')
+                ->printCode('composer app-update')
+                ->addLn(5)
+                ->setFontStyle(style: 'B', size: 14)
+                ->print('Fonctionnalités')
+                ->setFontStyle(style: '', size: 10)
+                ->printBulletArray([
+                    'Tablettes',
+                    'Utilisateurs' => [
+                        'Inscription',
+                        'Authentification',
+                        'Mot de passe oublié',
+                    ],
+                    'Logs' => [
+                        'Formulaire de recherche'
+                    ],
+                    'EasyAdmin',
+                    'UX Charts',
+                    'Pivottable',
+                    'Makefile',
+                    'PDF',
+                ])
+                ->addLn(5)
+                ->setFontStyle(style: 'B', size: 14)
+                ->print('Todos')
+                ->setFontStyle(style: '', size: 10)
+                ->printBulletArray([
+                    'Captcha'
+                ]);
+
+            $pdf->render('F', $filename);
             return $this->file($filename);
         }
 

@@ -36,7 +36,11 @@ final class PdfService
     {
         $logoFilename = sprintf('%s/logo-pdf.png', dirname($this->config['logo']));
         if (!file_exists($logoFilename)) {
-            Images::make($this->config['logo'])->resize(80, 50)->save($logoFilename, 90, 'PNG');
+            Images::make($this->config['logo'])
+                ->resize(50, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save($logoFilename, 90, 'PNG');
         }
         return [
             'orientation' => $this->config['orientation'],

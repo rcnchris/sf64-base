@@ -262,8 +262,8 @@ class MyFPDF extends \FPDF
      */
     public function getStartContentY(): float
     {
-        return $this->tMargin 
-            + ($this->options->header_height === false ? 0 : $this->options->header_height) 
+        return $this->tMargin
+            + ($this->options->header_height === false ? 0 : $this->options->header_height)
             + $this->options->line_height;
     }
 
@@ -748,6 +748,31 @@ class MyFPDF extends \FPDF
             ->setFontStyle(family: 'courier', size: 8)
             ->print($code, fill: true)
             ->setFontStyle();
+    }
+
+    /**
+     * Imprime une liste à puces
+     * 
+     * @param array $data Données de la liste
+     */
+    public function printBulletArray(array $data, ?int $level = 0): self
+    {
+        $bullet = chr(149);
+        $xStart = $this->lMargin + $level;
+        foreach ($data as $key => $value) {
+            $this->SetX($xStart);
+            if (is_string($key)) {
+                $this->Cell($this->GetStringWidth($bullet . ' '), $this->options->line_height, $bullet . ' ');
+                $this->print($key);
+            }
+            if (is_array($value)) {
+                $this->printBulletArray($value, $level + 5);
+            } else {
+                $this->Cell($this->GetStringWidth($bullet . ' '), $this->options->line_height, $bullet . ' ');
+                $this->print($value);
+            }
+        }
+        return $this;
     }
 
     /**

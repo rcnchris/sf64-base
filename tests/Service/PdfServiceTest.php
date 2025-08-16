@@ -68,6 +68,19 @@ final class PdfServiceTest extends AppKernelTestCase
         );
     }
 
+    public function testAddTocWithBookmarksIndent(): void
+    {
+        self::assertIsString(
+            $this->service
+                ->make()
+                ->addBookmark(basename(__FILE__))
+                ->addBookmark(__FUNCTION__, 1)
+                ->addBookmark(__CLASS__)
+                ->addToc()
+                ->render('S')
+        );
+    }
+
     public function testAddTocWithTooLongBookmark(): void
     {
         self::assertInstanceOf(
@@ -81,6 +94,25 @@ final class PdfServiceTest extends AppKernelTestCase
         self::assertInstanceOf(
             AppPdf::class,
             $this->service->make()->addBookmark(__FUNCTION__, 0, 0, false)
+        );
+    }
+
+    public function testAddBookmarkWithNegativeY(): void
+    {
+        self::assertInstanceOf(
+            AppPdf::class,
+            $this->service->make()->addBookmark(__FUNCTION__, 0, -1, false)
+        );
+    }
+
+    public function testRenderWithBookmarks(): void
+    {
+        self::assertIsString(
+            $this->service
+                ->make()
+                ->addBookmark(__FUNCTION__)
+                ->printInfos()
+                ->render('S')
         );
     }
 

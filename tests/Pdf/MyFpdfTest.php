@@ -297,7 +297,7 @@ class MyFpdfTest extends AppTestCase
     {
         self::assertIsString(
             (new MyFPDF([
-                'header_height' => 10,
+                'footer_height' => 10,
                 'pagination_enabled' => 'footer',
                 'pagination_fill' => true,
             ]))
@@ -305,13 +305,21 @@ class MyFpdfTest extends AppTestCase
                 ->render('S')
         );
 
+        $filename = sprintf('%s/%s.pdf', $this->getRootDir('/tests/files'), __FUNCTION__);
+        $pdf = new MyFPDF([
+            'footer_height' => 10,
+            'pagination_enabled' => 'footer',
+            'pagination_fill' => '#27ae60',
+        ]);
+        self::assertIsString($pdf->printInfos()->render('F', $filename));
+    }
+
+    public function testDrawLine(): void
+    {
         self::assertIsString(
-            (new MyFPDF([
-                'header_height' => 10,
-                'pagination_enabled' => 'footer',
-                'pagination_fill' => '#27ae60',
-            ]))
-                ->printInfos()
+            (new MyFPDF())
+                ->print('Ola les gens')
+                ->drawLine()
                 ->render('S')
         );
     }
