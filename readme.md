@@ -20,7 +20,7 @@ composer app-update
 
 - Tablettes
 - Utilisateurs
-   - Inscription
+   - Inscription (captcha)
    - Authentification
    - Mot de passe oublié
 - Logs
@@ -32,5 +32,3 @@ composer app-update
 - PDF
 
 ### Todo
-
-- Captcha

@@ -25,3 +25,36 @@ label.required:before {
 code {
     border-radius: 3px;
 }
+
+.captcha {
+    position: relative;
+    display: block;
+    border: 2px solid var(--bs-border-color);
+    width: var(--width);
+    height: var(--height);
+    background: var(--image);
+    touch-action: none;
+}
+
+.captcha-piece {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--pieceWidth);
+    height: var(--pieceHeight);
+    background: var(--image) top right;
+}
+
+.captcha-piece::after {
+    position: absolute;
+    content: '';
+    width: calc(var(--pieceWidth) + 10px);
+    height: calc(var(--pieceHeight) + 10px);
+    background: url(../images/puzzle/piece-contour.png) no-repeat;
+    transform: translate(-4px, 0px);
+    transition: .3s;
+}
+
+.captcha:not(.captcha-waiting-interaction) .captcha-piece:not(.is-moving)::after {
+    opacity: .3;
+}

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Security\Antispam\Puzzle\PuzzleChallenge;
 use App\Tests\AppWebTestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
@@ -27,19 +28,19 @@ final class SecurityControllerTest extends AppWebTestCase
         }
         $count = $repo->count([]);
 
-        // $inputChallenge = $crawler->filter('#captcha_challenge');
-        // $key = $inputChallenge->attr('value');
+        $inputChallenge = $crawler->filter('#captcha_challenge');
+        $key = $inputChallenge->attr('value');
 
-        // $challenge = $this->getService(PuzzleChallenge::class);
-        // $solution = join('-', $challenge->getSolution($key));
+        $challenge = $this->getService(PuzzleChallenge::class);
+        $solution = join('-', $challenge->getSolution($key));
 
         $client->submitForm($title, [
             'email' => 'me@example.com',
             'pseudo' => __FUNCTION__,
             'plainPassword' => 'password',
             'agreeTerms' => true,
-            // 'captcha[challenge]' => $key,
-            // 'captcha[answer]' => $solution,
+            'captcha[challenge]' => $key,
+            'captcha[answer]' => $solution,
         ]);
 
         self::assertResponseRedirects('/home');
@@ -66,6 +67,29 @@ final class SecurityControllerTest extends AppWebTestCase
         $user = $this->getUserRepository()->getByPseudoOrEmail(__FUNCTION__);
         self::assertContains('ROLE_APP', $user->getRoles());
         self::assertTrue($user->isVerified());
+    }
+
+    public function testCaptchaWithoutChallengeReturn404(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/captcha');
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testCaptchaWithInvalidChallengeReturn404(): void
+    {
+        $client = $this->makeClient();
+        $client->request('GET', '/security/captcha', ['challenge' => '123456']);
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testCaptchaWithChallengeReturn200(): void
+    {
+        $client = $this->makeClient();
+        $challenge = $this->getService(PuzzleChallenge::class);
+        $key = $challenge->generateKey();
+        $client->request('GET', '/security/captcha', ['challenge' => $key]);
+        self::assertResponseStatusCodeSame(200);
     }
 
     public function testVerifyEmailWithWrongQueries(): void

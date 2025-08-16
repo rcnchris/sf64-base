@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\{Token, User};
 use App\Form\{ProfileForm, RegistrationFormType, ResetPasswordForm, ResetPasswordRequestForm};
 use App\Repository\{TokenRepository, UserRepository};
+use App\Security\Antispam\{ChallengeGeneratorInterface, ChallengeInterface};
 use App\Security\EmailVerifier;
 use App\Service\MailerService;
 use Knp\Component\Pager\PaginatorInterface;
@@ -36,6 +37,7 @@ final class SecurityController extends AppAbstractController
         UserPasswordHasherInterface $userPasswordHasher,
         UserRepository $userRepository,
         MailerService $mailer,
+        ChallengeInterface $challenge,
     ): Response {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -72,7 +74,14 @@ final class SecurityController extends AppAbstractController
         return $this->render('security/register.html.twig', [
             'title' => __FUNCTION__,
             'form' => $form,
+            'challenge' => $challenge->generateKey(),
         ]);
+    }
+
+    #[Route('/captcha', name: 'captcha')]
+    public function captcha(Request $request, ChallengeGeneratorInterface $generator): Response
+    {
+        return $generator->generate($request->query->get('challenge', ''));
     }
 
     #[Route('/verify/email', name: 'verify', methods: ['GET'])]

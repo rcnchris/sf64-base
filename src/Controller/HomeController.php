@@ -70,9 +70,7 @@ final class HomeController extends AppAbstractController
                 ->setFontStyle(style: 'B', size: 14)
                 ->print('Todos')
                 ->setFontStyle(style: '', size: 10)
-                ->printBulletArray([
-                    'Captcha'
-                ]);
+                ->printBulletArray([]);
 
             $pdf->render('F', $filename);
             return $this->file($filename);
@@ -95,7 +93,7 @@ final class HomeController extends AppAbstractController
             "\n### Fonctionalités\n",
             "- Tablettes",
             "- Utilisateurs",
-            "   - Inscription",
+            "   - Inscription (captcha)",
             "   - Authentification",
             "   - Mot de passe oublié",
             "- Logs",
@@ -106,7 +104,6 @@ final class HomeController extends AppAbstractController
             "- Makefile",
             "- PDF",
             "\n### Todo\n",
-            "- Captcha",
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
