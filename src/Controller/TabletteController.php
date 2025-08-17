@@ -21,7 +21,7 @@ final class TabletteController extends AppAbstractController
         ]);
         return $this->render('tablette/list.html.twig', [
             'title' => $this->trans('entity.tablette', ['tablettes' => 2]),
-            'tablettes' => $this->paginate($tabletteRepository->findListQb()->where('t.lvl = 0'), $request),
+            'tablettes' => $tabletteRepository->findListQb()->where('t.lvl = 0')->getQuery()->getResult(),
         ]);
     }
 

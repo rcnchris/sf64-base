@@ -79,7 +79,7 @@ return [
         'version' => '2.23.0',
     ],
     'jquery' => [
-        'version' => '3.3.1',
+        'version' => '3.7.1',
     ],
     'pivottable/dist/pivot.min.css' => [
         'version' => '2.23.0',
@@ -87,5 +87,25 @@ return [
     ],
     'chart.js' => [
         'version' => '3.9.1',
+    ],
+    'datatables.net' => [
+        'version' => '2.3.2',
+    ],
+    'datatables.net-bs5' => [
+        'version' => '2.3.2',
+    ],
+    'datatables.net-bs5/css/dataTables.bootstrap5.min.css' => [
+        'version' => '2.3.2',
+        'type' => 'css',
+    ],
+    'datatables.net-responsive-bs5' => [
+        'version' => '3.0.5',
+    ],
+    'datatables.net-responsive' => [
+        'version' => '3.0.5',
+    ],
+    'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css' => [
+        'version' => '3.0.5',
+        'type' => 'css',
     ],
 ];

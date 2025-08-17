@@ -17,7 +17,7 @@
 
 		<div class="card bg-light shadow">
 			<div class="card-body">
-				<table class="table table-striped table-hover align-middle">
+				<table data-controller="datatable">
 					<thead>
 						<tr>
 							<th class="text-center">{{ ux_icon('pointer') }}</th>
@@ -49,7 +49,6 @@
 						{% endfor %}
 					</tbody>
 				</table>
-				{{ knp_pagination_render(tablettes) }}
 			</div>
 		</div>
 	</div>
