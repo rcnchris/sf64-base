@@ -108,4 +108,7 @@ return [
         'version' => '3.0.5',
         'type' => 'css',
     ],
+    'inputmask' => [
+        'version' => '5.0.9',
+    ],
 ];

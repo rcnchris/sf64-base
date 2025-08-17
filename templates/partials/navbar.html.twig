@@ -58,7 +58,7 @@
 				<ul class="navbar-nav d-flex">
 					<li class="nav-item dropdown dropstart">
 						<a class="nav-link dropdown-toggle dropend" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							{{ ux_icon(constant('App\\Entity\\User::ICON'), {class: 'text-success'}) }}
+							<canvas id="avatar" width="30" height="30" data-controller="avatar" data-color="{{ app.user.color }}" data-src="{{ app.user.fullname }}"></canvas>
 							<strong>{{ app.user }}</strong>
 						</a>
 						<ul class="dropdown-menu">

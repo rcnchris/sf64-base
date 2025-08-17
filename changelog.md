@@ -507,7 +507,6 @@ export default class extends Controller {
                 sInfoFiltered: "<small><em style='color: #FF0000;'>(filtré de _MAX_ éléments au total)</em></small>",
                 sProcessing: 'Traitement en cours...',
                 sLoadingRecords: '<div class="spinner-border text-info spinner-border-sm" role="status"><span class="visually-hidden">Traitement en cours...</span></div>',
-                // lengthMenu: '<span class="me-1">Voir _MENU_</span>',
                 search: '',
                 sSearchPlaceholder: 'On cherche quoi ?',
                 zeroRecords: "<span style='color: #FF0000;'>Rien trouvé !</span>",
@@ -517,6 +516,53 @@ export default class extends Controller {
         let table = $(this.element).DataTable(options);
     }
 }
+```
+
+### Input Mask
+
+```bash
+php bin/console importmap:require inputmask
+touch assets/controllers/inputmask_controller.js
+```
+
+```js
+// Fichier assets/controllers/inputmask_controller.js
+import '../vendor/inputmask/inputmask.index.js';
+import { Controller } from '@hotwired/stimulus';
+
+export default class extends Controller {
+    connect() {
+        let phone_mask = new Inputmask('99.99.99.99.99');
+        let siren_mask = new Inputmask('999-999-999');
+        let siret_mask = new Inputmask('999-999-999-99999');
+        let nif_mask = new Inputmask('aa-99-999-99-999');
+
+        let maskType = this.element.dataset.type;
+        if (maskType == 'phone') {
+            phone_mask.mask(this.element);
+        } else if (maskType == 'siret') {
+            siret_mask.mask(this.element);
+        } else if (maskType == 'siren') {
+            siren_mask.mask(this.element);
+        } else if (maskType == 'nif') {
+            nif_mask.mask(this.element);
+        }
+    }
+}
+```
+
+Utilisation dans un formulaire
+
+```php
+$builder->add('phone', TextType::class, [
+    'required' => false,
+    'attr' => [
+        'placeholder' => 'Phone',
+        'data-controller' => 'inputmask',
+        'data-type' => 'phone',
+    ],
+    'row_attr' => ['class' => 'form-floating mb-3'],
+])
 ```
 
 ### CK Editor
@@ -550,6 +596,16 @@ fos_ck_editor:
                 ['Bold', 'Italic', 'Underline', 'NumberedList', 'BulletedList', 'TextColor', 'BGColor', 'RemoveFormat'],
                 ['Image', 'Link']
             ]
+```
+
+Utilisation dans un formulaire
+
+```php
+$builder->add('description', CKEditorType::class, [
+    'required' => false,
+    'label' => false,
+    'config_name' => 'min',
+])
 ```
 
 ### Fichier assets/app.js

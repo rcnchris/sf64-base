@@ -5,7 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Component\Form\{AbstractType, FormBuilderInterface};
-use Symfony\Component\Form\Extension\Core\Type\{EmailType, TextareaType, TextType};
+use Symfony\Component\Form\Extension\Core\Type\{ColorType, EmailType, TextareaType, TextType};
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ProfileForm extends AbstractType
@@ -38,12 +38,13 @@ final class ProfileForm extends AbstractType
             ->add('phone', TextType::class, [
                 'required' => false,
                 'attr' => [
+                    'placeholder' => 'Phone',
                     'data-controller' => 'inputmask',
                     'data-type' => 'phone',
                 ],
-                'label_html' => true,
                 'row_attr' => ['class' => 'form-floating mb-3'],
             ])
+            ->add('color', ColorType::class, ['required' => false])
             ->add('description', CKEditorType::class, [
                 'required' => false,
                 'label' => false,

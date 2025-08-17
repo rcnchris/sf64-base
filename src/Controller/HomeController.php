@@ -60,35 +60,21 @@ final class HomeController extends AppAbstractController
                     ],
                     'EasyAdmin',
                     'CK Editor',
+                    'Datatables',
+                    'Input Mask',
                     'UX Charts',
                     'Pivottable',
                     'Makefile',
                     'PDF',
                 ])
-                ->addLn(5)
-                ->setFontStyle(style: 'B', size: 14)
-                ->print('Todos')
-                ->setFontStyle(style: '', size: 10)
-                ->printBulletArray([]);
-
-            $pdf->render('F', $filename);
+                ->render('F', $filename);
             return $this->file($filename);
         }
 
         $composer = json_decode($this->getFileContent('composer.json'), true);
         $readme = [
             sprintf("## %s\n", $composer['description']),
-            sprintf("Version : **%s**\n", $composer['version']),
-            "### Installation\n",
-            '```bash',
-            'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
-            'cd my-project-dir',
-            'composer app-install',
-            '```',
-            "\n### Mise à jour\n",
-            '```bash',
-            'composer app-update',
-            '```',
+            sprintf("Version : **%s**", $composer['version']),
             "\n### Fonctionalités\n",
             "- Tablettes",
             "- Utilisateurs",
@@ -99,17 +85,30 @@ final class HomeController extends AppAbstractController
             "   - Formulaire de recherche",
             "- EasyAdmin",
             "- CK Editor",
+            "- Datatables",
+            "- Input Mask",
             "- UX Charts",
             "- Pivottable",
             "- Makefile",
             "- PDF",
-            "\n### Todo\n",
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
+
+        $installCmds = [
+            'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
+            'cd my-project-dir',
+            'composer app-install',
+        ];
+
+        $updateCmds = [
+            'composer app-update',
+        ];
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
         return $this->render('home/readme.html.twig', [
             'title' => __FUNCTION__,
             'readme' => $this->getFileContent('readme.md'),
+            'install_cmds' => $installCmds,
+            'update_cmds' => $updateCmds,
         ]);
     }
 

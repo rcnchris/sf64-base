@@ -40,11 +40,11 @@
             </tr>
             <tr>
                 <th>{{ 'context'|trans|capitalize }}</th>
-                <td>{{ log.context ? log.context|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|highlight : '' }}</td>
+                <td>{{ log.context ? log.context|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|highlight('json') : '' }}</td>
             </tr>
             <tr>
                 <th>{{ 'extra'|trans|capitalize }}</th>
-                <td>{{ log.extra ? log.extra|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|highlight : '' }}</td>
+                <td>{{ log.extra ? log.extra|json_encode(constant('JSON_PRETTY_PRINT') b-or constant('JSON_UNESCAPED_SLASHES'))|highlight('json') : '' }}</td>
             </tr>
             <tr>
                 <th>Id</th>
