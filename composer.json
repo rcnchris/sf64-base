@@ -162,7 +162,6 @@
         "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql",
         "app-install": [
             "composer install",
-            "@sfy app:install-env",
             "@db-init"
         ],
         "app-update": [
