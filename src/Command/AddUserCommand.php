@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Utils\Tools;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -45,8 +46,7 @@ class AddUserCommand extends Command
             ->addOption('lastname', 'l', InputOption::VALUE_OPTIONAL, 'Nom')
             ->addOption('phone', 't', InputOption::VALUE_OPTIONAL, 'Téléphone')
             ->addOption('color', 'c', InputOption::VALUE_OPTIONAL, 'Couleur')
-            ->addOption('description', 'd', InputOption::VALUE_OPTIONAL, 'Description')
-        ;
+            ->addOption('description', 'd', InputOption::VALUE_OPTIONAL, 'Description');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -144,7 +144,7 @@ class AddUserCommand extends Command
             ->setFirstname($this->data['firstname'] ?? null)
             ->setLastname($this->data['lastname'] ?? null)
             ->setPhone($this->data['phone'] ?? null)
-            // ->setColor($this->data['color'] ?? Tools::getRandColor())
+            ->setColor($this->data['color'] ?? Tools::getRandColor())
             ->setDescription($this->data['description'] ?? null)
         ;
         $this->em->persist($user);

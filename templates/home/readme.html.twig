@@ -7,21 +7,22 @@
 {% endblock %}
 
 {% block body %}
-
-	<div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pt-2 pb-2 mb-3">
-		<h1 class="text-white">
-			{{ ux_icon('book', {class: 'mb-2', width: '35', height: '35'}) }}
-			{{ title|trans|capitalize }}
-		</h1>
-		<div class="btn-toolbar" role="toolbar">
-			<a href="{{ path(app.current_route, {pdf: true}) }}" class="btn btn-light" title="{{ 'show pdf'|trans|capitalize }}" data-toggle="tooltip">
-				{{ ux_icon('pdf', {class: 'text-danger mb-1'}) }}
-			</a>
+	<div class="container">
+		<div class="d-flex flex-wrap justify-content-between align-items-center border-bottom pt-2 pb-2 mb-3">
+			<h1 class="text-white">
+				{{ ux_icon('book', {class: 'mb-2', width: '35', height: '35'}) }}
+				{{ title|trans|capitalize }}
+			</h1>
+			<div class="btn-toolbar" role="toolbar">
+				<a href="{{ path(app.current_route, {pdf: true}) }}" class="btn btn-light" title="{{ 'show pdf'|trans|capitalize }}" data-toggle="tooltip">
+					{{ ux_icon('pdf', {class: 'text-danger mb-1'}) }}
+				</a>
+			</div>
 		</div>
-	</div>
-	<div class="card shadow">
-		<div class="card-body">
-			{{ readme|markdown_to_html }}
+		<div class="card shadow">
+			<div class="card-body">
+				{{ readme|markdown_to_html }}
+			</div>
 		</div>
 	</div>
 {% endblock %}

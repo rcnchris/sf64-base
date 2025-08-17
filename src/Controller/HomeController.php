@@ -31,7 +31,6 @@ final class HomeController extends AppAbstractController
             $filename = sprintf('%s/readme.pdf', $this->getParameter('app.docs_dir'));
             $pdf = $pdfService->make([
                 'title' => $this->getParameter('app.name'),
-                'graduated_grid' => true,
             ]);
             $pdf
                 ->setFontStyle(style: 'B', size: 14)
@@ -60,6 +59,7 @@ final class HomeController extends AppAbstractController
                         'Formulaire de recherche'
                     ],
                     'EasyAdmin',
+                    'CK Editor',
                     'UX Charts',
                     'Pivottable',
                     'Makefile',
@@ -98,6 +98,7 @@ final class HomeController extends AppAbstractController
             "- Logs",
             "   - Formulaire de recherche",
             "- EasyAdmin",
+            "- CK Editor",
             "- UX Charts",
             "- Pivottable",
             "- Makefile",

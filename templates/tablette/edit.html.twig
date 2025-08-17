@@ -7,59 +7,61 @@
 {% endblock %}
 
 {% block body %}
-	{% include "partials/page_title.html.twig" with {
-        title: title, 
-        icon: constant('App\\Entity\\Tablette::ICON'),
-        prefix: 'tablette'
-    } %}
+	<div class="container">
 
-	<div class="card bg-light shadow">
-		<div class="card-body">
-			<div class="row">
-				<div class="col">{{ include('tablette/_form.html.twig') }}</div>
-				{% if tablette.id %}
-					<div class="col-8">
-						<table class="table table-striped table-hover align-middle">
-							<thead>
-								<tr>
-									<th class="text-center">{{ 'Name'|trans([], 'forms')|capitalize }}</th>
-									<th class="text-center">{{ 'Slug'|trans([], 'forms')|capitalize }}</th>
-									<th class="text-center">{{ 'Icon'|trans([], 'forms')|capitalize }}</th>
-									<th class="text-center">{{ 'Color'|trans([], 'forms')|capitalize }}</th>
-									<th class="text-center">{{ 'Description'|trans([], 'forms')|capitalize }}</th>
-									<th class="text-center">{{ 'Children'|trans([], 'forms')|capitalize }}</th>
-									<th class="text-center">{{ ux_icon('pointer') }}</th>
-								</tr>
-							</thead>
-							<tbody>
-								{% for tablette in tablette.children %}
+		{% include "partials/page_title.html.twig" with {
+			title: title, 
+			icon: constant('App\\Entity\\Tablette::ICON'),
+			prefix: 'tablette'
+		} %}
+
+		<div class="card bg-light shadow">
+			<div class="card-body">
+				<div class="row">
+					<div class="col">{{ include('tablette/_form.html.twig') }}</div>
+					{% if tablette.id %}
+						<div class="col-8">
+							<table class="table table-striped table-hover align-middle">
+								<thead>
 									<tr>
-										<td>{{ tablette.name }}</td>
-										<td>{{ tablette.slug }}</td>
-										<td class="text-center">{{ tablette.icon ? ux_icon(tablette.icon) : null }}</td>
-										<td class="text-center">{{ tablette.color|canvas }}</td>
-										<td>{{ tablette.description }}</td>
-										<td class="text-center">
-											<span class="badge text-bg-info">{{ tablette.children.count }}</span>
-										</td>
-										<td class="text-center">
-											<a href="{{ path('tablette.edit', {id: tablette.id, slug: tablette.slug}) }}" class="btn btn-sm btn-primary" title="{{ 'edit'|trans|capitalize }}" data-toggle="tooltip">
-												{{ ux_icon('bi:pencil-square') }}
-											</a>
-										</td>
+										<th class="text-center">{{ ux_icon('pointer') }}</th>
+										<th class="text-center">{{ 'Name'|trans([], 'forms')|capitalize }}</th>
+										<th class="text-center">{{ 'Slug'|trans([], 'forms')|capitalize }}</th>
+										<th class="text-center">{{ 'Icon'|trans([], 'forms')|capitalize }}</th>
+										<th class="text-center">{{ 'Color'|trans([], 'forms')|capitalize }}</th>
+										<th class="text-center">{{ 'Description'|trans([], 'forms')|capitalize }}</th>
+										<th class="text-center">{{ 'Children'|trans([], 'forms')|capitalize }}</th>
 									</tr>
-								{% endfor %}
-							</tbody>
-						</table>
-					</div>
-				{% endif %}
+								</thead>
+								<tbody>
+									{% for tablette in tablette.children %}
+										<tr>
+											<td class="text-center">
+												<a href="{{ path('tablette.edit', {id: tablette.id, slug: tablette.slug}) }}" class="btn btn-sm" title="{{ 'edit'|trans|capitalize }}" data-toggle="tooltip">
+													{{ ux_icon('bi:pencil-square', {class: 'text-primary'}) }}
+												</a>
+											</td>
+											<td>{{ tablette.name }}</td>
+											<td>{{ tablette.slug }}</td>
+											<td class="text-center">{{ tablette.icon ? ux_icon(tablette.icon) : null }}</td>
+											<td class="text-center">{{ tablette.color|canvas }}</td>
+											<td>{{ tablette.description }}</td>
+											<td class="text-center">
+												<span class="badge text-bg-info">{{ tablette.children.count }}</span>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+					{% endif %}
+				</div>
 			</div>
+			{% if tablette.id %}
+				<div class="card-footer text-end">
+					{% include "partials/delete_button.html.twig" with {route: 'tablette.delete', id: tablette.id} %}
+				</div>
+			{% endif %}
 		</div>
-		{% if tablette.id %}
-			<div class="card-footer text-end">
-				{% include "partials/delete_button.html.twig" with {route: 'tablette.delete', id: tablette.id} %}
-			</div>
-		{% endif %}
 	</div>
-
 {% endblock %}

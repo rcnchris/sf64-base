@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>
+			{% block title %}
+				{{ app_name }}
+				- Erreur
+				{{ exception.statusCode }}
+			{% endblock %}
+		</title>
+		<link rel="icon" href="{{ asset(app_logo_path) }}"> 
+
+        {% block stylesheets %}{% endblock %}
+		{% block javascripts %}
+			{% block importmap %}
+				{{ importmap('app') }}
+			{% endblock %}
+		{% endblock %}
+	</head>
+
+	<body>
+		<div class="d-flex align-items-center justify-content-center mt-5">
+			<div class="text-center">
+				<h1 class="display-1 fw-bold text-white-50">{{ exception.statusCode }}</h1>
+				<p class="fs-3 text-white-50">
+					<span class="text-danger">Oups !</span>
+					{{ exception.statusText|trans }}.
+                </p>
+				<a href="{{ path('app.home') }}" class="btn btn-lg btn-primary">
+					{{ ux_icon('home', {width: '20', height: '20'}) }}
+					{{ 'home'|trans|capitalize }}
+				</a>
+			</div>
+		</div>
+	</body>
+
+</html>

@@ -26,6 +26,7 @@ composer app-update
 - Logs
    - Formulaire de recherche
 - EasyAdmin
+- CK Editor
 - UX Charts
 - Pivottable
 - Makefile

@@ -6,7 +6,7 @@ use Faker\Factory;
 use LogicException;
 use SimpleXMLElement;
 
-class Tools
+final class Tools
 {
     /**
      * Convertit une taille en bits en octets

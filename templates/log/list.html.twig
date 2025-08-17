@@ -56,17 +56,22 @@
 					<table class="table table-sm table-striped table-hover align-middle">
 						<thead>
 							<tr>
+								<th class="text-center">{{ ux_icon('pointer') }}</th>
 								<th class="text-center">{{ ux_icon('event')}}</th>
 								<th class="text-center">{{ 'message'|trans|capitalize }}</th>
 								<th class="text-center">{{ ux_icon(constant('App\\Entity\\User::ICON')) }}</th>
 								<th class="text-center">{{ 'level'|trans|capitalize }}</th>
 								<th class="text-center">{{ 'channel'|trans|capitalize }}</th>
-								<th class="text-center">{{ ux_icon('pointer') }}</th>
 							</tr>
 						</thead>
 						<tbody>
 							{% for log in logs %}
 								<tr>
+									<td class="text-center">
+										<a href="{{ path('log.show', {id: log.id}) }}" class="btn btn-sm">
+											{{ ux_icon('eye', {class: 'text-info'}) }}
+										</a>
+									</td>
 									<td class="text-center">{{ log.createdAt|format_datetime('full', 'short') }}</td>
 									<td class="text-center">{{ log.message }}</td>
 									<td class="text-center">{{ log.user }}</td>
@@ -74,11 +79,6 @@
 										{% include "partials/badge_log.html.twig" with {level: log.level} only %}
 									</td>
 									<td class="text-center">{{ log.channel }}</td>
-									<td class="text-center">
-										<a href="{{ path('log.show', {id: log.id}) }}" class="btn btn-sm btn-info">
-											{{ ux_icon('eye') }}
-										</a>
-									</td>
 								</tr>
 							{% endfor %}
 						</tbody>

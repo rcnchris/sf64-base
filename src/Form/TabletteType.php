@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Tablette;
+use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\{AbstractType, FormBuilderInterface};
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
@@ -16,7 +17,10 @@ class TabletteType extends AbstractType
             ->add('name')
             ->add('icon')
             ->add('color', ColorType::class)
-            ->add('description')
+            ->add('description', CKEditorType::class, [
+                'required' => false,
+                'label' => false,
+            ])
             ->add('parent', EntityType::class, [
                 'class' => Tablette::class,
                 'required' => false,

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Repository\Trait;
+namespace App\Tests\Repository;
 
 use App\Entity\Tablette;
 use App\Tests\AppKernelTestCase;

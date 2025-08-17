@@ -51,10 +51,10 @@ Scripts **composer**
 ## Installation des librairies
 
 ```bash
-composer require webapp symfony/apache-pack symfony/ux-icons twig/intl-extra twig/html-extra twig/cssinliner-extra twig/string-extra twig/inky-extra twig/markdown-extra league/commonmark symfony/ux-live-component intervention/image:"^2.7"
+composer require webapp symfony/apache-pack symfony/ux-icons twig/intl-extra twig/html-extra twig/cssinliner-extra twig/string-extra twig/inky-extra twig/markdown-extra league/commonmark symfony/ux-live-component intervention/image:"^2.7" fakerphp/faker
 rm -f compose.yaml && rm -f compose.override.yaml
 composer remove symfony/ux-turbo
-composer require --dev fakerphp/faker doctrine/doctrine-fixtures-bundle
+composer require --dev doctrine/doctrine-fixtures-bundle
 ```
 
 Les trois dernières lignes permettent de forcer le https
@@ -67,6 +67,16 @@ RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteCond %{HTTPS} !on
 RewriteRule ^(.*) https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+```
+
+-----
+
+## Environnement local
+
+```
+# Fichier .env.local
+DATABASE_URL="mysql://root:@127.0.0.1:3306/sf64-base?serverVersion=8.0.30&charset=utf8mb4"
+MAILER_DSN=smtp://10.0.0.21:1025
 ```
 
 -----
@@ -449,6 +459,39 @@ hljs.registerLanguage('sql', sql);
 hljs.registerLanguage('twig', twig);
 hljs.registerLanguage('yaml', yaml);
 hljs.highlightAll();
+```
+
+### CK Editor
+
+```bash
+composer require friendsofsymfony/ckeditor-bundle
+```
+
+```yaml
+# Fichier config/packages/fos_ckeditor.yaml
+twig:
+    form_themes:
+        - '@FOSCKEditor/Form/ckeditor_widget.html.twig'
+
+fos_ck_editor:
+    default_config: min
+    inline: false
+    configs:
+        full:
+            toolbar: full
+            language: '%app.locale%'
+            uiColor: '#f1c40f'
+        min:
+            toolbar: min
+            language: '%app.locale%'
+            uiColor: '#34495e'
+
+    toolbars:
+        configs:
+            min: [
+                ['Bold', 'Italic', 'Underline', 'NumberedList', 'BulletedList', 'TextColor', 'BGColor', 'RemoveFormat'],
+                ['Image', 'Link']
+            ]
 ```
 
 ### Fichier assets/app.js
@@ -4417,7 +4460,7 @@ class AppWebTestCase extends WebTestCase
             self::assertArrayHasKey($key, $array);
         }
     }
-    
+
     protected function assertRequestRedirectTo(
         string $uri,
         ?array $params = [],

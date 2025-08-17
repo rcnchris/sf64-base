@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 final class TabletteController extends AppAbstractController
 {
     #[Route('/list', name: 'list', methods: ['GET'])]
-    public function list(TabletteRepository $tabletteRepository): Response
+    public function list(TabletteRepository $tabletteRepository, Request $request): Response
     {
         $this->addLog('Tablettes', [
             'action' => __FUNCTION__,
@@ -21,7 +21,7 @@ final class TabletteController extends AppAbstractController
         ]);
         return $this->render('tablette/list.html.twig', [
             'title' => $this->trans('entity.tablette', ['tablettes' => 2]),
-            'tablettes' => $tabletteRepository->findListQb()->where('t.lvl = 0')->getQuery()->getResult(),
+            'tablettes' => $this->paginate($tabletteRepository->findListQb()->where('t.lvl = 0'), $request),
         ]);
     }
 
