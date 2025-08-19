@@ -846,9 +846,9 @@ class MyFPDF extends \FPDF
             'Parents' => join(', ', array_map(function (string $name) {
                 return Tools::namespaceSplit($name, true);
             }, class_parents($this))),
-            'Traits' => join(', ', array_map(function (string $name) {
-                return Tools::namespaceSplit($name, true);
-            }, class_uses($this))),
+            // 'Traits' => join(', ', array_map(function (string $name) {
+            //     return Tools::namespaceSplit($name, true);
+            // }, class_uses($this))),
             'Fichier classe' => __FILE__,
         ];
 
@@ -918,6 +918,25 @@ class MyFPDF extends \FPDF
         return $this
             ->setToolColor()
             ->setFontStyle();
+    }
+
+    /**
+     * Envoie le document vers une destination donnée en fonction du type demandé
+     * 
+     * @param string $type Envoie le document vers une destination donnée en fonction du type demandé :
+     * - I : navigateur
+     * - D : télécharger en utilisant $name pour le nom du fichier
+     * - F : fichier en utilisant $name pour le nom du fichier
+     * - S : chaîne de caractères 
+     * @param string $name Le nom du fichier. Il est ignoré si le type est "S".
+     * @param bool $isUtf8 Indique si $name est encodé en ISO-8859-1 (false) ou en UTF-8 (true). Ce paramètre est utilisé uniquement pour les types "I" et "D".
+     */
+    public function render(string $type = 'I', string $name = 'doc.pdf', bool $isUtf8 = false): string
+    {
+        if (in_array($type, ['F', 'D']) && !is_dir(dirname($name))) {
+            mkdir(dirname($name));
+        }
+        return $this->Output($type, $name, $isUtf8);
     }
 
     /**
@@ -1268,6 +1287,23 @@ class MyFPDF extends \FPDF
     }
 
     /**
+     * Retourne la valeur de output pour un style
+     * 
+     * @param string $style Style de dessin, comme pour Rect (D, F ou FD)
+     */
+    private function defineOutputStyle(?string $style = 'D'): string
+    {
+        if ($style == 'F') {
+            $op = 'f';
+        } elseif ($style == 'FD' || $style == 'DF') {
+            $op = 'B';
+        } else {
+            $op = 'S';
+        }
+        return $op;
+    }
+
+    /**
      * Dessine une ellipse
      * 
      * @param float $x Abscisse du centre
@@ -1278,13 +1314,8 @@ class MyFPDF extends \FPDF
      */
     public function ellipsis(float $x, float $y, float $rx, float $ry, ?string $style = 'D'): self
     {
-        if ($style == 'F') {
-            $op = 'f';
-        } elseif ($style == 'FD' || $style == 'DF') {
-            $op = 'B';
-        } else {
-            $op = 'S';
-        }
+        list($x, $y) = $this->setCursor($x, $y)->getCursor();
+        $op = $this->defineOutputStyle($style);
         $lx = 4 / 3 * (M_SQRT2 - 1) * $rx;
         $ly = 4 / 3 * (M_SQRT2 - 1) * $ry;
         $k = $this->k;
@@ -1345,22 +1376,87 @@ class MyFPDF extends \FPDF
     }
 
     /**
-     * Envoie le document vers une destination donnée en fonction du type demandé
+     * Dessine un rectangle avec les coins arrondis
      * 
-     * @param string $type Envoie le document vers une destination donnée en fonction du type demandé :
-     * - I : navigateur
-     * - D : télécharger en utilisant $name pour le nom du fichier
-     * - F : fichier en utilisant $name pour le nom du fichier
-     * - S : chaîne de caractères 
-     * @param string $name Le nom du fichier. Il est ignoré si le type est "S".
-     * @param bool $isUtf8 Indique si $name est encodé en ISO-8859-1 (false) ou en UTF-8 (true). Ce paramètre est utilisé uniquement pour les types "I" et "D".
+     * @param float $w Largeur du rectangle
+     * @param float $h Hauteur du rectangle
+     * @param ?float $r Rayon de l'arc
+     * @param ?string $corners Numéro du ou des angles à arrondir : 1, 2, 3, 4 ou toute combinaison (1=haut gauche, 2=haut droite, 3=bas droite, 4=bas gauche).
+     * @param ?float $x Abscisse du coin supérieur gauche du rectangle
+     * @param ?float $y Ordonnée du coin supérieur gauche du rectangle
+     * @param ?string $style Style de dessin, comme pour Rect (D, F ou FD)
      */
-    public function render(string $type = 'I', string $name = 'doc.pdf', bool $isUtf8 = false): string
-    {
-        if (in_array($type, ['F', 'D']) && !is_dir(dirname($name))) {
-            mkdir(dirname($name));
+    public function roundedRect(
+        float $w,
+        float $h,
+        ?float $r = 5,
+        ?string $corners = '1234',
+        ?float $x = null,
+        ?float $y = null,
+        ?string $style = 'D'
+    ): self {
+        list($x, $y) = $this->setCursor($x, $y)->getCursor();
+        $k = $this->k;
+        $hp = $this->h;
+        $op = $this->defineOutputStyle($style);
+        $MyArc = 4 / 3 * (sqrt(2) - 1);
+        $this->_out(sprintf('%.2F %.2F m', ($x + $r) * $k, ($hp - $y) * $k));
+
+        $xc = $x + $w - $r;
+        $yc = $y + $r;
+        $this->_out(sprintf('%.2F %.2F l', $xc * $k, ($hp - $y) * $k));
+        if (strpos($corners, '2') === false) {
+            $this->_out(sprintf('%.2F %.2F l', ($x + $w) * $k, ($hp - $y) * $k));
+        } else {
+            $this->drawArc($xc + $r * $MyArc, $yc - $r, $xc + $r, $yc - $r * $MyArc, $xc + $r, $yc);
         }
-        return $this->Output($type, $name, $isUtf8);
+
+        $xc = $x + $w - $r;
+        $yc = $y + $h - $r;
+        $this->_out(sprintf('%.2F %.2F l', ($x + $w) * $k, ($hp - $yc) * $k));
+        if (strpos($corners, '3') === false) {
+            $this->_out(sprintf('%.2F %.2F l', ($x + $w) * $k, ($hp - ($y + $h)) * $k));
+        } else {
+            $this->drawArc($xc + $r, $yc + $r * $MyArc, $xc + $r * $MyArc, $yc + $r, $xc, $yc + $r);
+        }
+
+        $xc = $x + $r;
+        $yc = $y + $h - $r;
+        $this->_out(sprintf('%.2F %.2F l', $xc * $k, ($hp - ($y + $h)) * $k));
+        if (strpos($corners, '4') === false) {
+            $this->_out(sprintf('%.2F %.2F l', ($x) * $k, ($hp - ($y + $h)) * $k));
+        } else {
+            $this->drawArc($xc - $r * $MyArc, $yc + $r, $xc - $r, $yc + $r * $MyArc, $xc - $r, $yc);
+        }
+
+        $xc = $x + $r;
+        $yc = $y + $r;
+        $this->_out(sprintf('%.2F %.2F l', ($x) * $k, ($hp - $yc) * $k));
+        if (strpos($corners, '1') === false) {
+            $this->_out(sprintf('%.2F %.2F l', ($x) * $k, ($hp - $y) * $k));
+            $this->_out(sprintf('%.2F %.2F l', ($x + $r) * $k, ($hp - $y) * $k));
+        } else {
+            $this->drawArc($xc - $r, $yc - $r * $MyArc, $xc - $r * $MyArc, $yc - $r, $xc, $yc - $r);
+        }
+        $this->_out($op);
+        return $this;
+    }
+
+    /**
+     * Dessine un arc
+     */
+    private function drawArc($x1, $y1, $x2, $y2, $x3, $y3): void
+    {
+        $h = $this->h;
+        $this->_out(sprintf(
+            '%.2F %.2F %.2F %.2F %.2F %.2F c ',
+            $x1 * $this->k,
+            ($h - $y1) * $this->k,
+            $x2 * $this->k,
+            ($h - $y2) * $this->k,
+            $x3 * $this->k,
+            ($h - $y3) * $this->k
+        ));
     }
 
     /**

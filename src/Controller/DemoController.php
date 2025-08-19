@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Service\PdfService;
-use Faker\Factory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,10 +19,13 @@ final class DemoController extends AbstractController
         switch ($name) {
             case 'app-pdf':
             default:
-                $pdf = $pdfService->make([
-                    'title' => 'Démo AppPdf',
-                    'subject' => 'PDF de l\'application'
-                ]);
+                $pdf = $pdfService
+                    ->make([
+                        'title' => 'Démo AppPdf',
+                        'subject' => 'PDF de l\'application'
+                    ])
+                    ->printInfos(false);
+
                 $pdf->render('F', $filename);
                 break;
 
@@ -59,7 +61,12 @@ final class DemoController extends AbstractController
                     ->circle(20, 50, 10)
                     ->circle(45, 50, 10, 'F')
                     ->circle(70, 50, 10, 'FD')
-                    ->ellipsis(30, 90, 20, 10);
+                    ->ellipsis(30, 80, 20, 10)
+                    ->roundedRect(20, 10, 5, '1234', 10, 100)
+                    ->roundedRect(20, 10, 5, '134', 35, 100)
+                    ->roundedRect(20, 10, 5, '14', 60, 100)
+                    ->roundedRect(20, 10, 5, '1', 85, 100)
+                    ->roundedRect(20, 10, 5, '2', 110, 100);
                 $pdf->render('F', $filename);
                 break;
         }
