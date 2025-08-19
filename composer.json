@@ -161,13 +161,10 @@
         "db-save": "mysqldump -u root sf64-base > ./var/dump/sf64-base.sql",
         "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql",
         "app-install": [
+            "rm -rf .git",
             "composer install",
-            "@db-init"
-        ],
-        "app-update": [
-            "git pull origin main",
-            "composer update",
-            "@db-migrate"
+            "@sfy app:env-install",
+            "@to-dev"
         ],
         "test-yaml": "@sfy lint:yaml config translations --parse-tags",
         "test-container": "@sfy lint:container",
