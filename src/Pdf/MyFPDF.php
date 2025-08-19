@@ -1491,7 +1491,32 @@ class MyFPDF extends \FPDF
             ($h - $y3) * $this->k
         ));
     }
-    
+
+    /**
+     * Dessine un polygone
+     * 
+     * @param array $points Liste des points du polygone
+     */
+    public function polygon($points, ?string $style = 'D'): self
+    {
+        //Draw a polygon
+        $op = $this->defineOutputStyle($style);
+        $h = $this->h;
+        $k = $this->k;
+
+        $points_string = '';
+        for ($i = 0; $i < count($points); $i += 2) {
+            $points_string .= sprintf('%.2F %.2F', $points[$i] * $k, ($h - $points[$i + 1]) * $k);
+            if ($i == 0) {
+                $points_string .= ' m ';
+            } else {
+                $points_string .= ' l ';
+            }
+        }
+        $this->_out($points_string . $op);
+        return $this;
+    }
+
     /**
      * Ouvre la boîte d'impression à l'ouverture du document (ne fonctionne pas avec Chrome). 
      */
@@ -1571,7 +1596,7 @@ class MyFPDF extends \FPDF
         }
 
         if (!empty($this->javascript)) {
-            $this->_put('/Names <</JavaScript '.($this->nJavascript).' 0 R>>');
+            $this->_put('/Names <</JavaScript ' . ($this->nJavascript) . ' 0 R>>');
         }
     }
 

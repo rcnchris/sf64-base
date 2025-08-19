@@ -18,7 +18,7 @@ final class DemoController extends AbstractController
         $name = $request->query->get('name', 'app-pdf');
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), $name);
         $faker = Factory::create($this->getParameter('app.locale_country'));
-        
+
         switch ($name) {
             case 'app-pdf':
             default:
@@ -72,7 +72,8 @@ final class DemoController extends AbstractController
                     ->roundedRect(20, 10, 5, '134', 35, 100)
                     ->roundedRect(20, 10, 5, '14', 60, 100)
                     ->roundedRect(20, 10, 5, '1', 85, 100)
-                    ->roundedRect(20, 10, 5, '2', 110, 100);
+                    ->roundedRect(20, 10, 5, '2', 110, 100)
+                    ->polygon([20, 140, 40, 140, 30, 120, 20, 140]);
                 $pdf->render('F', $filename);
                 break;
 
