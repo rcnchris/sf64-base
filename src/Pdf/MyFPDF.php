@@ -64,6 +64,9 @@ class MyFPDF extends \FPDF
 
         'timezone' => 'Europe/Paris',
         'tmp_dir' => null,
+
+        'watermark' => false,
+        'watermark_color' => '#ffc0cb',
     ];
 
     /**
@@ -184,6 +187,13 @@ class MyFPDF extends \FPDF
         // Grille graduée
         if ($this->options->graduated_grid !== false) {
             $this->drawGraduatedGrid();
+        }
+
+        // Watermark
+        if ($this->options->watermark !== false) {
+            $this->SetFont('Arial', 'B', 50);
+            $this->setToolColor('text', $this->options->watermark_color);
+            $this->rotatedText($this->options->watermark, 45, 55, 190);
         }
 
         if ($this->options->header_height === false) {

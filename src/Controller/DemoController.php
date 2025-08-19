@@ -22,7 +22,7 @@ final class DemoController extends AbstractController
                 $pdf = $pdfService
                     ->make([
                         'title' => 'Démo AppPdf',
-                        'subject' => 'PDF de l\'application'
+                        'subject' => 'PDF de l\'application',
                     ])
                     ->printInfos(false);
 
@@ -46,7 +46,10 @@ final class DemoController extends AbstractController
 
             case 'rotate':
                 $pdf = $pdfService
-                    ->make(['title' => 'Rotations'])
+                    ->make([
+                        'title' => 'Rotations',
+                        'watermark' => 'Rotations',
+                    ])
                     ->rotatedText('Oyé les gens', 45, 50, 50)
                     ->rotatedImage(sprintf('%s/images/empty.jpg', $this->getParameter('app.assets_dir')), 45, 70, 100, 20, 20);
                 $pdf->render('F', $filename);
