@@ -43,4 +43,10 @@ final class DemoControllerTest extends AppWebTestCase
         $this->makeClient()->request('GET', self::URI, ['name' => 'etiquette']);
         self::assertResponseIsSuccessful();
     }
+
+    public function testPdfAutoPrint(): void
+    {
+        $this->makeClient()->request('GET', self::URI, ['name' => 'js']);
+        self::assertResponseIsSuccessful();
+    }
 }

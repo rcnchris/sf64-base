@@ -110,6 +110,16 @@ class MyFPDF extends \FPDF
     private float $angleRotate = 0;
 
     /**
+     * Contenu javascript
+     */
+    private string $javascript;
+
+    /**
+     * Numéro d'objet javascript
+     */
+    private int $nJavascript;
+
+    /**
      * @param array $options Options du document
      * @param array $data Données du document
      */
@@ -601,13 +611,7 @@ class MyFPDF extends \FPDF
      */
     public function convertText(?string $text = null): string
     {
-        if (is_null($text)) {
-            return '';
-        }
-        if (mb_detect_encoding($text) === 'UTF-8') {
-            $text = mb_convert_encoding($text, 'Windows-1252', 'UTF-8');
-        }
-        return $text;
+        return Tools::convertText($text, 'UTF-8', 'Windows-1252');
     }
 
     /**
@@ -1487,6 +1491,44 @@ class MyFPDF extends \FPDF
             ($h - $y3) * $this->k
         ));
     }
+    
+    /**
+     * Ouvre la boîte d'impression à l'ouverture du document (ne fonctionne pas avec Chrome). 
+     */
+    public function autoPrint(): self
+    {
+        return $this->addJavascript('print(true);');
+    }
+
+    /**
+     * Ajout du contenu javascript au document
+     * 
+     * @param string $javascript Contenu à ajouter
+     */
+    public function addJavascript(string $script): self
+    {
+        $this->javascript = $script;
+        return $this;
+    }
+
+    /**
+     * Appelée par _putresources pour ajouter le code javascript
+     */
+    private function putJavascript(): void
+    {
+        $this->_newobj();
+        $this->nJavascript = $this->n;
+        $this->_put('<<');
+        $this->_put('/Names [(EmbeddedJS) ' . ($this->n + 1) . ' 0 R]');
+        $this->_put('>>');
+        $this->_put('endobj');
+        $this->_newobj();
+        $this->_put('<<');
+        $this->_put('/S /JavaScript');
+        $this->_put('/JS ' . $this->_textstring($this->javascript));
+        $this->_put('>>');
+        $this->_put('endobj');
+    }
 
     /**
      * @inheritdoc
@@ -1499,6 +1541,10 @@ class MyFPDF extends \FPDF
 
         if (!empty($this->joinedFiles)) {
             $this->putFiles();
+        }
+
+        if (!empty($this->javascript)) {
+            $this->putJavascript();
         }
     }
 
@@ -1523,6 +1569,10 @@ class MyFPDF extends \FPDF
             $this->_put('/AF [' . implode(' ', $a) . ']');
             $this->_put('/PageMode /UseAttachments');
         }
+
+        if (!empty($this->javascript)) {
+            $this->_put('/Names <</JavaScript '.($this->nJavascript).' 0 R>>');
+        }
     }
 
     /**
@@ -1530,10 +1580,8 @@ class MyFPDF extends \FPDF
      */
     protected function _endpage()
     {
-        if ($this->angleRotate != 0) {
-            $this->angleRotate = 0;
-            $this->_out('Q');
-        }
+        $this->angleRotate = 0;
+        $this->_out('Q');
         parent::_endpage();
     }
 }

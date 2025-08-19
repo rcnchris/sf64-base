@@ -92,6 +92,14 @@ final class DemoController extends AbstractController
 
                 $pdf->render('F', $filename);
                 break;
+
+            case 'js':
+                $pdf = $pdfService
+                    ->make(['title' => 'Javascript'])
+                    ->autoPrint();
+
+                $pdf->render('F', $filename);
+                break;
         }
         return $this->render('demo/pdf.html.twig', [
             'title' => 'Démo PDF',

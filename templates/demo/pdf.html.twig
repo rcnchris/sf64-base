@@ -16,23 +16,26 @@
 	<div class="row">
 		<div class="col-md-2">
 			<ul class="list-group list-group-flush">
-				<a href="{{ path('demo.pdf', {name: 'app-pdf'}) }}" class="list-group-item list-group-item-action {{ name == 'app-pdf' ? 'active' : null}}">
+				<a href="{{ path(app.current_route, {name: 'app-pdf'}) }}" class="list-group-item list-group-item-action {{ name == 'app-pdf' ? 'active' : null}}">
 					AppPdf
                 </a>
-				<a href="{{ path('demo.pdf', {name: 'bookmark'}) }}" class="list-group-item list-group-item-action {{ name == 'bookmark' ? 'active' : null}}">
+				<a href="{{ path(app.current_route, {name: 'bookmark'}) }}" class="list-group-item list-group-item-action {{ name == 'bookmark' ? 'active' : null}}">
 					Signets et TOC
                 </a>
-				<a href="{{ path('demo.pdf', {name: 'file'}) }}" class="list-group-item list-group-item-action {{ name == 'file' ? 'active' : null}}">
+				<a href="{{ path(app.current_route, {name: 'file'}) }}" class="list-group-item list-group-item-action {{ name == 'file' ? 'active' : null}}">
 					Fichier attaché
                 </a>
-				<a href="{{ path('demo.pdf', {name: 'rotate'}) }}" class="list-group-item list-group-item-action {{ name == 'rotate' ? 'active' : null}}">
+				<a href="{{ path(app.current_route, {name: 'rotate'}) }}" class="list-group-item list-group-item-action {{ name == 'rotate' ? 'active' : null}}">
 					Rotations
                 </a>
-				<a href="{{ path('demo.pdf', {name: 'geometry'}) }}" class="list-group-item list-group-item-action {{ name == 'geometry' ? 'active' : null}}">
+				<a href="{{ path(app.current_route, {name: 'geometry'}) }}" class="list-group-item list-group-item-action {{ name == 'geometry' ? 'active' : null}}">
 					Géométrie
                 </a>
-				<a href="{{ path('demo.pdf', {name: 'etiquette'}) }}" class="list-group-item list-group-item-action {{ name == 'etiquette' ? 'active' : null}}">
+				<a href="{{ path(app.current_route, {name: 'etiquette'}) }}" class="list-group-item list-group-item-action {{ name == 'etiquette' ? 'active' : null}}">
 					Etiquettes
+                </a>
+				<a href="{{ path(app.current_route, {name: 'js'}) }}" class="list-group-item list-group-item-action {{ name == 'js' ? 'active' : null}}">
+					Javascript
                 </a>
 			</ul>
 		</div>
