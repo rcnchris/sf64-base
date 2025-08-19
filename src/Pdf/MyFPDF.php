@@ -577,6 +577,25 @@ class MyFPDF extends \FPDF
     }
 
     /**
+     * Convertit une valeur dans l'unité du document
+     * 
+     * @param float|int $value Valeur à convertir
+     * @param string $src Unité de la valeur ('in', 'mm' ou 'cm')
+     */
+    public function convertUnit(float|int $value, string $src)
+    {
+        $dest = $this->options->unit;
+        if ($src != $dest) {
+            $a['in'] = 39.37008;
+            $a['mm'] = 1000;
+            $a['cm'] = 100;
+            return $value * $a[$dest] / $a[$src];
+        } else {
+            return $value;
+        }
+    }
+
+    /**
      * Convertit de l'UTF-8 en Windows-1252 si nécessaire
      * @param string $text Texte à convertir
      */

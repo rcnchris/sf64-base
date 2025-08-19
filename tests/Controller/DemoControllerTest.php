@@ -37,4 +37,10 @@ final class DemoControllerTest extends AppWebTestCase
         $this->makeClient()->request('GET', self::URI, ['name' => 'geometry']);
         self::assertResponseIsSuccessful();
     }
+
+    public function testPdfEtiquettes(): void
+    {
+        $this->makeClient()->request('GET', self::URI, ['name' => 'etiquette']);
+        self::assertResponseIsSuccessful();
+    }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Pdf\EtiquettePdf;
 use App\Service\PdfService;
+use Faker\Factory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
@@ -15,7 +17,8 @@ final class DemoController extends AbstractController
     {
         $name = $request->query->get('name', 'app-pdf');
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), $name);
-        // $faker = Factory::create($this->getParameter('app.locale_country'));
+        $faker = Factory::create($this->getParameter('app.locale_country'));
+        
         switch ($name) {
             case 'app-pdf':
             default:
@@ -70,6 +73,23 @@ final class DemoController extends AbstractController
                     ->roundedRect(20, 10, 5, '14', 60, 100)
                     ->roundedRect(20, 10, 5, '1', 85, 100)
                     ->roundedRect(20, 10, 5, '2', 110, 100);
+                $pdf->render('F', $filename);
+                break;
+
+            case 'etiquette':
+                $pdf = new EtiquettePdf('avery.L7163');
+                for ($i = 1; $i <= 20; $i++) {
+                    $text = sprintf(
+                        "%s\n%s\n%s %s,\n%s",
+                        sprintf('%s %s', $faker->firstName(), $faker->lastName()),
+                        $faker->streetAddress(),
+                        $faker->postcode(),
+                        $faker->city(),
+                        $faker->country(),
+                    );
+                    $pdf->addEtiquette($text);
+                }
+
                 $pdf->render('F', $filename);
                 break;
         }
