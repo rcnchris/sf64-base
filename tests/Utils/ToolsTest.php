@@ -136,6 +136,16 @@ final class ToolsTest extends AppTestCase
         Tools::convertColor([13, 0, 255, 123]);
     }
 
+    public function testConvertTextWithNullReturnEmptyString(): void
+    {
+        self::assertSame('', Tools::convertText());
+    }
+
+    public function testConvertText(): void
+    {
+        self::assertIsString(Tools::convertText('Oyé les gens'));
+    }
+
     public function testRemoveDirTreeWithNotExistPathReturnFalse(): void
     {
         $path = $this->getRootDir('/tests/files/fakedir');

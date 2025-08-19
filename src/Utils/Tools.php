@@ -135,6 +135,27 @@ final class Tools
     }
 
     /**
+     * Convertit un texte d'un encodage à un autre
+     * 
+     * @param string $text Texte à convertir
+     * @param ?string $from Encodage de la source
+     * @param ?string $to Encodage de destination
+     */
+    public static function convertText(
+        ?string $content = null,
+        ?string $from = 'UTF-8',
+        ?string $to = 'Windows-1252'
+    ): string {
+        if (is_null($content)) {
+            return '';
+        }
+        if (mb_detect_encoding($content) === $from) {
+            $content = mb_convert_encoding($content, $to, $from);
+        }
+        return $content;
+    }
+
+    /**
      * Convertit une couleur en RGB ou hexadécimal
      * 
      * @param array|string $color Couleur à convertir. 

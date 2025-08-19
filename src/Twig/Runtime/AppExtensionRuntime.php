@@ -58,4 +58,37 @@ class AppExtensionRuntime implements RuntimeExtensionInterface
     {
         return Tools::bytesToHumanSize($bytes, $decimals);
     }
+
+    /**
+     * Filtre qui retourne seulement le nom du fichier sans le chemin
+     * 
+     * @param string $filename Chemin absolu du fichier
+     */
+    public function fileBasename(string $filename = ''): string
+    {
+        return file_exists($filename) ? basename($filename) : '';
+    }
+
+    /**
+     * Filtre qui retourne le chemin d'un fichier sans le nom
+     * 
+     * @param string $filename Chemin absolu du fichier
+     */
+    public function fileDirname(string $filename = ''): string
+    {
+        return file_exists($filename) ? dirname($filename) : '';
+    }
+
+    /**
+     * Filtre qui retourne la taille d'un fichier
+     * 
+     * @param string $filename Chemin absolu du fichier
+     * @param ?bool $inHuman Formatage de la taille
+     * @param ?int $decimals Nombre de décimales si formatée
+     */
+    public function fileSize(string $filename = '', ?bool $inHuman = false, ?int $decimals = 2): int|string|false
+    {
+        $size = filesize($filename);
+        return $inHuman ? $this->bytesToHuman($size, $decimals) : $size;
+    }
 }

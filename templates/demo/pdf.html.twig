@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+		title: title, 
+		icon: 'pdf',
+	} %}
+
+	<div class="row">
+		<div class="col-md-2">
+			<ul class="list-group list-group-flush">
+				<a href="{{ path('demo.pdf', {name: 'app-pdf'}) }}" class="list-group-item list-group-item-action {{ name == 'app-pdf' ? 'active' : null}}">
+					AppPdf
+                </a>
+				<a href="{{ path('demo.pdf', {name: 'bookmark'}) }}" class="list-group-item list-group-item-action {{ name == 'bookmark' ? 'active' : null}}">
+					Signets et TOC
+                </a>
+				<a href="{{ path('demo.pdf', {name: 'file'}) }}" class="list-group-item list-group-item-action {{ name == 'file' ? 'active' : null}}">
+					Fichier attaché
+                </a>
+				<a href="{{ path('demo.pdf', {name: 'rotate'}) }}" class="list-group-item list-group-item-action {{ name == 'rotate' ? 'active' : null}}">
+					Rotations
+                </a>
+				<a href="{{ path('demo.pdf', {name: 'geometry'}) }}" class="list-group-item list-group-item-action {{ name == 'geometry' ? 'active' : null}}">
+					Géométrie
+                </a>
+			</ul>
+		</div>
+		<div class="col-md-10">
+			<div class="card">
+				<div class="card-header">
+					Fichier :
+					{{ filename|basename }}
+					-
+					<span class="badge text-bg-secondary" title="Emplacement {{ filename|dirname }}">{{ filename|filesize(true) }}</span>
+				</div>
+				<div class="card-body">
+					<iframe src="{{ asset('docs/' ~ filename|basename) }}" frameborder="0" width="100%" height="800"></iframe>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

@@ -82,6 +82,31 @@ class MyFPDF extends \FPDF
     protected ?Collection $infos;
 
     /**
+     * Signets définis
+     */
+    private array $bookmarks = [];
+
+    /**
+     * Numéro courant d'objet de type signet
+     */
+    private int $nBookmarks = 0;
+
+    /**
+     * Liste des fichiers attachés
+     */
+    private array $joinedFiles = [];
+
+    /**
+     * Numéro courant d'objet de type fichier
+     */
+    private int $nJoinedFile = 0;
+
+    /**
+     * Angle de rotation pour la méthode rotate
+     */
+    private float $angleRotate = 0;
+
+    /**
      * @param array $options Options du document
      * @param array $data Données du document
      */
@@ -782,14 +807,6 @@ class MyFPDF extends \FPDF
     {
         $vars = array_keys(get_object_vars($this));
 
-        $nbFiles = in_array('joinedFiles', $vars)
-            ? count($this->{'joinedFiles'})
-            : 0;
-
-        $nbBookmarks = in_array('bookmarks', $vars)
-            ? count($this->{'bookmarks'})
-            : 0;
-
         $infos = [
             'Titre' => $this->metadata['Title'],
             'Sujet' => $this->metadata['Subject'],
@@ -820,8 +837,8 @@ class MyFPDF extends \FPDF
             'Rotation' => empty($this->CurRotation) ? 'Aucune' : $this->CurRotation,
             'Données' => $this->data->count(),
             'Images' => count($this->images),
-            'Fichiers' => $nbFiles,
-            'Signets' => $nbBookmarks,
+            'Fichiers' => count($this->joinedFiles),
+            'Signets' => count($this->bookmarks),
             'Javascript' => in_array('javascript', $vars) ? 'Oui' : 'Non',
             'Version PHP' => PHP_VERSION,
             'Version FPDF' => $this->metadata['Producer'],
@@ -966,6 +983,368 @@ class MyFPDF extends \FPDF
     }
 
     /**
+     * Ajoute un signet
+     * 
+     * @param string $text Texte du signet
+     * @param int $level Niveau du signet (0 pour le plus haut niveau, 1 juste en dessous, etc)
+     * @param float $y Ordonnée de la destination du signet dans la page. -1 désigne la position courante
+     * @param bool $isUTF8 Définit si le titre est encodé en ISO-8859-1 (false) ou en UTF-8 (true)
+     */
+    public function addBookmark(
+        string $txt,
+        int $level = 0,
+        float $y = 0,
+        bool $utf8 = true
+    ): self {
+        if (!$utf8) {
+            $txt = $this->_UTF8encode($txt);
+        }
+        if ($y == -1) {
+            $y = $this->GetY();
+        }
+        array_push($this->bookmarks, [
+            't' => $txt,
+            'l' => $level,
+            'y' => ($this->h - $y) * $this->k,
+            'p' => $this->PageNo()
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Ajoute une table des matières à partir des signets
+     * 
+     * @param string $title Titre de la table des matières
+     * @param ?bool $addPage Si vrai, une page est ajoutée pour la TOC
+     */
+    public function addToc(string $title = 'Index', ?bool $addPage = true): self
+    {
+        if (empty($this->bookmarks)) {
+            return $this;
+        }
+
+        if ($addPage) {
+            $this->AddPage();
+        }
+
+        // Index title
+        $this->SetFontSize(20);
+        $this->Cell(0, 5, $this->convertText($title), 0, 1, 'C');
+        $this->SetFontSize(15);
+        $this->Ln(10);
+
+        $size = count($this->bookmarks);
+        $pageCellSize = $this->GetStringWidth('p. ' . $this->bookmarks[$size - 1]['p']) + 2;
+        for ($i = 0; $i < $size; $i++) {
+            // Offset
+            $level = $this->bookmarks[$i]['l'];
+            if ($level > 0) {
+                $this->Cell($level * 8);
+            }
+
+            // Caption
+            $str = mb_convert_encoding($this->bookmarks[$i]['t'], 'ISO-8859-1', 'UTF-8');
+            $strSize = $this->GetStringWidth($str);
+            $availSize = $this->w - $this->lMargin - $this->rMargin - $pageCellSize - ($level * 8) - 4;
+            while ($strSize >= $availSize) {
+                $str = substr($str, 0, -1);
+                $strSize = $this->GetStringWidth($str);
+            }
+            $this->Cell($strSize + 2, $this->FontSize + 2, $str);
+
+            // Filling dots
+            $w = $this->w - $this->lMargin - $this->rMargin - $pageCellSize - ($level * 8) - ($strSize + 2);
+            $nb = $w / $this->GetStringWidth('.');
+            $dots = str_repeat('.', (int)$nb);
+            $this->Cell($w, $this->FontSize + 2, $dots, 0, 0, 'R');
+
+            // Page number
+            $this->Cell($pageCellSize, $this->FontSize + 2, 'p. ' . $this->bookmarks[$i]['p'], 0, 1, 'R');
+        }
+        return $this;
+    }
+
+    /**
+     * Appelée par _putresources pour ajouter les signets
+     */
+    private function putBookmarks(): void
+    {
+        $nb = count($this->bookmarks);
+        if ($nb == 0) {
+            return;
+        }
+        $lru = [];
+        $level = 0;
+        foreach ($this->bookmarks as $i => $o) {
+            if ($o['l'] > 0) {
+                $parent = $lru[$o['l'] - 1];
+                // Set parent and last pointers
+                $this->bookmarks[$i]['parent'] = $parent;
+                $this->bookmarks[$parent]['last'] = $i;
+                if ($o['l'] > $level) {
+                    // Level increasing: set first pointer
+                    $this->bookmarks[$parent]['first'] = $i;
+                }
+            } else {
+                $this->bookmarks[$i]['parent'] = $nb;
+            }
+            if ($o['l'] <= $level && $i > 0) {
+                // Set prev and next pointers
+                $prev = $lru[$o['l']];
+                $this->bookmarks[$prev]['next'] = $i;
+                $this->bookmarks[$i]['prev'] = $prev;
+            }
+            $lru[$o['l']] = $i;
+            $level = $o['l'];
+        }
+        // Outline items
+        $n = $this->n + 1;
+        foreach ($this->bookmarks as $i => $o) {
+            $this->_newobj();
+            $this->_put('<</Title ' . $this->_textstring($o['t']));
+            $this->_put('/Parent ' . ($n + $o['parent']) . ' 0 R');
+            if (isset($o['prev'])) {
+                $this->_put('/Prev ' . ($n + $o['prev']) . ' 0 R');
+            }
+            if (isset($o['next'])) {
+                $this->_put('/Next ' . ($n + $o['next']) . ' 0 R');
+            }
+            if (isset($o['first'])) {
+                $this->_put('/First ' . ($n + $o['first']) . ' 0 R');
+            }
+            if (isset($o['last'])) {
+                $this->_put('/Last ' . ($n + $o['last']) . ' 0 R');
+            }
+            $this->_put(sprintf('/Dest [%d 0 R /XYZ 0 %.2F null]', $this->PageInfo[$o['p']]['n'], $o['y']));
+            $this->_put('/Count 0>>');
+            $this->_put('endobj');
+        }
+        // Outline root
+        $this->_newobj();
+        $this->nBookmarks = $this->n;
+        $this->_put('<</Type /Outlines /First ' . $n . ' 0 R');
+        $this->_put('/Last ' . ($n + $lru[0]) . ' 0 R>>');
+        $this->_put('endobj');
+    }
+
+    /**
+     * Ajoute un fichier à la liste des fichiers
+     * 
+     * @param string $filename Chemin absolu du fichier
+     * @param ?string $name Nom du fichier
+     * @param ?string $desc Description du fichier
+     */
+    public function addFile(string $filename, ?string $name = '', ?string $desc = ''): self
+    {
+        if (!file_exists($filename)) {
+            $this->Error('Fichier introuvable : ' . $filename);
+        }
+        array_push($this->joinedFiles, [
+            'file' => $filename,
+            'name' => (empty($name)) ? basename($filename) : $name,
+            'size' => filesize($filename),
+            'desc' => $desc,
+        ]);
+        return $this;
+    }
+
+    /**
+     * Appelée par _putresources pour ajouter les fichiers joints
+     */
+    private function putFiles(): void
+    {
+        foreach ($this->joinedFiles as $i => &$info) {
+            $file = $info['file'];
+            $name = $info['name'];
+            $desc = $info['desc'];
+
+            $fc = file_get_contents($file);
+            $size = strlen($fc);
+            $date = @date('YmdHisO', filemtime($file));
+            $md = 'D:' . substr($date, 0, -2) . "'" . substr($date, -2) . "'";;
+
+            $this->_newobj();
+            $info['n'] = $this->n;
+            $this->_put('<<');
+            $this->_put('/Type /Filespec');
+            $this->_put('/F (' . $this->_escape($name) . ')');
+            $this->_put('/UF ' . $this->_textstring($name));
+            $this->_put('/EF <</F ' . ($this->n + 1) . ' 0 R>>');
+            if ($desc) {
+                $this->_put('/Desc ' . $this->_textstring($desc));
+            }
+            $this->_put('/AFRelationship /Unspecified');
+            $this->_put('>>');
+            $this->_put('endobj');
+
+            $this->_newobj();
+            $this->_put('<<');
+            $this->_put('/Type /EmbeddedFile');
+            $this->_put('/Subtype /application#2Foctet-stream');
+            $this->_put('/Length ' . $size);
+            $this->_put('/Params <</Size ' . $size . ' /ModDate ' . $this->_textstring($md) . '>>');
+            $this->_put('>>');
+            $this->_putstream($fc);
+            $this->_put('endobj');
+        }
+        unset($info);
+
+        $this->_newobj();
+        $this->nJoinedFile = $this->n;
+        $a = [];
+        foreach ($this->joinedFiles as $i => $info) {
+            $a[] = $this->_textstring(sprintf('%03d', $i)) . ' ' . $info['n'] . ' 0 R';
+        }
+        $this->_put('<<');
+        $this->_put('/Names [' . join(' ', $a) . ']');
+        $this->_put('>>');
+        $this->_put('endobj');
+    }
+
+    /**
+     * Effectue une rotation autour d'un centre donné
+     * 
+     * @param float $angle Angle de rotation
+     * @param ?float $x Abscisse de départ
+     * @param ?float $y Ordonnée de départ
+     */
+    private function rotate(float $angle, ?float $x = null, ?float $y = null): self
+    {
+        $this->setCursor($x, $y);
+        if ($this->angleRotate != 0) {
+            $this->_out('Q');
+        }
+        $this->angleRotate = $angle;
+        if ($angle != 0) {
+            $angle *= M_PI / 180;
+            $c = cos($angle);
+            $s = sin($angle);
+            $cx = $x * $this->k;
+            $cy = ($this->h - $y) * $this->k;
+            $this->_out(sprintf('q %.5F %.5F %.5F %.5F %.2F %.2F cm 1 0 0 1 %.2F %.2F cm', $c, $s, -$s, $c, $cx, $cy, -$cx, -$cy));
+        }
+        return $this;
+    }
+
+    /**
+     * Effectue une rotation sur du texte
+     * 
+     * @param string $txt Texte à faire pivoter
+     * @param float $angle Angle de rotation
+     * @param ?float $x Abscisse de départ
+     * @param ?float $y Ordonnée de départ
+     */
+    public function rotatedText(string $txt, float $angle, ?float $x = null, ?float $y = null): self
+    {
+        // Rotation du texte autour de son origine
+        $this->rotate($angle, $x, $y);
+        $this->print($txt, mode: 'text');
+        return $this->rotate(0);
+    }
+
+    /**
+     * Effectue une rotation sur une image
+     * 
+     * @param mixed $file Fichier de l'image à faire pivoter
+     * @param float $angle Angle de rotation
+     * @param ?float $x Abscisse de départ
+     * @param ?float $y Ordonnée de départ
+     * @param ?float $w Largeur de l'image
+     * @param ?float $h Hauteur de l'image
+     */
+    public function rotatedImage(
+        mixed $file,
+        float $angle,
+        ?float $x = null,
+        ?float $y = null,
+        ?float $w = 0,
+        ?float $h = 0
+    ): self {
+        // Rotation de l'image autour du coin supérieur gauche
+        $this->rotate($angle, $x, $y);
+        $this->Image($file, $x, $y, $w, $h);
+        return $this->rotate(0);
+    }
+
+    /**
+     * Dessine une ellipse
+     * 
+     * @param float $x Abscisse du centre
+     * @param float $y Ordonnée du centre
+     * @param float $rx Rayon horizontal
+     * @param float $ry Rayon vertical
+     * @param string $style Style de dessin, comme pour Rect (D, F ou FD)
+     */
+    public function ellipsis(float $x, float $y, float $rx, float $ry, ?string $style = 'D'): self
+    {
+        if ($style == 'F') {
+            $op = 'f';
+        } elseif ($style == 'FD' || $style == 'DF') {
+            $op = 'B';
+        } else {
+            $op = 'S';
+        }
+        $lx = 4 / 3 * (M_SQRT2 - 1) * $rx;
+        $ly = 4 / 3 * (M_SQRT2 - 1) * $ry;
+        $k = $this->k;
+        $h = $this->h;
+        $this->_out(sprintf(
+            '%.2F %.2F m %.2F %.2F %.2F %.2F %.2F %.2F c',
+            ($x + $rx) * $k,
+            ($h - $y) * $k,
+            ($x + $rx) * $k,
+            ($h - ($y - $ly)) * $k,
+            ($x + $lx) * $k,
+            ($h - ($y - $ry)) * $k,
+            $x * $k,
+            ($h - ($y - $ry)) * $k
+        ));
+        $this->_out(sprintf(
+            '%.2F %.2F %.2F %.2F %.2F %.2F c',
+            ($x - $lx) * $k,
+            ($h - ($y - $ry)) * $k,
+            ($x - $rx) * $k,
+            ($h - ($y - $ly)) * $k,
+            ($x - $rx) * $k,
+            ($h - $y) * $k
+        ));
+        $this->_out(sprintf(
+            '%.2F %.2F %.2F %.2F %.2F %.2F c',
+            ($x - $rx) * $k,
+            ($h - ($y + $ly)) * $k,
+            ($x - $lx) * $k,
+            ($h - ($y + $ry)) * $k,
+            $x * $k,
+            ($h - ($y + $ry)) * $k
+        ));
+        $this->_out(sprintf(
+            '%.2F %.2F %.2F %.2F %.2F %.2F c %s',
+            ($x + $lx) * $k,
+            ($h - ($y + $ry)) * $k,
+            ($x + $rx) * $k,
+            ($h - ($y + $ly)) * $k,
+            ($x + $rx) * $k,
+            ($h - $y) * $k,
+            $op
+        ));
+        return $this;
+    }
+
+    /**
+     * Dessine un cercle
+     * 
+     * @param float $x Abscisse du centre
+     * @param float $y Ordonnée du centre
+     * @param float $r Rayon
+     * @param string $style Style de dessin, comme pour Rect (D, F ou FD)
+     */
+    public function circle(float $x, float $y, float $r, ?string $style = 'D'): self
+    {
+        return $this->ellipsis($x, $y, $r, $r, $style);
+    }
+
+    /**
      * Envoie le document vers une destination donnée en fonction du type demandé
      * 
      * @param string $type Envoie le document vers une destination donnée en fonction du type demandé :
@@ -982,5 +1361,54 @@ class MyFPDF extends \FPDF
             mkdir(dirname($name));
         }
         return $this->Output($type, $name, $isUtf8);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function _putresources(): void
+    {
+        parent::_putresources();
+
+        $this->putBookmarks();
+
+        if (!empty($this->joinedFiles)) {
+            $this->putFiles();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function _putcatalog(): void
+    {
+        parent::_putcatalog();
+
+        if (count($this->bookmarks) > 0) {
+            $this->_put('/Outlines ' . $this->nBookmarks . ' 0 R');
+            $this->_put('/PageMode /UseOutlines');
+        }
+
+        if (!empty($this->joinedFiles)) {
+            $this->_put('/Names <</EmbeddedFiles ' . $this->nJoinedFile . ' 0 R>>');
+            $a = [];
+            foreach ($this->joinedFiles as $info) {
+                $a[] = $info['n'] . ' 0 R';
+            }
+            $this->_put('/AF [' . implode(' ', $a) . ']');
+            $this->_put('/PageMode /UseAttachments');
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function _endpage()
+    {
+        if ($this->angleRotate != 0) {
+            $this->angleRotate = 0;
+            $this->_out('Q');
+        }
+        parent::_endpage();
     }
 }

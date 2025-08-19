@@ -16,6 +16,20 @@
 				</li>
 				<li class="nav-item dropdown">
 					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						{{ ux_icon('bi:person-workspace', {class: 'text-info mb-1'}) }}
+						Démo
+					</a>
+					<ul class="dropdown-menu">
+						<li>
+							<a class="dropdown-item {{ app.current_route == 'demo.pdf.' ? 'active' : null }}" href="{{ path('demo.pdf') }}">
+								{{ ux_icon('pdf', {class: 'text-danger mb-1'}) }}
+								PDF
+							</a>
+						</li>
+					</ul>
+				</li>
+				<li class="nav-item dropdown">
+					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 						{{ ux_icon('gear', {class: 'text-info mb-1'}) }}
 						{{ 'application'|trans|capitalize }}
 					</a>
