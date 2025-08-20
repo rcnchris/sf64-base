@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Pdf\EtiquettePdf;
 use App\Service\PdfService;
+use App\Utils\Tools;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -203,6 +204,66 @@ final class DemoController extends AppAbstractController
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
         $pdf
             ->printInfos(false, true)
+            ->addToc()
+            ->render('F', $filename);
+        return $this->render('demo/pdf.html.twig', [
+            'title' => $title,
+            'pdf' => $pdf,
+            'filename' => $filename,
+        ]);
+    }
+
+    #[Route('/pdf/charts', name: 'pdf.charts')]
+    public function charts(PdfService $pdfService): Response
+    {
+        $title = 'Graphiques';
+        $faker = $this->getFaker();
+        $countries = [];
+        $colors = [];
+        for ($i = 0; $i < 8; $i++) {
+            $countries[$faker->country()] = mt_rand(800, 50000);
+            $colors[] = Tools::getRandColor();
+        }
+        $pdf = $pdfService
+            ->make([
+                'title' => $title,
+                'graduated_grid' => true,
+            ])
+            ->addBookmark($title, 0, 1);
+
+        $label = 'Camembert des pays en valeur sans couleur';
+        $pdf
+            ->addBookmark($label, 1)
+            ->setFontStyle(style: 'B', size: 12)
+            ->print($label, border: 'B')
+            ->chartPie(
+                x: 30,
+                y: 60,
+                r: 20,
+                data: $countries,
+                format: '%l (%v)',
+                decimals: 0,
+            );
+
+        $label = 'Camembert des pays en pourcentage avec couleurs';
+        $pdf
+            ->setCursor(10, 95)
+            ->addBookmark($label, 1)
+            ->setFontStyle(style: 'B', size: 12)
+            ->print($label, border: 'B')
+            ->chartPie(
+                x: 30,
+                y: 125,
+                r: 20,
+                data: $countries,
+                format: '%l (%p)',
+                colors: $colors,
+                decimals: 0,
+            );
+
+        $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
+        $pdf
+            ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
         return $this->render('demo/pdf.html.twig', [

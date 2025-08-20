@@ -44,6 +44,10 @@
 					{{ ux_icon('bi:printer') }}
 					AutoPrint
                 </a>
+				<a href="{{ path('demo.pdf.charts') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.charts' ? 'active' : null}}">
+					{{ ux_icon('chart-pie') }}
+					Graphiques
+                </a>
 			</ul>
 		</div>
 		<div class="col-md-10">

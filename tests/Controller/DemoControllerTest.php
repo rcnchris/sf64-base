@@ -40,4 +40,9 @@ final class DemoControllerTest extends AppWebTestCase
     {
         $this->assertRequestIsSuccessful('/demo/pdf/autoprint');
     }
+
+    public function testPdfCharts(): void
+    {
+        $this->assertRequestIsSuccessful('/demo/pdf/charts');
+    }
 }

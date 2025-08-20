@@ -121,6 +121,26 @@ class MyFPDF extends \FPDF
     private int $nJavascript;
 
     /**
+     * Tableau des légendes d'un graphique
+     */
+    private array $chartLegends = [];
+
+    /**
+     * Largeur des légéndes d'un graphique
+     */
+    private float $chartWidthLegend = 0;
+
+    /**
+     * Somme des données d'un graphique
+     */
+    private float $chartSumData = 0;
+
+    /**
+     * Nombre de données d'un graphique
+     */
+    private int $chartCountData = 0;
+
+    /**
      * @param array $options Options du document
      * @param array $data Données du document
      */
@@ -1636,6 +1656,106 @@ class MyFPDF extends \FPDF
             $strPoints .= ($i == 0) ? ' m ' : ' l ';
         }
         $this->_out($strPoints . $op);
+        return $this;
+    }
+
+    /**
+     * Déssine un graphique camembert
+     * 
+     * @param array $data Données du graphique dans un tableau associatif contenant les libellés et les données correspondantes
+     * @param float $x Abscisse du centre
+     * @param float $y Ordonnée du centre
+     * @param float $r Rayon
+     * @param string $format Format à utiliser pour afficher les légendes. Il s'agit dune chaîne pouvant contenir les valeurs spéciales suivantes : %l (libellé), %v (valeur) et %p (pourcentage).
+     * @param ?int $decimals Décimales des valeurs
+     * @param array $colors Tableau contenant les couleurs. S'il n'est pas indiqué, un dégradé de gris sera utilisé.
+     */
+    public function chartPie(
+        array $data,
+        float $x,
+        float $y,
+        ?float $r = 10,
+        ?string $format = '%l (%p)',
+        ?int $decimals = 2,
+        ?array $colors = [],
+    ): self {
+
+        $this->setChartLegends($data, $format, $decimals);
+
+        // Couleurs
+        if (empty($colors)) {
+            for ($i = 0; $i < $this->chartCountData; $i++) {
+                $gray = $i * intval(255 / $this->chartCountData);
+                $colors[$i] = $this->convertColor([$gray, $gray, $gray]);
+            }
+        }
+
+        // Secteurs
+        $this->SetLineWidth(0.2);
+        $angleStart = 0;
+        $angleEnd = 0;
+        $i = 0;
+        foreach ($data as $val) {
+            $angle = ($val * 360) / floatval($this->chartSumData);
+            if ($angle != 0) {
+                $angleEnd = $angleStart + $angle;
+                $this
+                    ->setToolColor('fill', $colors[$i])
+                    ->sector($x, $y, $r, $angleStart, $angleEnd);
+                $angleStart += $angle;
+            }
+            $i++;
+        }
+
+        // Légendes
+        $xStartLegend = $x + $r + 5;
+        $yStartLegend = $y - $r;
+        $this
+            ->setCursor($xStartLegend, $yStartLegend)
+            ->setFontStyle(style: '', size: 10);
+        for ($i = 0; $i < $this->chartCountData; $i++) {
+            $this->setToolColor('fill', $colors[$i]);
+            $yLegend = $yStartLegend + ($i * $this->options->line_height);
+            $this->Rect(
+                $xStartLegend,
+                $yLegend,
+                $this->options->line_height,
+                $this->options->line_height,
+                'DF'
+            );
+            $this
+                ->setCursor($xStartLegend + 5, $yLegend)
+                ->print($this->chartLegends[$i], mode: 'cell');
+        }
+        $this
+            ->addLn(5)
+            ->SetX($xStartLegend);
+        $this
+            ->setFontStyle(style: 'B')
+            ->print(sprintf('Total : %s', number_format($this->chartSumData, $decimals, ',', ' ')));
+
+        return $this;
+    }
+
+    /**
+     * Définit les légendes d'un graphique
+     * 
+     * @param array $data Données du graphique dans un tableau associatif contenant les libellés et les données correspondantes
+     * @param string $format Format à utiliser pour afficher les légendes. Il s'agit dune chaîne pouvant contenir les valeurs spéciales suivantes : %l (libellé), %v (valeur) et %p (pourcentage).
+     * @param ?int $decimals Décimales des valeurs
+     */
+    private function setChartLegends(array $data, string $format, ?int $decimals = 2): self
+    {
+        $this->chartLegends = [];
+        $this->chartWidthLegend = 0;
+        $this->chartSumData = array_sum($data);
+        $this->chartCountData = count($data);
+        foreach ($data as $l => $val) {
+            $p = sprintf('%.2f', $val / $this->chartSumData * 100) . '%';
+            $legend = str_replace(['%l', '%v', '%p'], [$l, number_format($val, $decimals, ',', ' '), $p], $format);
+            $this->chartLegends[] = $legend;
+            $this->chartWidthLegend = max($this->GetStringWidth($legend), $this->chartWidthLegend);
+        }
         return $this;
     }
 
