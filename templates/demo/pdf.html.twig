@@ -16,36 +16,46 @@
 	<div class="row">
 		<div class="col-md-2">
 			<ul class="list-group list-group-flush">
-				<a href="{{ path(app.current_route, {name: 'app-pdf'}) }}" class="list-group-item list-group-item-action {{ name == 'app-pdf' ? 'active' : null}}">
+				<a href="{{ path('demo.pdf.app') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.app' ? 'active' : null}}">
+					{{ ux_icon('window') }}
 					AppPdf
-                </a>
-				<a href="{{ path(app.current_route, {name: 'bookmark'}) }}" class="list-group-item list-group-item-action {{ name == 'bookmark' ? 'active' : null}}">
-					Signets et TOC
-                </a>
-				<a href="{{ path(app.current_route, {name: 'file'}) }}" class="list-group-item list-group-item-action {{ name == 'file' ? 'active' : null}}">
+				</a>
+				<a href="{{ path('demo.pdf.bookmark') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.bookmark' ? 'active' : null}}">
+					{{ ux_icon('bookmark') }}
+					Signets
+				</a>
+				<a href="{{ path('demo.pdf.file') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.file' ? 'active' : null}}">
+					{{ ux_icon('paperclip') }}
 					Fichier attaché
                 </a>
-				<a href="{{ path(app.current_route, {name: 'rotate'}) }}" class="list-group-item list-group-item-action {{ name == 'rotate' ? 'active' : null}}">
+				<a href="{{ path('demo.pdf.rotate') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.rotate' ? 'active' : null}}">
+					{{ ux_icon('reload') }}
 					Rotations
                 </a>
-				<a href="{{ path(app.current_route, {name: 'geometry'}) }}" class="list-group-item list-group-item-action {{ name == 'geometry' ? 'active' : null}}">
+				<a href="{{ path('demo.pdf.geometry') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.geometry' ? 'active' : null}}">
+					{{ ux_icon('bi:pencil-square') }}
 					Géométrie
                 </a>
-				<a href="{{ path(app.current_route, {name: 'etiquette'}) }}" class="list-group-item list-group-item-action {{ name == 'etiquette' ? 'active' : null}}">
+				<a href="{{ path('demo.pdf.etiquette') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.etiquette' ? 'active' : null}}">
+					{{ ux_icon('bi:table') }}
 					Etiquettes
                 </a>
-				<a href="{{ path(app.current_route, {name: 'js'}) }}" class="list-group-item list-group-item-action {{ name == 'js' ? 'active' : null}}">
-					Javascript
+				<a href="{{ path('demo.pdf.autoprint') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.autoprint' ? 'active' : null}}">
+					{{ ux_icon('bi:printer') }}
+					AutoPrint
                 </a>
 			</ul>
 		</div>
 		<div class="col-md-10">
 			<div class="card">
-				<div class="card-header">
+				<div class="card-header d-flex flex-wrap justify-content-between align-items-center">
 					Fichier :
 					{{ filename|basename }}
-					-
 					<span class="badge text-bg-secondary" title="Emplacement {{ filename|dirname }}">{{ filename|filesize(true) }}</span>
+					<button type="button" class="btn btn-sm btn-light" data-bs-toggle="modal" data-bs-target="#optionsModal">
+						{{ ux_icon('bi:gear') }}
+						Options
+					</button>
 				</div>
 				<div class="card-body">
 					<iframe src="{{ asset('docs/' ~ filename|basename) }}" frameborder="0" width="100%" height="800"></iframe>
@@ -53,5 +63,18 @@
 			</div>
 		</div>
 	</div>
-
+	
+	<!-- Options Modal -->
+	<div class="modal fade" id="optionsModal" tabindex="-1" aria-labelledby="optionsModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="optionsModalLabel">Options</h1>
+				</div>
+				<div class="modal-body">
+					{{ pdf.options.toJson|highlight }}
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

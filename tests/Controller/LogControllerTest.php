@@ -4,19 +4,22 @@ namespace App\Tests\Controller;
 
 use App\Entity\Log;
 use App\Tests\AppWebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 final class LogControllerTest extends AppWebTestCase
 {
     public function testListWhenNotAuthenticated(): void
     {
-        $this->makeClient()->request('GET', '/log/list');
-        self::assertResponseRedirects('/security/login');
+        $this->assertRequestRedirectTo(
+            uri: '/log/list',
+            uriTo: '/security/login',
+            expectedCode: Response::HTTP_FOUND
+        );
     }
 
     public function testList(): void
     {
-        $this->makeClient('tst')->request('GET', '/log/list');
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/log/list', user: 'tst');
     }
 
     public function testShow(): void
@@ -30,17 +33,20 @@ final class LogControllerTest extends AppWebTestCase
 
     public function testCalendar(): void
     {
-        $this->makeClient('tst')->request('GET', '/log/calendar');
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/log/calendar', user: 'tst');
     }
 
-    public function testPivottableNotAjaxRedirectToList(): void 
+    public function testPivottableNotAjaxRedirectToList(): void
     {
-        $this->makeClient('tst')->request('GET', '/log/pivottable');
-        self::assertResponseRedirects('/log/list');
+        $this->assertRequestRedirectTo(
+            user: 'tst',
+            uri: '/log/pivottable',
+            uriTo: '/log/list',
+            expectedCode: Response::HTTP_SEE_OTHER
+        );
     }
 
-    public function testPivottableInAjax(): void 
+    public function testPivottableInAjax(): void
     {
         $client = $this->makeClient('tst');
         $client->xmlHttpRequest('GET', '/log/pivottable');
@@ -55,7 +61,6 @@ final class LogControllerTest extends AppWebTestCase
 
     public function testChart(): void
     {
-        $this->makeClient('tst')->request('GET', '/log/chart');
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/log/chart', user: 'tst');
     }
 }

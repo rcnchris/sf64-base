@@ -323,4 +323,23 @@ class MyFpdfTest extends AppTestCase
                 ->render('S')
         );
     }
+
+    public function testSector(): void
+    {
+        $pdf = new MyFPDF();
+        $xc = 15;
+        $xy = 30;
+        $r = 5;
+        self::assertInstanceOf(MyFPDF::class, $pdf->sector($xc, $xy, $r, 0, 90, 'FD', false));
+        self::assertInstanceOf(MyFPDF::class, $pdf->sector($xc, $xy, $r, 0, 90, 'FD', true, 500));
+        self::assertInstanceOf(MyFPDF::class, $pdf->sector($xc, $xy, $r, 0, 0));
+        self::assertInstanceOf(MyFPDF::class, $pdf->sector($xc, $xy, $r, 90, 100));
+        self::assertInstanceOf(
+            MyFPDF::class,
+            $pdf
+                ->sector($xc, $xy, $r, 20, 120)
+                ->sector($xc, $xy, $r, 120, 250)
+                ->sector($xc, $xy, $r, 250, 20)
+        );
+    }
 }

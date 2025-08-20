@@ -67,7 +67,7 @@ final class LogController extends AppAbstractController
     public function pivottable(LogRepository $logRepository, Request $request): Response
     {
         if (!$request->isXmlHttpRequest()) {
-            return $this->redirectToRoute('log.list');
+            return $this->redirectToRoute('log.list', [], Response::HTTP_SEE_OTHER);
         }
         $this->addLog(ucfirst(__FUNCTION__), [
             'action' => __FUNCTION__,

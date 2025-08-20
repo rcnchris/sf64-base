@@ -6,47 +6,38 @@ use App\Tests\AppWebTestCase;
 
 final class DemoControllerTest extends AppWebTestCase
 {
-    const URI = '/demo/pdf';
-
-    public function testPdfAppPdf(): void
+    public function testPdfApp(): void
     {
-        $this->makeClient()->request('GET', self::URI);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/app');
     }
 
-    public function testPdfBookmarksToc(): void
+    public function testPdfBookmark(): void
     {
-        $this->makeClient()->request('GET', self::URI, ['name' => 'bookmark']);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/bookmark');
     }
 
     public function testPdfFile(): void
     {
-        $this->makeClient()->request('GET', self::URI, ['name' => 'file']);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/file');
     }
 
     public function testPdfRotate(): void
     {
-        $this->makeClient()->request('GET', self::URI, ['name' => 'rotate']);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/rotate');
     }
 
     public function testPdfGeometry(): void
     {
-        $this->makeClient()->request('GET', self::URI, ['name' => 'geometry']);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/geometry');
     }
 
-    public function testPdfEtiquettes(): void
+    public function testPdfEtiquette(): void
     {
-        $this->makeClient()->request('GET', self::URI, ['name' => 'etiquette']);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/etiquette');
     }
 
-    public function testPdfAutoPrint(): void
+    public function testPdfAutoprint(): void
     {
-        $this->makeClient()->request('GET', self::URI, ['name' => 'js']);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/demo/pdf/autoprint');
     }
 }

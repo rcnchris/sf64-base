@@ -52,6 +52,7 @@ class MyFPDF extends \FPDF
         'header_height' => false, // Hauteur de l'entête de page. false pour aucun.
         'header_border' => 0, // Bordure(s) de l'entête de page (0, 1, L, T, R ou B)
         'header_fill' => false, // Remplissage de l'entête de page
+        'header_title_align' => 'C', // Alignement du titre dans l'entête
 
         'footer_height' => false, // Hauteur du pied de page. false pour aucun.
         'footer_border' => 0, // Bordure(s) du pied de page (0, 1, L, T, R ou B)
@@ -162,7 +163,7 @@ class MyFPDF extends \FPDF
             ->setMargin('right', $this->options->margin_right)
             ->setMargin('cell', $this->options->margin_cell);
 
-        // Couleurs
+        // Couleurs par défaut des outils draw, fill et text à partir des options
         $this->setToolColor();
 
         // Propriétés
@@ -182,8 +183,7 @@ class MyFPDF extends \FPDF
     }
 
     /**
-     * En-tête
-     * Appelée automatiquement par AddPage().
+     * En-tête appelée automatiquement par AddPage().
      */
     public function Header(): void
     {
@@ -201,9 +201,10 @@ class MyFPDF extends \FPDF
 
         // Watermark
         if ($this->options->watermark !== false) {
-            $this->SetFont('Arial', 'B', 50);
-            $this->setToolColor('text', $this->options->watermark_color);
-            $this->rotatedText($this->options->watermark, 45, 55, 190);
+            $this
+                ->setFontStyle('Arial', 'B', 50)
+                ->setToolColor('text', $this->options->watermark_color)
+                ->rotatedText($this->options->watermark, 45, 55, 190);
         }
 
         if ($this->options->header_height === false) {
@@ -219,8 +220,7 @@ class MyFPDF extends \FPDF
                 w: $this->getBodyWidth(),
                 border: $this->options->header_border,
                 fill: $this->options->header_fill
-            )
-            ->setCursor($this->lMargin, $this->tMargin);
+            );
 
         // Pagination
         if ($this->options->pagination_enabled === 'header') {
@@ -242,6 +242,10 @@ class MyFPDF extends \FPDF
                 )
                 ->setCursor($this->lMargin, $this->tMargin);
         }
+
+        $this
+            ->setFontStyle()
+            ->setToolColor();
     }
 
     /**
@@ -414,7 +418,7 @@ class MyFPDF extends \FPDF
         $this->SetFont(
             family: empty($family) ? $this->options->font_family : $family,
             style: empty($style) ? $this->options->font_style : $style,
-            size: ($size == 0) ? $this->options->font_size : $size
+            size: ($size === 0) ? $this->options->font_size : $size
         );
         return $this;
     }
@@ -892,8 +896,9 @@ class MyFPDF extends \FPDF
      * Imprime la liste des informations du document
      * 
      * @param ?bool $addPage Si vrai, une page est ajoutée pour les informations
+     * @param ?bool $addBookmark Ajouter un signet
      */
-    public function printInfos(?bool $addPage = true): self
+    public function printInfos(?bool $addPage = false, ?bool $addBookmark = false): self
     {
         $infos = $this->getInfos();
         $this
@@ -907,13 +912,16 @@ class MyFPDF extends \FPDF
         // Calcul de la taille de la colonne des labels
         $maxWidth = 0;
         foreach ($infos->keys() as $key) {
-            $width = $this->GetStringWidth($this->convertText($key)) + $this->getMargins()->cell;
+            $width = $this->GetStringWidth($this->convertText($key)) + $this->cMargin;
             if ($maxWidth < $width) {
                 $maxWidth = $width;
             }
         }
 
         // Titre
+        if ($addBookmark) {
+            $this->addBookmark('Informations', 1);
+        }
         $this
             ->setCursor($this->GetX(), $this->tMargin + $this->options->header_height + 5)
             ->setFontStyle(style: 'BU', size: 18)
@@ -1045,7 +1053,7 @@ class MyFPDF extends \FPDF
     public function addBookmark(
         string $txt,
         int $level = 0,
-        float $y = 0,
+        float $y = -1,
         bool $utf8 = true
     ): self {
         if (!$utf8) {
@@ -1409,6 +1417,124 @@ class MyFPDF extends \FPDF
     }
 
     /**
+     * Dessine un secteur de cercle
+     * 
+     * @param float $xc Abscisse du centre
+     * @param float $yc Ordonnée du centre
+     * @param float $r Rayon
+     * @param float $a Angle de début en degré
+     * @param float $b Angle de fin en degré
+     * @param ?string $style Style de dessin, comme pour Rect (D, F ou FD)
+     * @param ?bool $cw Indique si le sens est celui des aiguilles d'une montre
+     * @param ?int $o Origine des angles (0 à droite, 90 en haut, 180 à gauche, 270 en bas)
+     */
+    public function sector(
+        float $xc,
+        float $yc,
+        float $r,
+        float $a,
+        float $b,
+        ?string $style = 'FD',
+        ?bool $cw = true,
+        ?int $o = 90
+    ): self {
+        $d0 = $a - $b;
+        if ($cw) {
+            $d = $b;
+            $b = $o - $a;
+            $a = $o - $d;
+        } else {
+            $b += $o;
+            $a += $o;
+        }
+        while ($a < 0) {
+            $a += 360;
+        }
+        while ($a > 360) {
+            $a -= 360;
+        }
+        while ($b < 0) {
+            $b += 360;
+        }
+        while ($b > 360) {
+            $b -= 360;
+        }
+        if ($a > $b) {
+            $b += 360;
+        }
+        $b = $b / 360 * 2 * M_PI;
+        $a = $a / 360 * 2 * M_PI;
+        $d = $b - $a;
+        if ($d == 0 && $d0 != 0) {
+            // @codeCoverageIgnoreStart
+            $d = 2 * M_PI;
+            // @codeCoverageIgnoreEnd
+        }
+        $k = $this->k;
+        $hp = $this->h;
+        if (sin($d / 2)) {
+            $MyArc = 4 / 3 * (1 - cos($d / 2)) / sin($d / 2) * $r;
+        } else {
+            $MyArc = 0;
+        }
+        $this->_out(sprintf('%.2F %.2F m', ($xc) * $k, ($hp - $yc) * $k));
+        $this->_out(sprintf('%.2F %.2F l', ($xc + $r * cos($a)) * $k, (($hp - ($yc - $r * sin($a))) * $k)));
+        if ($d < M_PI / 2) {
+            $this->drawArc(
+                $xc + $r * cos($a) + $MyArc * cos(M_PI / 2 + $a),
+                $yc - $r * sin($a) - $MyArc * sin(M_PI / 2 + $a),
+                $xc + $r * cos($b) + $MyArc * cos($b - M_PI / 2),
+                $yc - $r * sin($b) - $MyArc * sin($b - M_PI / 2),
+                $xc + $r * cos($b),
+                $yc - $r * sin($b)
+            );
+        } else {
+            $b = $a + $d / 4;
+            $MyArc = 4 / 3 * (1 - cos($d / 8)) / sin($d / 8) * $r;
+            $this->drawArc(
+                $xc + $r * cos($a) + $MyArc * cos(M_PI / 2 + $a),
+                $yc - $r * sin($a) - $MyArc * sin(M_PI / 2 + $a),
+                $xc + $r * cos($b) + $MyArc * cos($b - M_PI / 2),
+                $yc - $r * sin($b) - $MyArc * sin($b - M_PI / 2),
+                $xc + $r * cos($b),
+                $yc - $r * sin($b)
+            );
+            $a = $b;
+            $b = $a + $d / 4;
+            $this->drawArc(
+                $xc + $r * cos($a) + $MyArc * cos(M_PI / 2 + $a),
+                $yc - $r * sin($a) - $MyArc * sin(M_PI / 2 + $a),
+                $xc + $r * cos($b) + $MyArc * cos($b - M_PI / 2),
+                $yc - $r * sin($b) - $MyArc * sin($b - M_PI / 2),
+                $xc + $r * cos($b),
+                $yc - $r * sin($b)
+            );
+            $a = $b;
+            $b = $a + $d / 4;
+            $this->drawArc(
+                $xc + $r * cos($a) + $MyArc * cos(M_PI / 2 + $a),
+                $yc - $r * sin($a) - $MyArc * sin(M_PI / 2 + $a),
+                $xc + $r * cos($b) + $MyArc * cos($b - M_PI / 2),
+                $yc - $r * sin($b) - $MyArc * sin($b - M_PI / 2),
+                $xc + $r * cos($b),
+                $yc - $r * sin($b)
+            );
+            $a = $b;
+            $b = $a + $d / 4;
+            $this->drawArc(
+                $xc + $r * cos($a) + $MyArc * cos(M_PI / 2 + $a),
+                $yc - $r * sin($a) - $MyArc * sin(M_PI / 2 + $a),
+                $xc + $r * cos($b) + $MyArc * cos($b - M_PI / 2),
+                $yc - $r * sin($b) - $MyArc * sin($b - M_PI / 2),
+                $xc + $r * cos($b),
+                $yc - $r * sin($b)
+            );
+        }
+        $this->_out($this->defineOutputStyle($style));
+        return $this;
+    }
+
+    /**
      * Dessine un rectangle avec les coins arrondis
      * 
      * @param float $w Largeur du rectangle
@@ -1496,24 +1622,20 @@ class MyFPDF extends \FPDF
      * Dessine un polygone
      * 
      * @param array $points Liste des points du polygone
+     * @param string $style Style de dessin, comme pour Rect (D, F ou FD)
      */
     public function polygon($points, ?string $style = 'D'): self
     {
-        //Draw a polygon
         $op = $this->defineOutputStyle($style);
         $h = $this->h;
         $k = $this->k;
 
-        $points_string = '';
+        $strPoints = '';
         for ($i = 0; $i < count($points); $i += 2) {
-            $points_string .= sprintf('%.2F %.2F', $points[$i] * $k, ($h - $points[$i + 1]) * $k);
-            if ($i == 0) {
-                $points_string .= ' m ';
-            } else {
-                $points_string .= ' l ';
-            }
+            $strPoints .= sprintf('%.2F %.2F', $points[$i] * $k, ($h - $points[$i + 1]) * $k);
+            $strPoints .= ($i == 0) ? ' m ' : ' l ';
         }
-        $this->_out($points_string . $op);
+        $this->_out($strPoints . $op);
         return $this;
     }
 

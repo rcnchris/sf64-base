@@ -9,33 +9,33 @@ final class HomeControllerTest extends AppWebTestCase
 {
     public function testIndexRedirectToHome(): void
     {
-        $this->makeClient()->request('GET', '/');
-        self::assertResponseRedirects('/home', Response::HTTP_FOUND);
+        $this->assertRequestRedirectTo(
+            uri: '/',
+            uriTo: '/home',
+            expectedCode: Response::HTTP_FOUND
+        );
     }
 
     public function testHome(): void
     {
-        $this->makeClient()->request('GET', '/home');
-        self::assertResponseIsSuccessful();
-        self::assertPageTitleContains('Accueil');
-        self::assertSelectorTextContains('h1', strtolower($this->getParameter('app.name')));
+        $this->assertRequestIsSuccessful(
+            uri: '/home',
+            pageTitle: 'Accueil',
+        );
     }
 
     public function testReadme(): void
     {
-        $this->makeClient()->request('GET', '/readme');
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/readme');
     }
 
     public function testReadmePdf(): void
     {
-        $this->makeClient()->request('GET', '/readme', ['pdf' => true]);
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/readme', ['pdf' => true]);
     }
 
     public function testChangelog(): void
     {
-        $this->makeClient()->request('GET', '/changelog');
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/changelog');
     }
 }

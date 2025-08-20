@@ -9,8 +9,7 @@ final class TabletteControllerTest extends AppWebTestCase
 {
     public function testList(): void
     {
-        $this->makeClient()->request('GET', '/tablette/list');
-        self::assertResponseIsSuccessful();
+        $this->assertRequestIsSuccessful('/tablette/list');
     }
 
     public function testNew(): void

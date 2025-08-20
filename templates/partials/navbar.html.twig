@@ -21,7 +21,7 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li>
-							<a class="dropdown-item {{ app.current_route == 'demo.pdf.' ? 'active' : null }}" href="{{ path('demo.pdf') }}">
+							<a class="dropdown-item {{ app.current_route starts with 'demo.pdf.' ? 'active' : null }}" href="{{ path('demo.pdf.app') }}">
 								{{ ux_icon('pdf', {class: 'text-danger mb-1'}) }}
 								PDF
 							</a>

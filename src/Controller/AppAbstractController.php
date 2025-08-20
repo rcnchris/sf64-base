@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\{Log, User};
+use App\Pdf\AppPdf;
+use Faker\{Factory, Generator};
 use Knp\Component\Pager\Pagination\PaginationInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
@@ -126,8 +128,18 @@ class AppAbstractController extends AbstractController
     {
         parent::addFlash($type, $message);
 
-        if($addLog){
+        if ($addLog) {
             $this->addLog($message, $context, $type);
         }
+    }
+
+    /**
+     * Retourne une instance du générateur de données aléatoires
+     * 
+     * @param ?string $locale Locale à utiliser
+     */
+    protected function getFaker(?string $locale = null): Generator
+    {
+        return Factory::create(is_null($locale) ? $this->getParameter('app.locale_country') : $locale);
     }
 }

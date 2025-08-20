@@ -22,14 +22,13 @@ parameters:
         orientation: P
         unit: mm
         size: A4
-        font: helvetica
+        font: arial
         font_size: 10
         format: A4
         tmp_dir: '%app.tmp_dir%/pdf'
-        text_color: '#000000'
-        draw_color: '#000000'
+        text_color: '#2c3e50'
+        draw_color: '#7f8c8d'
         fill_color: '#ecf0f1'
-        php: true
         creator: '%app.name%'
         logo: '%app.logo%'
 

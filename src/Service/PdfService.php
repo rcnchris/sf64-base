@@ -30,7 +30,7 @@ final class PdfService
     }
 
     /**
-     * Retourne les options par défaut d'un document PDF MCV
+     * Retourne les options par défaut d'un document PDF de l'application
      */
     private function getDefaultOptions(): array
     {
@@ -60,18 +60,13 @@ final class PdfService
             'header_height' => 15,
             'header_fill' => false,
             'header_border' => 'B',
+            'header_title_align' => 'R',
 
             'footer_height' => 15,
             'footer_fill' => false,
             'footer_border' => 'T',
 
             'pagination_enabled' => 'footer',
-
-            'table_align' => 'C',
-            'table_header_color' => '#7f8c8d',
-            'table_header_text_color' => '#FFFFFF',
-            'table_row_color1' => '#bdc3c7',
-            'table_row_color2' => '#ecf0f1',
         ];
     }
 

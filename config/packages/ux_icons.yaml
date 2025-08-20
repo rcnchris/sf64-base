@@ -9,6 +9,7 @@ ux_icons:
     aliases:
         activity: bi:activity
         book: bi:book
+        bookmark: bi:bookmark
         category: bi:inboxes
         chart-line: bi:graph-up
         chart-bar: bi:bar-chart-line-fill
@@ -33,6 +34,7 @@ ux_icons:
         mail: bi:envelope
         mysql: logos:mysql
         new: bi:plus-circle
+        paperclip: bi:paperclip
         pdf: bi:file-earmark-pdf
         phone: bi:telephone
         php: logos:php
@@ -48,3 +50,4 @@ ux_icons:
         user: bi:person
         users: bi:people
         watch: bi:watch
+        window: bi:window

@@ -69,7 +69,7 @@ class AppWebTestCase extends WebTestCase
             self::assertArrayHasKey($key, $array);
         }
     }
-    
+
     protected function assertRequestRedirectTo(
         string $uri,
         ?array $params = [],
@@ -85,7 +85,8 @@ class AppWebTestCase extends WebTestCase
         $crawler = $client->request($method, $uri, $params);
         self::assertResponseRedirects(
             expectedLocation: $uriTo,
-            expectedCode: $expectedCode
+            expectedCode: $expectedCode,
+            message: "La requête n'est pas redirigée comme attendu"
         );
         return $crawler;
     }
@@ -106,10 +107,14 @@ class AppWebTestCase extends WebTestCase
         $crawler = $client->request($method, $uri, $params);
         self::assertResponseIsSuccessful();
         if (!is_null($pageTitle)) {
-            self::assertPageTitleContains($pageTitle);
+            self::assertPageTitleContains($pageTitle, "Le titre de l'onglet est incorrect");
         }
         if (!is_null($pageContains)) {
-            self::assertSelectorTextContains($selector, $pageContains);
+            self::assertSelectorTextContains(
+                $selector,
+                $pageContains,
+                sprintf("La page ne contient pas \"%s\" pour le sélecteur \"%s\"", $pageContains, $selector)
+            );
         }
         return $crawler;
     }
