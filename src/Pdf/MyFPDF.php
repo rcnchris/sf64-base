@@ -1660,7 +1660,7 @@ class MyFPDF extends \FPDF
     }
 
     /**
-     * Déssine un graphique camembert
+     * Déssine un graphique de type camembert
      * 
      * @param array $data Données du graphique dans un tableau associatif contenant les libellés et les données correspondantes
      * @param float $x Abscisse du centre
@@ -1730,29 +1730,125 @@ class MyFPDF extends \FPDF
         $this
             ->addLn(5)
             ->SetX($xStartLegend);
-        $this
+
+        return $this
             ->setFontStyle(style: 'B')
             ->print(sprintf('Total : %s', number_format($this->chartSumData, $decimals, ',', ' ')));
+    }
 
-        return $this;
+    /**
+     * Dessine un graphique de type histogramme
+     * 
+     * @param array $data Données du graphique dans un tableau associatif contenant les libellés et les données correspondantes
+     * @param ?float $x Abscisse du coin supérieur gauche
+     * @param ?float $y Ordonnée du coin supérieur gauche
+     * @param ?float $w Largeur max du graphique
+     * @param ?float $h Hauteur max du graphique
+     * @param ?string $format Format à utiliser pour afficher les légendes. Il s'agit dune chaîne pouvant contenir les valeurs spéciales suivantes : %l (libellé), %v (valeur) et %p (pourcentage).
+     * @param ?int $decimals Décimales des valeurs
+     * @param ?string $bgColor Couleur de fond du graphique
+     * @param ?string $barColor Couleur des barres
+     * @param ?float $maxScaleVal Valeur haute de l'échelle. Prend par défaut la valeur maximale des données.
+     * @param ?int $nbScales Nombre de subdivisions de l'échelle (4 par défaut).
+     */
+    public function chartBar(
+        array $data,
+        ?float $x = null,
+        ?float $y = null,
+        ?float $w = null,
+        ?float $h = 70,
+        ?string $format = '%l : %v (%p)',
+        ?int $decimals = 2,
+        ?string $bgColor = '#ecf0f1',
+        ?string $barColor = '#7f8c8d',
+        ?float $maxScaleVal = 0,
+        ?int $nbScales = 4
+    ) {
+        $this
+            ->setFontStyle(style: '', size: 8)
+            ->setChartLegends($data, $format, $decimals);
+
+        list($xSection, $ySection) = $this->getCursor($x, $y);
+
+        $marge = 2;
+        $yChart = $ySection + $marge;
+        $hChart = floor($h - $marge * 2);
+        $xChart = $xSection + $marge * 2 + $this->chartWidthLegend;
+        if (is_null($w)) {
+            $w = $this->getBodyWidth();
+        }
+        $wChart = floor($w - $marge * 3 - $this->chartWidthLegend);
+        if ($maxScaleVal == 0) {
+            $maxScaleVal = max($data);
+        }
+        $valIndRepere = ceil($maxScaleVal / $nbScales);
+        $maxScaleVal = $valIndRepere * $nbScales;
+        $wScale = floor($wChart / $nbScales);
+        $wChart = $wScale * $nbScales;
+        $unit = $wChart / $maxScaleVal;
+        $hBar = floor($hChart / ($this->chartCountData + 1));
+        $hChart = $hBar * ($this->chartCountData + 1);
+        $spaceBar = floor($hBar * 80 / 100);
+
+        // Dessine le contour du graphique
+        $styleChart = 'D';
+        if (!empty($bgColor)) {
+            $styleChart .= 'F';
+            $this->setToolColor('fill', $bgColor);
+        }
+        $this->SetLineWidth(0.2);
+        $this->Rect($xChart, $yChart, $wChart, $hChart, $styleChart);
+
+        // Dessine les barres du graphique
+        $this->setToolColor('fill', $barColor);
+        $i = 0;
+        foreach ($data as $val) {
+            // Barre
+            $wBar = (int)($val * $unit);
+            $yBar = $yChart + ($i + 1) * $hBar - $spaceBar / 2;
+            $this->Rect($xChart, $yBar, $wBar, $spaceBar, 'DF');
+
+            // Légende
+            $this
+                ->setCursor(0, $yBar)
+                ->print($this->chartLegends[$i], w: $xChart - $marge, h: $spaceBar, align: 'R');
+            $i++;
+        }
+
+        // Echelles
+        for ($i = 0; $i <= $nbScales; $i++) {
+            $xScale = $xChart + $wScale * $i;
+            $this->Line($xScale, $yChart, $xScale, $yChart + $hChart);
+            $val = $i * $valIndRepere;
+            $xScale = $xChart + $wScale * $i - $this->GetStringWidth($val) / 2;
+            $yScale = $yChart + $hChart - $marge;
+            $this->Text($xScale, $yScale, $val);
+        }
     }
 
     /**
      * Définit les légendes d'un graphique
      * 
      * @param array $data Données du graphique dans un tableau associatif contenant les libellés et les données correspondantes
-     * @param string $format Format à utiliser pour afficher les légendes. Il s'agit dune chaîne pouvant contenir les valeurs spéciales suivantes : %l (libellé), %v (valeur) et %p (pourcentage).
+     * @param ?string $format Format à utiliser pour afficher les légendes. Il s'agit dune chaîne pouvant contenir les valeurs spéciales suivantes : %l (libellé), %v (valeur) et %p (pourcentage).
      * @param ?int $decimals Décimales des valeurs
      */
-    private function setChartLegends(array $data, string $format, ?int $decimals = 2): self
-    {
+    private function setChartLegends(
+        array $data,
+        ?string $format = '%l : %v',
+        ?int $decimals = 2,
+    ): self {
         $this->chartLegends = [];
         $this->chartWidthLegend = 0;
         $this->chartSumData = array_sum($data);
         $this->chartCountData = count($data);
         foreach ($data as $l => $val) {
             $p = sprintf('%.2f', $val / $this->chartSumData * 100) . '%';
-            $legend = str_replace(['%l', '%v', '%p'], [$l, number_format($val, $decimals, ',', ' '), $p], $format);
+            $legend = str_replace(
+                ['%l', '%v', '%p'],
+                [$l, number_format($val, $decimals, ',', ' '), $p],
+                $format
+            );
             $this->chartLegends[] = $legend;
             $this->chartWidthLegend = max($this->GetStringWidth($legend), $this->chartWidthLegend);
         }

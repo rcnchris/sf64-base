@@ -261,6 +261,19 @@ final class DemoController extends AppAbstractController
                 decimals: 0,
             );
 
+        $label = 'Histogramme des pays';
+        $pdf
+            ->setCursor(10, 160)
+            ->addBookmark($label, 1)
+            ->setFontStyle(style: 'B', size: 12)
+            ->print($label, border: 'B')
+            ->chartBar(
+                data: $countries,
+                barColor: '#1abc9c',
+                decimals: 0,
+                nbScales: 5
+            );
+
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
         $pdf
             ->printInfos(true, true)
