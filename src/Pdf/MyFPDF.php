@@ -1882,6 +1882,286 @@ class MyFPDF extends \FPDF
     }
 
     /**
+     * Dessine un code à barres de type EAN13
+     * 
+     * @param string $barCode Valeur du code à barres
+     * @param float $w Epaisseur d'une barre
+     * @param float $h Hauteur du codes à barres
+     * @param ?float $x Ordonnée du coin supérieur gauche
+     * @param ?float $y Ordonnée du coin supérieur gauche
+     */
+    public function barCodeEan13(
+        string $barcode,
+        ?float $w = .35,
+        ?float $h = 16,
+        ?float $x = null,
+        ?float $y = null,
+    ): self {
+        return $this->barCode($barcode, $w, $h, $x, $y);
+    }
+
+    /**
+     * Dessine un code à barres de type UPCA
+     * 
+     * @param string $barCode Valeur du code à barres
+     * @param float $w Epaisseur d'une barre
+     * @param float $h Hauteur du codes à barres
+     * @param ?float $x Ordonnée du coin supérieur gauche
+     * @param ?float $y Ordonnée du coin supérieur gauche
+     */
+    public function barCodeUpca(
+        string $barcode,
+        ?float $w = .35,
+        ?float $h = 16,
+        ?float $x = null,
+        ?float $y = null,
+    ): self {
+        return $this->barCode($barcode, $w, $h, $x, $y, 12);
+    }
+
+    /**
+     * Dessine un code à barres
+     * 
+     * @param string $barcode Valeur du code à barres
+     * @param float $w Epaisseur d'une barre
+     * @param float $h Hauteur du codes à barres
+     * @param ?float $x Ordonnée du coin supérieur gauche
+     * @param ?float $y Ordonnée du coin supérieur gauche
+     */
+    private function barCode(
+        string $barcode,
+        ?float $w = .35,
+        ?float $h = 16,
+        ?float $x = null,
+        ?float $y = null,
+        ?int $length = null
+    ): self {
+        list($x, $y) = $this->getCursor($x, $y);
+
+        // Ajoute des 0 si nécessaire
+        $barcode = str_pad($barcode, $length - 1, '0', STR_PAD_LEFT);
+        if ($length == 12) {
+            $barcode = '0' . $barcode;
+        }
+
+        // Ajoute ou teste le chiffre de contrôle
+        if (strlen($barcode) == 12) {
+            $barcode .= $this->getBarCodeCheckDigit($barcode);
+        } elseif (!$this->testBarCodeCheckDigit($barcode)) {
+            $this->Error('Caractère de contrôle invalide');
+        }
+
+        // Convertit les chiffres en barres
+        $codes = [
+            'A' => [
+                '0' => '0001101',
+                '1' => '0011001',
+                '2' => '0010011',
+                '3' => '0111101',
+                '4' => '0100011',
+                '5' => '0110001',
+                '6' => '0101111',
+                '7' => '0111011',
+                '8' => '0110111',
+                '9' => '0001011'
+            ],
+            'B' => [
+                '0' => '0100111',
+                '1' => '0110011',
+                '2' => '0011011',
+                '3' => '0100001',
+                '4' => '0011101',
+                '5' => '0111001',
+                '6' => '0000101',
+                '7' => '0010001',
+                '8' => '0001001',
+                '9' => '0010111'
+            ],
+            'C' => [
+                '0' => '1110010',
+                '1' => '1100110',
+                '2' => '1101100',
+                '3' => '1000010',
+                '4' => '1011100',
+                '5' => '1001110',
+                '6' => '1010000',
+                '7' => '1000100',
+                '8' => '1001000',
+                '9' => '1110100'
+            ]
+        ];
+        $parities = [
+            '0' => ['A', 'A', 'A', 'A', 'A', 'A'],
+            '1' => ['A', 'A', 'B', 'A', 'B', 'B'],
+            '2' => ['A', 'A', 'B', 'B', 'A', 'B'],
+            '3' => ['A', 'A', 'B', 'B', 'B', 'A'],
+            '4' => ['A', 'B', 'A', 'A', 'B', 'B'],
+            '5' => ['A', 'B', 'B', 'A', 'A', 'B'],
+            '6' => ['A', 'B', 'B', 'B', 'A', 'A'],
+            '7' => ['A', 'B', 'A', 'B', 'A', 'B'],
+            '8' => ['A', 'B', 'A', 'B', 'B', 'A'],
+            '9' => ['A', 'B', 'B', 'A', 'B', 'A'],
+        ];
+        $code = '101';
+        $p = $parities[$barcode[0]];
+        for ($i = 1; $i <= 6; $i++) {
+            $code .= $codes[$p[$i - 1]][$barcode[$i]];
+        }
+        $code .= '01010';
+        for ($i = 7; $i <= 12; $i++) {
+            $code .= $codes['C'][$barcode[$i]];
+        }
+        $code .= '101';
+        // Dessine les barres
+        $this->SetFillColor(0);
+        for ($i = 0; $i < strlen($code); $i++) {
+            if ($code[$i] == '1') {
+                $this->Rect($x + $i * $w, $y, $w, $h, 'F');
+            }
+        }
+        // Imprime le texte sous le code-barres
+        $this->SetFont('Arial', '', 12);
+        $this->Text($x, $y + $h + 11 / $this->k, substr($barcode, -$length));
+        return $this->setToolColor();
+    }
+
+    /**
+     * Calcule le chiffre de contrôle pour un code à barres
+     * 
+     * @param string $code Valeur du code à barres
+     */
+    private function getBarCodeCheckDigit(string $code)
+    {
+        $sum = 0;
+        for ($i = 1; $i <= 11; $i += 2) {
+            $sum += 3 * $code[$i];
+        }
+        for ($i = 0; $i <= 10; $i += 2) {
+            $sum += $code[$i];
+        }
+        $r = $sum % 10;
+        if ($r > 0) {
+            $r = 10 - $r;
+        }
+        return $r;
+    }
+
+    /**
+     * Vérifie le chiffre de contrôle
+     * 
+     * @param string $code Valeur du code à barres
+     */
+    private function testBarCodeCheckDigit(string $code): bool
+    {
+        $sum = 0;
+        for ($i = 1; $i <= 11; $i += 2) {
+            $sum += 3 * $code[$i];
+        }
+        for ($i = 0; $i <= 10; $i += 2) {
+            $sum += $code[$i];
+        }
+        return ($sum + $code[12]) % 10 == 0;
+    }
+
+    /**
+     * Dessine un code à barres de type Code 39
+     * Ce type de code-barres peut encoder les chaînes composées des caractères suivants : 
+     * - chiffres (0 à 9)
+     * - lettres majuscules (A à Z) 
+     * - Et les caractères (- . espace $ / + % *)
+     * 
+     * @param string $code Valeur du code à barres
+     * @param ?float $x Ordonnée du coin supérieur gauche
+     * @param ?float $y Ordonnée du coin supérieur gauche
+     * @param ?float $w Epaisseur d'une barre
+     * @param ?float $h Hauteur des barres
+     */
+    public function barCodeCode39(
+        string $code,
+        ?float $x = null,
+        ?float $y = null,
+        ?float $w = .5,
+        ?float $h = 5
+    ): self {
+        list($x, $y) = $this->getCursor($x, $y);
+
+        $wide = $w;
+        $narrow = $w / 3;
+        $gap = $narrow;
+
+        $barChar['0'] = 'nnnwwnwnn';
+        $barChar['1'] = 'wnnwnnnnw';
+        $barChar['2'] = 'nnwwnnnnw';
+        $barChar['3'] = 'wnwwnnnnn';
+        $barChar['4'] = 'nnnwwnnnw';
+        $barChar['5'] = 'wnnwwnnnn';
+        $barChar['6'] = 'nnwwwnnnn';
+        $barChar['7'] = 'nnnwnnwnw';
+        $barChar['8'] = 'wnnwnnwnn';
+        $barChar['9'] = 'nnwwnnwnn';
+        $barChar['A'] = 'wnnnnwnnw';
+        $barChar['B'] = 'nnwnnwnnw';
+        $barChar['C'] = 'wnwnnwnnn';
+        $barChar['D'] = 'nnnnwwnnw';
+        $barChar['E'] = 'wnnnwwnnn';
+        $barChar['F'] = 'nnwnwwnnn';
+        $barChar['G'] = 'nnnnnwwnw';
+        $barChar['H'] = 'wnnnnwwnn';
+        $barChar['I'] = 'nnwnnwwnn';
+        $barChar['J'] = 'nnnnwwwnn';
+        $barChar['K'] = 'wnnnnnnww';
+        $barChar['L'] = 'nnwnnnnww';
+        $barChar['M'] = 'wnwnnnnwn';
+        $barChar['N'] = 'nnnnwnnww';
+        $barChar['O'] = 'wnnnwnnwn';
+        $barChar['P'] = 'nnwnwnnwn';
+        $barChar['Q'] = 'nnnnnnwww';
+        $barChar['R'] = 'wnnnnnwwn';
+        $barChar['S'] = 'nnwnnnwwn';
+        $barChar['T'] = 'nnnnwnwwn';
+        $barChar['U'] = 'wwnnnnnnw';
+        $barChar['V'] = 'nwwnnnnnw';
+        $barChar['W'] = 'wwwnnnnnn';
+        $barChar['X'] = 'nwnnwnnnw';
+        $barChar['Y'] = 'wwnnwnnnn';
+        $barChar['Z'] = 'nwwnwnnnn';
+        $barChar['-'] = 'nwnnnnwnw';
+        $barChar['.'] = 'wwnnnnwnn';
+        $barChar[' '] = 'nwwnnnwnn';
+        $barChar['*'] = 'nwnnwnwnn';
+        $barChar['$'] = 'nwnwnwnnn';
+        $barChar['/'] = 'nwnwnnnwn';
+        $barChar['+'] = 'nwnnnwnwn';
+        $barChar['%'] = 'nnnwnwnwn';
+
+        $this->SetFont('Arial', '', 8);
+        $this->Text($x, $y + $h + 3, $code);
+        $this->SetFillColor(0);
+
+        $code = '*' . strtoupper($code) . '*';
+        for ($i = 0; $i < strlen($code); $i++) {
+            $char = $code[$i];
+            if (!isset($barChar[$char])) {
+                $this->Error(sprintf('Le code contient un caractère invalide : "%s"', $char));
+            }
+            $seq = $barChar[$char];
+            for ($bar = 0; $bar < 9; $bar++) {
+                if ($seq[$bar] == 'n') {
+                    $lineWidth = $narrow;
+                } else {
+                    $lineWidth = $wide;
+                }
+                if ($bar % 2 == 0) {
+                    $this->Rect($x, $y, $lineWidth, $h, 'F');
+                }
+                $x += $lineWidth;
+            }
+            $x += $gap;
+        }
+        return $this;
+    }
+
+    /**
      * Ouvre la boîte d'impression à l'ouverture du document (ne fonctionne pas avec Chrome). 
      */
     public function autoPrint(): self

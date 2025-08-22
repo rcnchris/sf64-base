@@ -48,6 +48,10 @@
 					{{ ux_icon('chart-pie') }}
 					Graphiques
                 </a>
+				<a href="{{ path('demo.pdf.barcodes') }}" class="list-group-item list-group-item-action {{ app.current_route == 'demo.pdf.barcodes' ? 'active' : null}}">
+					{{ ux_icon('bi:upc') }}
+					Codes à barres
+                </a>
 			</ul>
 		</div>
 		<div class="col-md-10">

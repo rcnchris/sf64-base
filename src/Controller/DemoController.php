@@ -289,4 +289,51 @@ final class DemoController extends AppAbstractController
             'filename' => $filename,
         ]);
     }
+
+    #[Route('/pdf/barcodes', name: 'pdf.barcodes')]
+    public function barcodes(PdfService $pdfService): Response
+    {
+        $title = 'Codes à barres';
+        $faker = $this->getFaker();
+        $pdf = $pdfService
+            ->make([
+                'title' => $title,
+                'graduated_grid' => true,
+            ])
+            ->addBookmark($title, 0, 1);
+
+        $label = 'EAN 13';
+        $pdf
+            ->addBookmark($label, 1)
+            ->setFontStyle(style: 'B', size: 12)
+            ->print($label, border: 'B')
+            ->barCodeEan13($faker->ean13(), y: 40);
+
+        $label = 'UPCA';
+        $pdf
+            ->setCursor(10, 80)
+            ->addBookmark($label, 1)
+            ->setFontStyle(style: 'B', size: 12)
+            ->print($label, border: 'B')
+            ->barCodeUpca('306532893210', y: 90);
+
+        $label = 'Code 39';
+        $pdf
+            ->setCursor(10, 120)
+            ->addBookmark($label, 1)
+            ->setFontStyle(style: 'B', size: 12)
+            ->print($label, border: 'B')
+            ->barCodeCode39($faker->ean8(), y: 130);
+
+        $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
+        $pdf
+            ->printInfos(true, true)
+            ->addToc()
+            ->render('F', $filename);
+        return $this->render('demo/pdf.html.twig', [
+            'title' => $title,
+            'pdf' => $pdf,
+            'filename' => $filename,
+        ]);
+    }
 }

@@ -342,4 +342,19 @@ class MyFpdfTest extends AppTestCase
                 ->sector($xc, $xy, $r, 250, 20)
         );
     }
+
+    public function testBarCodeCheckDigit(): void
+    {
+        $pdf = new MyFPDF();
+        self::assertInstanceOf(MyFPDF::class, $pdf->barCodeUpca($this->getFaker()->ean8()));
+
+        $this->expectException(\Exception::class);
+        $pdf->barCodeUpca('4022007355927');
+    }
+
+    public function testBarCodeCode39WithInvalidCharacter(): void
+    {
+        $this->expectException(\Exception::class);
+        (new MyFPDF())->barCodeCode39('402200#735');
+    }
 }

@@ -45,4 +45,9 @@ final class DemoControllerTest extends AppWebTestCase
     {
         $this->assertRequestIsSuccessful('/demo/pdf/charts');
     }
+
+    public function testBarCodes(): void
+    {
+        $this->assertRequestIsSuccessful('/demo/pdf/barcodes');
+    }
 }
