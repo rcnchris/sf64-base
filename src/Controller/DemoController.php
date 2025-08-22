@@ -139,13 +139,20 @@ final class DemoController extends AppAbstractController
         $yLabel = $yLabel + 25;
         $pdf
             ->setCursor(10, $yLabel)
+            ->addBookmark('Rectangle', 1)
+            ->print('Rectangle', border: 'B')
+            ->rectangle(y: $yLabel + 10, bgColor: '#f39c12');
+
+        $yLabel = $yLabel + 25;
+        $pdf
+            ->setCursor(10, $yLabel)
             ->addBookmark('Rectangles arrondis', 1)
             ->print('Rectangles arrondis', border: 'B')
-            ->roundedRect(20, 10, 5, '1234', 10, $yLabel + 10)
-            ->roundedRect(20, 10, 5, '134', 35, $yLabel + 10)
-            ->roundedRect(20, 10, 5, '14', 60, $yLabel + 10)
-            ->roundedRect(20, 10, 5, '1', 85, $yLabel + 10)
-            ->roundedRect(20, 10, 5, '2', 110, $yLabel + 10);
+            ->roundedRectangle(20, 10, 5, '1234', 10, $yLabel + 10)
+            ->roundedRectangle(20, 10, 5, '134', 35, $yLabel + 10)
+            ->roundedRectangle(20, 10, 5, '14', 60, $yLabel + 10)
+            ->roundedRectangle(20, 10, 5, '1', 85, $yLabel + 10)
+            ->roundedRectangle(20, 10, 5, '2', 110, $yLabel + 10);
 
         $yLabel = $yLabel + 25;
         $pdf
@@ -225,10 +232,7 @@ final class DemoController extends AppAbstractController
             $colors[] = Tools::getRandColor();
         }
         $pdf = $pdfService
-            ->make([
-                'title' => $title,
-                'graduated_grid' => true,
-            ])
+            ->make(compact('title'))
             ->addBookmark($title, 0, 1);
 
         $label = 'Camembert des pays en valeur sans couleur';

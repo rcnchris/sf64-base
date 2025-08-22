@@ -1555,6 +1555,32 @@ class MyFPDF extends \FPDF
     }
 
     /**
+     * Dessine un rectangle
+     * 
+     * @param ?float $w Largeur du rectangle, si null prend toute la largeur du body
+     * @param ?float $h Hauteur du rectangle
+     * @param ?float $x Abscisse du coin supérieur gauche du rectangle
+     * @param ?float $y Ordonnée du coin supérieur gauche du rectangle
+     * @param ?string $bgColor Couleur de fond
+     */
+    public function rectangle(
+        ?float $w = null,
+        ?float $h = 10,
+        ?float $x = null,
+        ?float $y = null,
+        ?string $bgColor = ''
+    ): self {
+        list($x, $y) = $this->getCursor($x, $y);
+        $style = empty($bgColor) ? 'D' : 'DF';
+        if ($style === 'DF') {
+            $this->setToolColor('fill', $bgColor);
+        }
+        $w = is_null($w) ? $this->getBodyWidth() : $w;
+        $this->Rect($x, $y, $w, $h, $style);
+        return $this;
+    }
+
+    /**
      * Dessine un rectangle avec les coins arrondis
      * 
      * @param float $w Largeur du rectangle
@@ -1565,7 +1591,7 @@ class MyFPDF extends \FPDF
      * @param ?float $y Ordonnée du coin supérieur gauche du rectangle
      * @param ?string $style Style de dessin, comme pour Rect (D, F ou FD)
      */
-    public function roundedRect(
+    public function roundedRectangle(
         float $w,
         float $h,
         ?float $r = 5,
