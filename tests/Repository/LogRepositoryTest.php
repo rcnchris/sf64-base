@@ -21,6 +21,7 @@ final class LogRepositoryTest extends AppKernelTestCase
         $model->setMessage('logs');
         $model->setLevels(['200']);
         $model->setUsers([$this->getUserRepository()->findRand('u')]);
+        $model->setDaterange('22/08/2025 00:00 - 22/08/2025 23:59');
 
         self::assertInstanceOf(QueryBuilder::class, $this->getRepo()->findListQb($model));
     }

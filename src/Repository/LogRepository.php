@@ -6,6 +6,7 @@ use App\Entity\Log;
 use App\Model\LogSearchModel;
 use App\Repository\Trait\AppRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -48,7 +49,7 @@ class LogRepository extends ServiceEntityRepository
         if (!empty($search->getUsers())) {
             $qb
                 ->andWhere('u.id in (:userIds)')
-                ->setParameter('userIds', array_map(fn ($n)=> $n->getId(), $search->getUsers()));
+                ->setParameter('userIds', array_map(fn($n) => $n->getId(), $search->getUsers()));
         }
 
         if (!empty($search->getLevels())) {
@@ -57,13 +58,15 @@ class LogRepository extends ServiceEntityRepository
                 ->setParameter('levels', $search->getLevels());
         }
 
-        // if (!is_null($search->getDaterange())) {
-        //     $dtr = Tools::extractDaterange($search->getDaterange());
-        //     $qb
-        //         ->andWhere($qb->expr()->between('l.createdAt', ':start', ':end'))
-        //         ->setParameter('start', $dtr['start'])
-        //         ->setParameter('end', $dtr['end']);
-        // }
+        if (!is_null($search->getDaterange())) {
+            $parts = explode(' - ', $search->getDaterange());
+            $start = \DateTimeImmutable::createFromFormat('d/m/Y H:i', current($parts), new \DateTimeZone('Europe/Paris'));
+            $end = \DateTimeImmutable::createFromFormat('d/m/Y H:i', end($parts), new \DateTimeZone('Europe/Paris'));
+            $qb
+                ->andWhere('l.createdAt >= :start and l.createdAt <= :end')
+                ->setParameter('start', $start)
+                ->setParameter('end', $end);
+        }
 
         return $qb;
     }

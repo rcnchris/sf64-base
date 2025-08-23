@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\{Log, User};
+use App\Form\Type\DateRangeType;
 use App\Model\LogSearchModel;
 use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -43,16 +44,12 @@ final class LogSearchForm extends AbstractType
                 'autocomplete' => true,
                 'attr' => ['placeholder' => 'Levels']
             ])
-            // ->add('daterange', TextType::class, [
-            //     'required' => false,
-            //     'label' => false,
-            //     'attr' => [
-            //         'placeholder' => 'Période',
-            //         'data-controller' => 'daterange',
-            //         'data-locale' => 'fr-FR',
-            //         'data-time' => true,
-            //     ]
-            // ])
+            ->add('daterange', DateRangeType::class, [
+                'mapped' => true,
+                'extra_options' => ['range' => 'search_past'],
+                'input_group' => false,
+                'label' => false,
+            ])
         ;
     }
 

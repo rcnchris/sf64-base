@@ -22,6 +22,7 @@ final class LogController extends AppAbstractController
         $search = new LogSearchModel();
         $form = $this->createForm(LogSearchForm::class, $search);
         $form->handleRequest($request);
+        dump($form->getData());
 
         $title = 'Liste logs';
         $this->addLog($title, [

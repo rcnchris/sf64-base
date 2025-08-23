@@ -7,7 +7,7 @@ final class LogSearchModel
     private ?string $message = null;
     private array $users = [];
     private array $levels = [];
-    // private ?string $daterange = null;
+    private ?string $daterange = null;
 
     public function getMessage(): ?string
     {
@@ -39,13 +39,13 @@ final class LogSearchModel
         $this->levels = $levels;
     }
 
-    // public function getDaterange(): ?string
-    // {
-    //     return $this->daterange;
-    // }
+    public function getDaterange(): ?string
+    {
+        return $this->daterange;
+    }
 
-    // public function setDaterange(?string $daterange): void
-    // {
-    //     $this->daterange = $daterange;
-    // }
+    public function setDaterange(?string $daterange): void
+    {
+        $this->daterange = $daterange;
+    }
 }

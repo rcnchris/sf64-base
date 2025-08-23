@@ -136,4 +136,14 @@ return [
         'version' => '2.4.3',
         'type' => 'css',
     ],
+    'moment' => [
+        'version' => '2.30.1',
+    ],
+    'daterangepicker/daterangepicker.css' => [
+        'version' => '3.1.0',
+        'type' => 'css',
+    ],
+    'daterangepicker/daterangepicker.js' => [
+        'version' => '3.1.0',
+    ],
 ];
