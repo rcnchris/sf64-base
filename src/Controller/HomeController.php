@@ -107,17 +107,17 @@ final class HomeController extends AppAbstractController
             'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
             'cd my-project-dir',
             'composer app-install',
-        ];
-
-        $updateCmds = [
-            'composer app-update',
+            'git init',
+            'git branch -M main',
+            "php bin/console app:env-install",
+            'git commit -m "Création projet"',
+            "code .",
         ];
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
         return $this->render('home/readme.html.twig', [
             'title' => __FUNCTION__,
             'readme' => $this->getFileContent('readme.md'),
             'install_cmds' => $installCmds,
-            'update_cmds' => $updateCmds,
         ]);
     }
 
