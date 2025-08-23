@@ -1109,10 +1109,11 @@ class MyFPDF extends \FPDF
         }
 
         // Index title
-        $this->SetFontSize(20);
-        $this->Cell(0, 5, $this->convertText($title), 0, 1, 'C');
-        $this->SetFontSize(15);
-        $this->Ln(10);
+        $this
+            ->setFontStyle(size: 20)
+            ->print($title, mode: 'cell', ln: 1, align: 'C')
+            ->setFontStyle(size: 15)
+            ->addLn(10);
 
         $size = count($this->bookmarks);
         $pageCellSize = $this->GetStringWidth('p. ' . $this->bookmarks[$size - 1]['p']) + 2;
@@ -1668,7 +1669,7 @@ class MyFPDF extends \FPDF
      * Dessine un polygone
      * 
      * @param array $points Liste des points du polygone
-     * @param string $style Style de dessin, comme pour Rect (D, F ou FD)
+     * @param ?string $style Style de dessin, comme pour Rect (D, F ou FD)
      */
     public function polygon($points, ?string $style = 'D'): self
     {
@@ -1682,6 +1683,42 @@ class MyFPDF extends \FPDF
             $strPoints .= ($i == 0) ? ' m ' : ' l ';
         }
         $this->_out($strPoints . $op);
+        return $this;
+    }
+
+    /**
+     * Dessine une étoile
+     * 
+     * @param int $nbPoints Nombre de points
+     * @param float $rin Rayon interne
+     * @param float $rout Rayon externe
+     * @param ?float $x Abscisse du centre
+     * @param ?float $y Ordonnée du centre
+     * @param ?string $style Style de dessin, comme pour Rect (D, F ou FD)
+     */
+    public function star(
+        int $points,
+        float $rin,
+        float $rout,
+        ?float $x = null,
+        ?float $y = null,
+        ?string $style = 'D'
+    ): self {
+        list($x, $y) = $this->setCursor($x, $y)->getCursor();
+        $op = $this->defineOutputStyle($style);
+        $dth = M_PI / $points;
+        $th = 0;
+        $k = $this->k;
+        $h = $this->h;
+        $points_string = '';
+        for ($i = 0; $i < ($points * 2) + 1; $i++) {
+            $th += $dth;
+            $cx = $x + (($i % 2 == 0 ? $rin : $rout) * cos($th));
+            $cy = $y + (($i % 2 == 0 ? $rin : $rout) * sin($th));
+            $points_string .= sprintf('%.2F %.2F', $cx * $k, ($h - $cy) * $k);
+            $points_string .= $i == 0 ? ' m ' : ' l ';
+        }
+        $this->_out($points_string . $op);
         return $this;
     }
 

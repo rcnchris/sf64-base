@@ -50,4 +50,9 @@ final class DemoControllerTest extends AppWebTestCase
     {
         $this->assertRequestIsSuccessful('/demo/pdf/barcodes');
     }
+
+    public function testFonts(): void
+    {
+        $this->assertRequestIsSuccessful('/demo/pdf/fonts');
+    }
 }

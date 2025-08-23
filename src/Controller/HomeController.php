@@ -91,6 +91,14 @@ final class HomeController extends AppAbstractController
             "- Pivottable",
             "- Makefile",
             "- PDF",
+            "   - Signets",
+            "   - Fichiers attachés",
+            "   - Rotation texte et image",
+            "   - Géométrie",
+            "   - Etiquettes",
+            "   - AutoPrint",
+            "   - Graphique camembert et histogramme",
+            "   - Codes à barres",
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
 

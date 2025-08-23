@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Pdf\DumpFontsPdf;
 use App\Pdf\EtiquettePdf;
 use App\Service\PdfService;
 use App\Utils\Tools;
@@ -160,6 +161,13 @@ final class DemoController extends AppAbstractController
             ->addBookmark('Polygone', 1)
             ->print('Polygone', border: 'B')
             ->polygon([10, $yLabel + 20, 20, $yLabel + 20, 15, $yLabel + 10, 10, $yLabel + 20]);
+
+        $yLabel = $yLabel + 25;
+        $pdf
+            ->setCursor(10, $yLabel)
+            ->addBookmark('Etoile', 1)
+            ->print('Etoile', border: 'B')
+            ->star(5, 10, 20, 60, $yLabel + 25);
 
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
         $pdf
@@ -324,6 +332,34 @@ final class DemoController extends AppAbstractController
             ->setFontStyle(style: 'B', size: 12)
             ->print($label, border: 'B')
             ->barCodeCode39($faker->ean8(), y: 130);
+
+        $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
+        $pdf
+            ->printInfos(true, true)
+            ->addToc()
+            ->render('F', $filename);
+        return $this->render('demo/pdf.html.twig', [
+            'title' => $title,
+            'pdf' => $pdf,
+            'filename' => $filename,
+        ]);
+    }
+
+    #[Route('/pdf/fonts', name: 'pdf.fonts')]
+    public function fonts(PdfService $pdfService): Response
+    {
+        $title = 'Polices';
+        $faker = $this->getFaker();
+        $pdf = new DumpFontsPdf(compact('title'));
+        $pdf->addBookmark($title, 0, 1);
+
+        $pdf
+            ->dumpFont('Courier', false)
+            ->dumpFont('Arial')
+            ->dumpFont('Helvetica')
+            ->dumpFont('Times')
+            ->dumpFont('Symbol')
+            ->dumpFont('Zapfdingbats');
 
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
         $pdf

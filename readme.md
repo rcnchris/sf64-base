@@ -19,3 +19,11 @@ Version : **1.0.0**
 - Pivottable
 - Makefile
 - PDF
+   - Signets
+   - Fichiers attachés
+   - Rotation texte et image
+   - Géométrie
+   - Etiquettes
+   - AutoPrint
+   - Graphique camembert et histogramme
+   - Codes à barres
