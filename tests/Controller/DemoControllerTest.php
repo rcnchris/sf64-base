@@ -67,4 +67,9 @@ final class DemoControllerTest extends AppWebTestCase
         ]);
         self::assertResponseRedirects($uri);
     }
+
+    public function testTwig(): void
+    {
+        $this->assertRequestIsSuccessful('/demo/twig');
+    }
 }

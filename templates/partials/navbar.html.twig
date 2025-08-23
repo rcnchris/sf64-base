@@ -32,6 +32,12 @@
 								Formulaire
 							</a>
 						</li>
+						<li>
+							<a class="dropdown-item {{ app.current_route == 'demo.twig' ? 'active' : null }}" href="{{ path('demo.twig') }}">
+								{{ ux_icon('twig', {class: 'mb-1'}) }}
+								Twig
+							</a>
+						</li>
 					</ul>
 				</li>
 				<li class="nav-item dropdown">

@@ -349,7 +349,6 @@ final class DemoController extends AppAbstractController
     public function fonts(PdfService $pdfService): Response
     {
         $title = 'Polices';
-        $faker = $this->getFaker();
         $pdf = new DumpFontsPdf(compact('title'));
         $pdf->addBookmark($title, 0, 1);
 
@@ -385,6 +384,18 @@ final class DemoController extends AppAbstractController
         return $this->render('demo/form.html.twig', [
             'title' => $title,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/twig', name: 'twig')]
+    public function twig(Request $request): Response
+    {
+        $title = 'Twig';
+        $faker = $this->getFaker();
+        return $this->render('demo/twig.html.twig', [
+            'title' => $title,
+            'faker' => $faker,
+            'file' => __FILE__,
         ]);
     }
 }

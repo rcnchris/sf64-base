@@ -47,6 +47,7 @@ ux_icons:
         send: bi:send-fill
         success: bi:check-circle-fill
         table: bi:table
+        twig: material-icon-theme:twig
         user: bi:person
         users: bi:people
         watch: bi:watch

@@ -71,6 +71,17 @@ final class HomeController extends AppAbstractController
             return $this->file($filename);
         }
 
+        $installCmds = [
+            'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
+            'cd my-project-dir',
+            'composer app-install',
+            'git init',
+            'git branch -M main',
+            "php bin/console app:env-install",
+            'git commit -m "Création projet"',
+            "code .",
+        ];
+
         $composer = json_decode($this->getFileContent('composer.json'), true);
         $readme = [
             sprintf("## %s\n", $composer['description']),
@@ -100,24 +111,14 @@ final class HomeController extends AppAbstractController
             "   - AutoPrint",
             "   - Graphique camembert et histogramme",
             "   - Codes à barres",
+            "### Installation",
+            sprintf("```bash\n%s\n```", join(PHP_EOL, $installCmds))
         ];
         file_put_contents(sprintf('%s/readme.md', $this->getParameter('kernel.project_dir')), join("\n", $readme));
-
-        $installCmds = [
-            'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
-            'cd my-project-dir',
-            'composer app-install',
-            'git init',
-            'git branch -M main',
-            "php bin/console app:env-install",
-            'git commit -m "Création projet"',
-            "code .",
-        ];
         $this->addLog(ucfirst($this->trans(__FUNCTION__)), ['action' => 'show']);
         return $this->render('home/readme.html.twig', [
             'title' => __FUNCTION__,
             'readme' => $this->getFileContent('readme.md'),
-            'install_cmds' => $installCmds,
         ]);
     }
 

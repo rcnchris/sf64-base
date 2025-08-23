@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+		title: title, 
+		icon: 'twig',
+	} %}
+
+	<div class="card bg-light shadow">
+		<div class="card-body">
+			<div class="row border-bottom mb-2">
+				<div class="col-md-4">
+					Canvas
+				</div>
+				<div class="col-md-4">
+					{{ '{{ faker.hexColor|canvas }}'|highlight('twig') }}
+				</div>
+				<div class="col-md-4">
+					<div class="alert alert-secondary">
+						{{ faker.hexColor|canvas }}
+					</div>
+				</div>
+			</div>
+			<div class="row border-bottom mb-2">
+				<div class="col-md-4">
+					Coloration syntaxique avec Highlight.js
+				</div>
+				<div class="col-md-4">
+					{{ '{{ ["cd mon-projet", "ls -lAf"]|highlight }}'|highlight('twig') }}
+				</div>
+				<div class="col-md-4">
+					<div class="alert alert-secondary">
+						{{ ['cd mon-projet', 'ls -lAf']|highlight }}
+					</div>
+				</div>
+			</div>
+			<div class="row border-bottom mb-2">
+				<div class="col-md-4">
+					Formater une taille en bit
+				</div>
+				<div class="col-md-4">
+					{{ '{{ 123456|format_bytes }}'|highlight('twig') }}
+				</div>
+				<div class="col-md-4">
+					<div class="alert alert-secondary">
+						{{ 123456|format_bytes }}
+					</div>
+				</div>
+			</div>
+			<div class="row border-bottom mb-2">
+				<div class="col-md-4">
+					Basename
+				</div>
+				<div class="col-md-4">
+					{{ '{{ file|basename }}'|highlight('twig') }}
+				</div>
+				<div class="col-md-4">
+					<div class="alert alert-secondary">
+						{{ file|basename }}
+					</div>
+				</div>
+			</div>
+			<div class="row border-bottom mb-2">
+				<div class="col-md-4">
+					Dirname
+				</div>
+				<div class="col-md-4">
+					{{ '{{ file|dirname }}'|highlight('twig') }}
+				</div>
+				<div class="col-md-4">
+					<div class="alert alert-secondary">
+						{{ file|dirname }}
+					</div>
+				</div>
+			</div>
+			<div class="row border-bottom mb-2">
+				<div class="col-md-4">
+					Taille fichier
+				</div>
+				<div class="col-md-4">
+					{{ '{{ file|filesize|format_bytes }}'|highlight('twig') }}
+				</div>
+				<div class="col-md-4">
+					<div class="alert alert-secondary">
+						{{ file|filesize|format_bytes }}
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}
