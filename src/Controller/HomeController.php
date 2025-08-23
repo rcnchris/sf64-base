@@ -75,8 +75,6 @@ final class HomeController extends AppAbstractController
             'git clone https://github.com/rcnchris/sf64-base.git my-project-dir',
             'cd my-project-dir',
             'composer app-install',
-            'git init',
-            'git branch -M main',
             "php bin/console app:env-install",
             'git commit -m "Création projet"',
             "code .",

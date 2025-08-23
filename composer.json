@@ -164,7 +164,9 @@
         "app-install": [
             "rm -rf .git",
             "composer install",
-            "@to-dev"
+            "git init",
+            "git branch -M main",
+            "code ."
         ],
         "test-yaml": "@sfy lint:yaml config translations --parse-tags",
         "test-container": "@sfy lint:container",
