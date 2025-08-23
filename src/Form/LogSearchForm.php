@@ -24,7 +24,7 @@ final class LogSearchForm extends AbstractType
             ->add('users', EntityType::class, [
                 'required' => false,
                 'class' => User::class,
-                // 'autocomplete' => true,
+                'autocomplete' => true,
                 'multiple' => true,
                 'label' => false,
                 'attr' => ['placeholder' => 'Users'],
@@ -40,7 +40,7 @@ final class LogSearchForm extends AbstractType
                     return sprintf('%s - %s', $level, $name);
                 },
                 'multiple' => true,
-                // 'autocomplete' => true,
+                'autocomplete' => true,
                 'attr' => ['placeholder' => 'Levels']
             ])
             // ->add('daterange', TextType::class, [
@@ -62,7 +62,7 @@ final class LogSearchForm extends AbstractType
             'data_class' => LogSearchModel::class,
             'method' => 'get',
             'csrf_protection' => false,
-            // 'translation_domain' => 'EasyAdminBundle',
+            'translation_domain' => 'forms',
         ]);
     }
 

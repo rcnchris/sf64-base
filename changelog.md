@@ -608,6 +608,30 @@ $builder->add('description', CKEditorType::class, [
 ])
 ```
 
+### UX Autocomplete
+
+```bash
+composer require symfony/ux-autocomplete
+```
+
+Fichier assets/controllers.json
+
+```json
+"controllers": {
+    "@symfony/ux-autocomplete": {
+        "autocomplete": {
+            "enabled": true,
+            "fetch": "eager",
+            "autoimport": {
+                "tom-select/dist/css/tom-select.default.css": false,
+                "tom-select/dist/css/tom-select.bootstrap4.css": false,
+                "tom-select/dist/css/tom-select.bootstrap5.css": true
+            }
+        }
+    },
+},
+```
+
 ### Fichier assets/app.js
 
 ```js
