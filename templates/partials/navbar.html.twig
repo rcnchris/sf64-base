@@ -21,9 +21,15 @@
 					</a>
 					<ul class="dropdown-menu">
 						<li>
-							<a class="dropdown-item {{ app.current_route starts with 'demo.pdf.' ? 'active' : null }}" href="{{ path('demo.pdf.app') }}">
+							<a class="dropdown-item {{ app.current_route starts with 'demo.form.' ? 'active' : null }}" href="{{ path('demo.pdf.app') }}">
 								{{ ux_icon('pdf', {class: 'text-danger mb-1'}) }}
 								PDF
+							</a>
+						</li>
+						<li>
+							<a class="dropdown-item {{ app.current_route == 'demo.form' ? 'active' : null }}" href="{{ path('demo.form') }}">
+								{{ ux_icon('bi:input-cursor', {class: 'text-info mb-1'}) }}
+								Formulaire
 							</a>
 						</li>
 					</ul>

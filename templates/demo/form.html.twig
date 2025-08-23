@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+		title: title, 
+		icon: 'bi:input-cursor',
+	} %}
+
+	<div class="card bg-light shadow w-50 m-auto">
+		<div class="card-body">
+			{{ form_start(form) }}
+			{{ form_widget(form) }}
+			<button type="submit" class="btn btn-primary">
+				Feu !
+			</button>
+			{{ form_end(form) }}
+		</div>
+	</div>
+{% endblock %}

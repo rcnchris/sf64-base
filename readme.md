@@ -13,6 +13,7 @@ Version : **1.0.0**
    - Formulaire de recherche
 - EasyAdmin
 - CK Editor
+- DateRangePicker
 - Datatables
 - Input Mask
 - UX Charts

@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\Pdf\DumpFontsPdf;
-use App\Pdf\EtiquettePdf;
+use App\Form\DemoType;
+use App\Pdf\{DumpFontsPdf, EtiquettePdf};
 use App\Service\PdfService;
 use App\Utils\Tools;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/demo', name: 'demo.', methods: ['GET'])]
@@ -370,6 +370,21 @@ final class DemoController extends AppAbstractController
             'title' => $title,
             'pdf' => $pdf,
             'filename' => $filename,
+        ]);
+    }
+
+    #[Route('/form', name: 'form', methods: ['GET', 'POST'])]
+    public function form(Request $request): Response
+    {
+        $title = 'Formulaire';
+        $form = $this->createForm(DemoType::class);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            return $this->redirectToRoute('demo.form');
+        }
+        return $this->render('demo/form.html.twig', [
+            'title' => $title,
+            'form' => $form,
         ]);
     }
 }

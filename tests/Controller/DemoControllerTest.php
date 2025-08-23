@@ -55,4 +55,16 @@ final class DemoControllerTest extends AppWebTestCase
     {
         $this->assertRequestIsSuccessful('/demo/pdf/fonts');
     }
+
+    public function testForm(): void
+    {
+        $client = $this->makeClient();
+        $uri = '/demo/form';
+        $client->request('GET', $uri);
+        self::assertResponseIsSuccessful();
+        $client->submitForm('Feu !', [
+            'daterange' => '22/08/2025 00:00 - 22/08/2025 23:59',
+        ]);
+        self::assertResponseRedirects($uri);
+    }
 }

@@ -85,6 +85,7 @@ final class HomeController extends AppAbstractController
             "   - Formulaire de recherche",
             "- EasyAdmin",
             "- CK Editor",
+            "- DateRangePicker",
             "- Datatables",
             "- Input Mask",
             "- UX Charts",
