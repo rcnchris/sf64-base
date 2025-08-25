@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+		title: title, 
+		icon: 'search',
+	} %}
+
+    <twig:LogSearch />
+{% endblock %}

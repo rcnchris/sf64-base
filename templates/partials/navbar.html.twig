@@ -44,6 +44,12 @@
 								Calendrier
 							</a>
 						</li>
+						<li>
+							<a class="dropdown-item {{ app.current_route == 'demo.log.search' ? 'active' : null }}" href="{{ path('demo.log.search') }}">
+								{{ ux_icon('search', {class: 'text-info mb-1'}) }}
+								Composant de recherche
+							</a>
+						</li>
 					</ul>
 				</li>
 				<li class="nav-item dropdown">

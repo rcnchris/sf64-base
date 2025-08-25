@@ -5,8 +5,7 @@ namespace App\Controller;
 use App\Entity\Log;
 use App\Form\DemoType;
 use App\Pdf\{DumpFontsPdf, EtiquettePdf};
-use App\Repository\LogRepository;
-use App\Repository\UserRepository;
+use App\Repository\{LogRepository, UserRepository};
 use App\Service\PdfService;
 use App\Utils\Tools;
 use Symfony\Component\HttpFoundation\{Request, Response};
@@ -456,5 +455,15 @@ final class DemoController extends AppAbstractController
             'data' => $data,
         ]);
         return new Response('Enregistrement modifié', 200);
+    }
+
+    #[Route('/log/search', name: 'log.search')]
+    public function logSearch(LogRepository $logRepository): Response
+    {
+        $title = 'Composant de recherche';
+        $this->addLog($title, ['action' => 'search', 'entity' => 'Log']);
+        return $this->render('demo/search.html.twig', [
+            'title' => $title,
+        ]);
     }
 }

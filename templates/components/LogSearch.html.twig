@@ -1,0 +1,57 @@
+<div {{ attributes }}>
+    <div class="input-group mb-3">
+		<span class="input-group-text" id="query">
+			<span data-loading="hide">
+				{{ ux_icon('search', {class: 'text-info', width: '20', height: '20'}) }}
+			</span>
+			<div class="spinner-border spinner-border-sm text-info" role="status" data-loading>
+				<span class="visually-hidden">{{ 'loading'|trans|capitalize }}...</span>
+			</div>
+		</span>
+		<input 
+            type="search" 
+            id="search-query"
+            value="{{ this.query }}" 
+            data-model="debounce(500)|query" 
+            class="form-control form-control-lg" 
+            placeholder="{{ this.placeholder }}" 
+            aria-describedby="query" 
+            autofocus>
+	</div>
+
+    <div class="card bg-light shadow">
+        <div class="card-body">
+            <table class="table table-sm table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th class="text-center">{{ ux_icon('pointer') }}</th>
+                        <th class="text-center">{{ ux_icon('event')}}</th>
+                        <th class="text-center">{{ 'message'|trans|capitalize }}</th>
+                        <th class="text-center">{{ ux_icon(constant('App\\Entity\\User::ICON')) }}</th>
+                        <th class="text-center">{{ 'level'|trans|capitalize }}</th>
+                        <th class="text-center">{{ 'channel'|trans|capitalize }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in this.logs %}
+                        <tr>
+                            <td class="text-center">
+                                <a href="{{ path('log.show', {id: log.id}) }}" class="btn btn-sm">
+                                    {{ ux_icon('eye', {class: 'text-info'}) }}
+                                </a>
+                            </td>
+                            <td class="text-center">{{ log.createdAt|format_datetime('full', 'short') }}</td>
+                            <td class="text-center">{{ log.message }}</td>
+                            <td class="text-center">{{ log.user }}</td>
+                            <td class="text-center">
+                                {% include "partials/badge_log.html.twig" with {level: log.level} only %}
+                            </td>
+                            <td class="text-center">{{ log.channel }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {{ knp_pagination_render(this.logs) }}
+        </div>
+    </div>
+</div>

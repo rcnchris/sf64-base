@@ -17,6 +17,7 @@ Version : **1.0.0**
    - DateRangePicker
    - Input Mask
    - DualListBox
+   - Live Component Twig de recherche
 - Datatables
 - FullCalendar
 - UX Charts

@@ -132,4 +132,21 @@ class LogRepository extends ServiceEntityRepository
         }
         return $events;
     }
+
+    /**
+     * Recherche des logs à partir d'une chaîne de caractères
+     * 
+     * @param ?string $query Terme à chercher
+     */
+    public function searchByQueryString(?string $query): array 
+    {
+        return $this
+            ->createQueryBuilder('l')
+            ->leftJoin('l.user', 'u')
+            ->where('l.message like :query OR u.pseudo like :query')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('l.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

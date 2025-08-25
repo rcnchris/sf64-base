@@ -21,6 +21,7 @@ home: accueil
 icon: icône
 level: niveau
 list: liste
+loading: chargement
 login: 'se connecter'
 logout: 'se déconnecter'
 logs: journaux

@@ -103,4 +103,9 @@ final class DemoControllerTest extends AppWebTestCase
         ]);
         self::assertResponseStatusCodeSame(400);
     }
+
+    public function testLogSearch(): void
+    {
+        $this->assertRequestIsSuccessful('/demo/log/search');
+    }
 }
