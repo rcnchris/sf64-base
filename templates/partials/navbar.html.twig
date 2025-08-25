@@ -38,6 +38,12 @@
 								Twig
 							</a>
 						</li>
+						<li>
+							<a class="dropdown-item {{ app.current_route == 'demo.calendar' ? 'active' : null }}" href="{{ path('demo.calendar') }}">
+								{{ ux_icon('calendar', {class: 'text-info mb-1'}) }}
+								Calendrier
+							</a>
+						</li>
 					</ul>
 				</li>
 				<li class="nav-item dropdown">

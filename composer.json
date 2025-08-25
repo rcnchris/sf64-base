@@ -58,6 +58,7 @@
         "symfony/ux-toggle-password": "^2.29",
         "symfony/validator": "6.4.*",
         "symfony/web-link": "6.4.*",
+        "symfony/workflow": "6.4.*",
         "symfony/yaml": "6.4.*",
         "symfonycasts/verify-email-bundle": "^1.17",
         "twig/cssinliner-extra": "^3.21",
@@ -163,6 +164,7 @@
         "db-restore": "mysql -u root sf64-base < ./var/dump/sf64-base.sql",
         "app-install": [
             "rm -rf .git",
+            "rm -rf public/docs/*.*",
             "composer install",
             "git init",
             "git branch -M main",

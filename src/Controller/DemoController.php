@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Log;
 use App\Form\DemoType;
 use App\Pdf\{DumpFontsPdf, EtiquettePdf};
+use App\Repository\LogRepository;
 use App\Service\PdfService;
 use App\Utils\Tools;
 use Symfony\Component\HttpFoundation\{Request, Response};
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\RouterInterface;
 
 #[Route('/demo', name: 'demo.', methods: ['GET'])]
 final class DemoController extends AppAbstractController
@@ -25,6 +28,7 @@ final class DemoController extends AppAbstractController
 
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
         $pdf->render('F', $filename);
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -47,6 +51,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -68,6 +74,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(false, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -93,6 +101,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -174,6 +184,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -200,6 +212,8 @@ final class DemoController extends AppAbstractController
         }
         $filename = sprintf('%s/%s.pdf', $this->getParameter('app.docs_dir'), __FUNCTION__);
         $pdf->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -221,6 +235,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(false, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -291,6 +307,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -338,6 +356,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -365,6 +385,8 @@ final class DemoController extends AppAbstractController
             ->printInfos(true, true)
             ->addToc()
             ->render('F', $filename);
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/pdf.html.twig', [
             'title' => $title,
             'pdf' => $pdf,
@@ -381,6 +403,8 @@ final class DemoController extends AppAbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             return $this->redirectToRoute('demo.form');
         }
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/form.html.twig', [
             'title' => $title,
             'form' => $form,
@@ -388,14 +412,45 @@ final class DemoController extends AppAbstractController
     }
 
     #[Route('/twig', name: 'twig')]
-    public function twig(Request $request): Response
+    public function twig(): Response
     {
         $title = 'Twig';
         $faker = $this->getFaker();
+
+        $this->addLog($title, ['action' => 'pdf']);
         return $this->render('demo/twig.html.twig', [
             'title' => $title,
             'faker' => $faker,
             'file' => __FILE__,
         ]);
+    }
+
+    #[Route('/calendar', name: 'calendar')]
+    public function calendar(LogRepository $logRepository, RouterInterface $router): Response
+    {
+        $title = 'Calendrier';
+        $this->addLog($title, ['action' => 'show']);
+        return $this->render('demo/calendar.html.twig', [
+            'title' => $title,
+            'events' => json_encode($logRepository->findForCalendar($router))
+        ]);
+    }
+
+    #[Route('/calendar/edit/{id}', name: 'calendar.edit', methods: ['PUT'])]
+    public function calendarEdit(?Log $log, LogRepository $logRepository, Request $request): Response
+    {
+        $data = json_decode($request->getContent());
+        if (empty($data) || !isset($data->start)) {
+            return new Response('Aucune donnée', 400);
+        }
+
+        $logRepository->save($log->setCreatedAt(new \DateTimeImmutable($data->start)));
+        $this->addLog('Calendrier Edit', [
+            'action' => 'edit',
+            'entity' => 'Log',
+            'entity_id' => $log->getId(),
+            'data' => $data,
+        ]);
+        return new Response('Enregistrement modifié', 200);
     }
 }

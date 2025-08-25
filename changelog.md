@@ -51,7 +51,7 @@ Scripts **composer**
 ## Installation des librairies
 
 ```bash
-composer require webapp symfony/apache-pack symfony/ux-icons twig/intl-extra twig/html-extra twig/cssinliner-extra twig/string-extra twig/inky-extra twig/markdown-extra league/commonmark symfony/ux-live-component intervention/image:"^2.7" fakerphp/faker
+composer require webapp symfony/apache-pack symfony/ux-icons symfony/workflow twig/intl-extra twig/html-extra twig/cssinliner-extra twig/string-extra twig/inky-extra twig/markdown-extra league/commonmark symfony/ux-live-component intervention/image:"^2.7" fakerphp/faker
 rm -f compose.yaml && rm -f compose.override.yaml
 composer remove symfony/ux-turbo
 composer require --dev doctrine/doctrine-fixtures-bundle

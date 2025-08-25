@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	{{ title }}
+	-
+	{{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar')
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr',
+                timeZone: 'Europe/Paris',
+                firstDay: 1,
+                initialView: 'timeGridWeek',
+                navLinks: true,
+                editable: true,
+                selectable: true,
+                eventResizableFromStart: true,
+                dayMaxEvents: true,
+                weekNumbers: true,
+                weekText: 'S',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,listMonth,timeGridWeek,listWeek,timeGridDay,listDay',
+                },
+                buttonText: {
+                    today: "Aujourd'hui",
+                    month: 'Mois',
+                    week: 'Semaine',
+                    day: 'Jour',
+                    listMonth: 'Liste mois',
+                    listWeek: 'Liste semaine',
+                    listDay: 'Liste jour',
+                },
+                views: {
+                    timeGridWeek: {
+                        titleFormat: {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                        },
+                    },
+                    listDay: { buttonText: 'list day' },
+                    listWeek: { buttonText: 'list week' },
+                    listMonth: { buttonText: 'list month' },
+                },
+                events: {{ events|raw }}
+            });
+
+            calendar.on('eventChange', (e) => {
+                let url = `/demo/calendar/edit/${e.event.id}`
+                let data = {
+                    "title": e.event.title,
+                    "start": e.event.start,
+                    "end": e.event.end,
+                    "allDay": e.event.allDay
+                }
+                let xhr = new XMLHttpRequest
+                xhr.open('PUT', url)
+                xhr.send(JSON.stringify(data))
+            })
+
+            calendar.render()
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+
+	{% include "partials/page_title.html.twig" with {
+		title: title, 
+		icon: 'calendar',
+	} %}
+
+	<div class="card bg-light shadow">
+		<div class="card-body">
+			<div id="calendar"></div>
+		</div>
+	</div>
+{% endblock %}

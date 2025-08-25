@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\Log;
 use App\Tests\AppWebTestCase;
 
 final class DemoControllerTest extends AppWebTestCase
@@ -71,5 +72,35 @@ final class DemoControllerTest extends AppWebTestCase
     public function testTwig(): void
     {
         $this->assertRequestIsSuccessful('/demo/twig');
+    }
+
+    public function testCalendar(): void
+    {
+        $this->assertRequestIsSuccessful('/demo/calendar');
+    }
+
+    public function testCalendarEdit(): void
+    {
+        $client = $this->makeClient();
+        $log = $this->getRepository(Log::class)->findRand('l');
+        $client->jsonRequest('PUT', sprintf('/demo/calendar/edit/%d', $log->getId()), [
+            'title' => __FUNCTION__,
+            'start' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'end' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'allDay' => false
+        ]);
+        self::assertResponseStatusCodeSame(200);
+    }
+
+    public function testCalendarEditWithoutStart(): void
+    {
+        $client = $this->makeClient();
+        $log = $this->getRepository(Log::class)->findRand('l');
+        $client->jsonRequest('PUT', sprintf('/demo/calendar/edit/%d', $log->getId()), [
+            'title' => __FUNCTION__,
+            'end' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'allDay' => false
+        ]);
+        self::assertResponseStatusCodeSame(400);
     }
 }

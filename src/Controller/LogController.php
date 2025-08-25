@@ -94,7 +94,7 @@ final class LogController extends AppAbstractController
                 'labels' => array_column($countHours, 'hour'),
                 'datasets' => [
                     [
-                        'label' => 'Actions par heures',
+                        'label' => 'Heures de fréquentation',
                         'borderColor' => '#0dcaf0',
                         'backgroundColor' => '#1abc9c',
                         'tension' => .3,
@@ -110,7 +110,7 @@ final class LogController extends AppAbstractController
                 'labels' => array_column($countHours, 'day'),
                 'datasets' => [
                     [
-                        'label' => 'Actions par jours de la semaine',
+                        'label' => 'Jours de fréquentation',
                         'borderColor' => '#0dcaf0',
                         'backgroundColor' => '#1abc9c',
                         'tension' => .3,

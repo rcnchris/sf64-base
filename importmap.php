@@ -16,14 +16,17 @@ return [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
-    '@hotwired/stimulus' => [
-        'version' => '3.2.2',
-    ],
     '@symfony/stimulus-bundle' => [
         'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
     ],
+    '@symfony/ux-live-component' => [
+        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
+    ],
+    '@hotwired/stimulus' => [
+        'version' => '3.2.2',
+    ],
     '@hotwired/turbo' => [
-        'version' => '7.3.0',
+        'version' => '8.0.13',
     ],
     'bootstrap' => [
         'version' => '5.3.7',
@@ -72,9 +75,6 @@ return [
         'version' => '11.11.1',
         'type' => 'css',
     ],
-    '@symfony/ux-live-component' => [
-        'path' => './vendor/symfony/ux-live-component/assets/dist/live_controller.js',
-    ],
     'pivottable' => [
         'version' => '2.23.0',
     ],
@@ -86,26 +86,26 @@ return [
         'type' => 'css',
     ],
     'chart.js' => [
-        'version' => '3.9.1',
+        'version' => '4.5.0',
     ],
     'datatables.net' => [
-        'version' => '2.3.2',
+        'version' => '2.3.3',
     ],
     'datatables.net-bs5' => [
-        'version' => '2.3.2',
+        'version' => '2.3.3',
     ],
     'datatables.net-bs5/css/dataTables.bootstrap5.min.css' => [
-        'version' => '2.3.2',
+        'version' => '2.3.3',
         'type' => 'css',
     ],
     'datatables.net-responsive-bs5' => [
-        'version' => '3.0.5',
+        'version' => '3.0.6',
     ],
     'datatables.net-responsive' => [
-        'version' => '3.0.5',
+        'version' => '3.0.6',
     ],
     'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css' => [
-        'version' => '3.0.5',
+        'version' => '3.0.6',
         'type' => 'css',
     ],
     'inputmask' => [
@@ -145,5 +145,8 @@ return [
     ],
     'daterangepicker/daterangepicker.js' => [
         'version' => '3.1.0',
+    ],
+    '@kurkle/color' => [
+        'version' => '0.4.0',
     ],
 ];

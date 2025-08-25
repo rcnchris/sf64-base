@@ -6,9 +6,9 @@ use App\Entity\Log;
 use App\Model\LogSearchModel;
 use App\Repository\Trait\AppRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends ServiceEntityRepository<Log>
@@ -112,5 +112,24 @@ class LogRepository extends ServiceEntityRepository
     {
         $this->setLocale();
         return $this->countByDateFormatQb('%w-%W', 'day')->getQuery()->getArrayResult();
+    }
+
+    public function findForCalendar(RouterInterface $router): array
+    {
+        $logs = $this->findAll();
+        $events = [];
+        foreach ($logs as $log) {
+            $event = [
+                'id' => $log->getId(),
+                'title' => htmlspecialchars($log->getMessage(), ENT_COMPAT | ENT_HTML5),
+                'start' => $log->getCreatedAt()->format('Y-m-d H:i:s'),
+                'end' => $log->getCreatedAt()->format('Y-m-d H:i:s'),
+                'url' => $router->generate('log.show', ['id' => $log->getId()]),
+                'color' => '#3498db',
+                'allDay' => false,
+            ];
+            array_push($events, $event);
+        }
+        return $events;
     }
 }

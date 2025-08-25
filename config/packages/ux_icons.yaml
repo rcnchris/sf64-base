@@ -10,6 +10,7 @@ ux_icons:
         activity: bi:activity
         book: bi:book
         bookmark: bi:bookmark
+        calendar: bi:calendar
         category: bi:inboxes
         chart-line: bi:graph-up
         chart-bar: bi:bar-chart-line-fill

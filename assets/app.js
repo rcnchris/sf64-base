@@ -1,5 +1,5 @@
 import $ from "jquery";
-window.$ = $;
+window.$ = window.jQuery = $;
 import './bootstrap.js';
 import './js/highlight.js';
 import './js/twbs.js';
