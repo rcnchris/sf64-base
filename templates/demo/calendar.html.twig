@@ -27,7 +27,7 @@
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
-                    right: 'dayGridMonth,listMonth,timeGridWeek,listWeek,timeGridDay,listDay',
+                    right: 'dayGridMonth,listMonth,timeGridWeek,listWeek,timeGridDay,listDay,multiMonthYear',
                 },
                 buttonText: {
                     today: "Aujourd'hui",
@@ -37,18 +37,17 @@
                     listMonth: 'Liste mois',
                     listWeek: 'Liste semaine',
                     listDay: 'Liste jour',
+                    multiMonthYear: 'Année',
                 },
                 views: {
                     timeGridWeek: {
+                        dayMaxEventRows: 5,
                         titleFormat: {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
                         },
                     },
-                    listDay: { buttonText: 'list day' },
-                    listWeek: { buttonText: 'list week' },
-                    listMonth: { buttonText: 'list month' },
                 },
                 events: {{ events|raw }}
             });

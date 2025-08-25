@@ -6,6 +6,7 @@ use App\Entity\Log;
 use App\Form\DemoType;
 use App\Pdf\{DumpFontsPdf, EtiquettePdf};
 use App\Repository\LogRepository;
+use App\Repository\UserRepository;
 use App\Service\PdfService;
 use App\Utils\Tools;
 use Symfony\Component\HttpFoundation\{Request, Response};
@@ -395,19 +396,22 @@ final class DemoController extends AppAbstractController
     }
 
     #[Route('/form', name: 'form', methods: ['GET', 'POST'])]
-    public function form(Request $request): Response
+    public function form(Request $request, UserRepository $userRepository): Response
     {
         $title = 'Formulaire';
         $form = $this->createForm(DemoType::class);
         $form->handleRequest($request);
+
+        $submitted = [];
         if ($form->isSubmitted() && $form->isValid()) {
-            return $this->redirectToRoute('demo.form');
+            $submitted = json_encode($form->getData(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         }
 
-        $this->addLog($title, ['action' => 'pdf']);
+        $this->addLog($title, ['action' => __FUNCTION__]);
         return $this->render('demo/form.html.twig', [
             'title' => $title,
             'form' => $form,
+            'submitted' => $submitted,
         ]);
     }
 

@@ -12,10 +12,13 @@ Version : **1.0.0**
 - Logs
    - Formulaire de recherche
 - EasyAdmin
-- CK Editor
-- DateRangePicker
+- Formulaires
+   - CK Editor
+   - DateRangePicker
+   - Input Mask
+   - DualListBox
 - Datatables
-- Input Mask
+- FullCalendar
 - UX Charts
 - Pivottable
 - Makefile

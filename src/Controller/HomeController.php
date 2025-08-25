@@ -49,7 +49,9 @@ final class HomeController extends AppAbstractController
                 ->print('Fonctionnalités')
                 ->setFontStyle(style: '', size: 10)
                 ->printBulletArray([
-                    'Tablettes',
+                    'Tablettes' => [
+                        'GedmoTree'
+                    ],
                     'Utilisateurs' => [
                         'Inscription (captcha)',
                         'Authentification',
@@ -59,9 +61,14 @@ final class HomeController extends AppAbstractController
                         'Formulaire de recherche'
                     ],
                     'EasyAdmin',
-                    'CK Editor',
+                    'Formulaires' => [
+                        'CK Editor',
+                        'DateRangePicker',
+                        'Input Mask',
+                        'DualListBox',
+                    ],
                     'Datatables',
-                    'Input Mask',
+                    'FullCalendar',
                     'UX Charts',
                     'Pivottable',
                     'Makefile',
@@ -93,10 +100,13 @@ final class HomeController extends AppAbstractController
             "- Logs",
             "   - Formulaire de recherche",
             "- EasyAdmin",
-            "- CK Editor",
-            "- DateRangePicker",
+            "- Formulaires",
+            "   - CK Editor",
+            "   - DateRangePicker",
+            "   - Input Mask",
+            "   - DualListBox",
             "- Datatables",
-            "- Input Mask",
+            "- FullCalendar",
             "- UX Charts",
             "- Pivottable",
             "- Makefile",

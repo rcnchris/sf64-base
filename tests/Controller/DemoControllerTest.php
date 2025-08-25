@@ -66,7 +66,7 @@ final class DemoControllerTest extends AppWebTestCase
         $client->submitForm('Feu !', [
             'daterange' => '22/08/2025 00:00 - 22/08/2025 23:59',
         ]);
-        self::assertResponseRedirects($uri);
+        self::assertResponseIsSuccessful();
     }
 
     public function testTwig(): void

@@ -16,9 +16,8 @@ final class DateRangeType extends AbstractType
             ->setDefaults([
                 'required' => false,
                 'mapped' => false,
-                'label_html' => true,
                 'input_group' => true,
-                'label' => 'Du - au'
+                'label' => 'Du - au',
             ])
             ->setAllowedTypes('input_group', ['null', 'bool'])
             ->setNormalizer('row_attr', function (Options $options): array {

@@ -567,6 +567,8 @@ $builder->add('phone', TextType::class, [
 
 ### CK Editor
 
+[CK Editor](https://ckeditor.com/ckeditor-4/)
+
 ```bash
 composer require friendsofsymfony/ckeditor-bundle
 ```
@@ -606,6 +608,183 @@ $builder->add('description', CKEditorType::class, [
     'label' => false,
     'config_name' => 'min',
 ])
+```
+
+### FullCalendar
+
+[FullCalendar](https://fullcalendar.io/)
+
+Template Twig
+
+```twig
+{% block javascripts %}
+    {{ parent() }}
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar')
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'fr',
+                timeZone: 'Europe/Paris',
+                firstDay: 1,
+                initialView: 'timeGridWeek',
+                navLinks: true,
+                editable: true,
+                selectable: true,
+                eventResizableFromStart: true,
+                dayMaxEvents: true,
+                weekNumbers: true,
+                weekText: 'S',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,listMonth,timeGridWeek,listWeek,timeGridDay,listDay,multiMonthYear',
+                },
+                buttonText: {
+                    today: "Aujourd'hui",
+                    month: 'Mois',
+                    week: 'Semaine',
+                    day: 'Jour',
+                    listMonth: 'Liste mois',
+                    listWeek: 'Liste semaine',
+                    listDay: 'Liste jour',
+                    multiMonthYear: 'Année',
+                },
+                views: {
+                    timeGridWeek: {
+                        dayMaxEventRows: 5,
+                        titleFormat: {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                        },
+                    },
+                },
+                events: {{ events|raw }}
+            });
+
+            calendar.on('eventChange', (e) => {
+                let url = `/demo/calendar/edit/${e.event.id}`
+                let data = {
+                    "title": e.event.title,
+                    "start": e.event.start,
+                    "end": e.event.end,
+                    "allDay": e.event.allDay
+                }
+                let xhr = new XMLHttpRequest
+                xhr.open('PUT', url)
+                xhr.send(JSON.stringify(data))
+            })
+
+            calendar.render()
+        })
+    </script>
+{% endblock %}
+```
+
+```php
+// Fichier src/Repository/LogRepository.php
+public function findForCalendar(RouterInterface $router): array
+{
+    $logs = $this->findAll();
+    $events = [];
+    foreach ($logs as $log) {
+        $event = [
+            'id' => $log->getId(),
+            'title' => htmlspecialchars($log->getMessage(), ENT_COMPAT | ENT_HTML5),
+            'start' => $log->getCreatedAt()->format('Y-m-d H:i:s'),
+            'end' => $log->getCreatedAt()->format('Y-m-d H:i:s'),
+            'url' => $router->generate('log.show', ['id' => $log->getId()]),
+            'color' => '#3498db',
+            'allDay' => false,
+        ];
+        array_push($events, $event);
+    }
+    return $events;
+}
+```
+
+```php
+// Fichier src/Controller/DemoController.php
+#[Route('/calendar', name: 'calendar')]
+public function calendar(LogRepository $logRepository, RouterInterface $router): Response
+{
+    $title = 'Calendrier';
+    $this->addLog($title, ['action' => 'show']);
+    return $this->render('demo/calendar.html.twig', [
+        'title' => $title,
+        'events' => json_encode($logRepository->findForCalendar($router))
+    ]);
+}
+
+#[Route('/calendar/edit/{id}', name: 'calendar.edit', methods: ['PUT'])]
+public function calendarEdit(?Log $log, LogRepository $logRepository, Request $request): Response
+{
+    $data = json_decode($request->getContent());
+    if (empty($data) || !isset($data->start)) {
+        return new Response('Aucune donnée', 400);
+    }
+
+    $logRepository->save($log->setCreatedAt(new \DateTimeImmutable($data->start)));
+    $this->addLog('Calendrier Edit', [
+        'action' => 'edit',
+        'entity' => 'Log',
+        'entity_id' => $log->getId(),
+        'data' => $data,
+    ]);
+    return new Response('Enregistrement modifié', 200);
+}
+```
+
+### DualListBox
+
+[Bootstrap DualListBox](https://www.virtuosoft.eu/code/bootstrap-duallistbox/)
+
+Template Twig
+
+```twig
+{% block stylesheets %}
+{{ parent() }}
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-duallistbox@3.0.9/dist/bootstrap-duallistbox.min.css" integrity="sha256-UhtNPnxCC2m5RO5wDpQbuNKQPHO5dGVhyAV4LGjRtBg=" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" integrity="sha256-pdY4ejLKO67E0CM2tbPtq1DJ3VGDVVdqAR6j3ZwdiE4=" crossorigin="anonymous">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="module" src="https://cdn.jsdelivr.net/npm/bootstrap-duallistbox@3.0.9/dist/jquery.bootstrap-duallistbox.min.js" integrity="sha256-WWR4MaxNN2zccw8rjBU8JWOcM5dV57luSalMtoiM3ss=" crossorigin="anonymous"></script>
+    <script type="module">
+		$("#users").bootstrapDualListbox({
+			nonSelectedListLabel: 'Choix',
+            selectedListLabel: 'Sélection',
+            filterTextClear: 'Supprimer le filtre',
+            filterPlaceHolder: 'Filtrer',
+            moveOnSelect: true,
+            moveAllLabel: 'Tout sélectionner',
+            removeAllLabel: 'Tout déselectionner',
+            infoText: 'Tous visibles {0}',
+            infoTextFiltered: '<span class="label label-warning">Filtré</span> {0} sur {1}',
+            infoTextEmpty: 'Vide'
+		});
+
+        var btnMoveAll = document.querySelector('button.btn.moveall.btn-default')
+        btnMoveAll.setAttribute('class', 'btn btn-sm btn-outline-secondary')
+        btnMoveAll.innerHTML = 'Tout sélectionner<i class="bi bi-arrow-right-square ms-1"></i>'
+
+        var btnRemoveAll = document.querySelector('button.btn.removeall.btn-default')
+        btnRemoveAll.setAttribute('class', 'btn btn-sm btn-outline-secondary')
+        btnRemoveAll.innerHTML = '<i class="bi bi-arrow-left-square me-1"></i>Tout désélectionner'
+
+        var btnClearLeft = document.querySelector('button.btn.clear1.pull-right.btn-default.btn-xs')
+        btnClearLeft.setAttribute('class', 'btn btn-sm btn-link text-decoration-none clear1')
+        btnClearLeft.setAttribute('title', 'Supprimer le filtre')
+        btnClearLeft.innerHTML = '<i class="bi bi-x-square text-danger"></i>'
+
+        var btnClearRight = document.querySelector('button.btn.clear2.pull-right.btn-default.btn-xs')
+        btnClearRight.setAttribute('class', 'btn btn-sm btn-link text-decoration-none clear2')
+        btnClearRight.setAttribute('title', 'Supprimer le filtre')
+        btnClearRight.innerHTML = '<i class="bi bi-x-square text-danger"></i>'
+    </script>
+{% endblock %}
 ```
 
 ### UX Autocomplete
